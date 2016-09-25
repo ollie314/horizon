@@ -32,13 +32,14 @@ LOG = logging.getLogger(__name__)
 
 
 class CreateForm(forms.SelfHandlingForm):
-    name = forms.CharField(max_length=255, label=_("Router Name"))
-    admin_state_up = forms.ChoiceField(label=_("Admin State"),
-                                       choices=[(True, _('UP')),
-                                                (False, _('DOWN'))],
-                                       required=False)
-    external_network = forms.ChoiceField(label=_("External Network"),
-                                         required=False)
+    name = forms.CharField(max_length=255, label=_("Router Name"),
+                           required=False)
+    admin_state_up = forms.ThemableChoiceField(label=_("Admin State"),
+                                               choices=[(True, _('UP')),
+                                                        (False, _('DOWN'))],
+                                               required=False)
+    external_network = forms.ThemableChoiceField(label=_("External Network"),
+                                                 required=False)
     mode = forms.ChoiceField(label=_("Router Type"))
     ha = forms.ChoiceField(label=_("High Availability Mode"))
     failure_url = 'horizon:project:routers:index'
@@ -91,11 +92,17 @@ class CreateForm(forms.SelfHandlingForm):
             params = {'name': data['name']}
             if 'admin_state_up' in data and data['admin_state_up']:
                 params['admin_state_up'] = data['admin_state_up']
+            if 'external_network' in data and data['external_network']:
+                params['external_gateway_info'] = {'network_id':
+                                                   data['external_network']}
             if (self.dvr_allowed and data['mode'] != 'server_default'):
                 params['distributed'] = (data['mode'] == 'distributed')
             if (self.ha_allowed and data['ha'] != 'server_default'):
                 params['ha'] = (data['ha'] == 'enabled')
             router = api.neutron.router_create(request, **params)
+            message = _('Router %s was successfully created.') % data['name']
+            messages.success(request, message)
+            return router
         except Exception as exc:
             if exc.status_code == 409:
                 msg = _('Quota exceeded for resource router.')
@@ -106,49 +113,16 @@ class CreateForm(forms.SelfHandlingForm):
             exceptions.handle(request, msg, redirect=redirect)
             return False
 
-        # workaround for neutron bug #1535707
-        try:
-            if ('external_network' in data and
-                    data['external_network']):
-                api.neutron.router_add_gateway(request,
-                                               router['id'],
-                                               data['external_network'])
-            message = _('Router %s was successfully created.') % data['name']
-            messages.success(request, message)
-            return router
-        except Exception:
-            try:
-                api.neutron.router_delete(request, router['id'])
-                message = _('Router %s was created but connecting to'
-                            ' an external network failed. The created'
-                            ' router has been deleted, as the overall'
-                            ' operation failed.') % data['name']
-                LOG.info(message)
-                redirect = reverse(self.failure_url)
-                exceptions.handle(request, message, redirect=redirect)
-                return False
-            except Exception:
-                message = _('Router %(name)s was created but connecting to'
-                            ' an external network failed. Attempts to'
-                            ' delete the new router also failed.'
-                            ' Router %(name)s still exists but is not connect'
-                            ' to the desired external network.') % {
-                    'name': data['name']}
-                LOG.info(message)
-                redirect = reverse(self.failure_url)
-                exceptions.handle(request, message, redirect=redirect)
-                return False
-
 
 class UpdateForm(forms.SelfHandlingForm):
     name = forms.CharField(label=_("Name"), required=False)
-    admin_state = forms.ChoiceField(choices=[(True, _('UP')),
-                                             (False, _('DOWN'))],
-                                    label=_("Admin State"))
+    admin_state = forms.ThemableChoiceField(choices=[(True, _('UP')),
+                                                     (False, _('DOWN'))],
+                                            label=_("Admin State"))
     router_id = forms.CharField(label=_("ID"),
                                 widget=forms.TextInput(
                                     attrs={'readonly': 'readonly'}))
-    mode = forms.ChoiceField(label=_("Router Type"))
+    mode = forms.ThemableChoiceField(label=_("Router Type"))
     ha = forms.BooleanField(label=_("High Availability Mode"), required=False)
 
     redirect_url = reverse_lazy('horizon:project:routers:index')

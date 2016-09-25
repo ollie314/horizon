@@ -1,9 +1,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 9.0.1.dev276\n"
+"Project-Id-Version: horizon 10.0.0.0b3.dev253\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-05-15 05:33+0000\n"
+"POT-Creation-Date: 2016-08-21 00:16+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,103 +13,6 @@ msgstr ""
 "Language: ks\n"
 "X-Generator: Zanata 3.7.3\n"
 "Plural-Forms: nplurals=1; plural=0\n"
-
-#, python-format
-msgid ""
-"\n"
-"            <a href=\"%(volume_url)s\">%(volume_label)s</a> on "
-"%(volume_device)s\n"
-"            "
-msgstr ""
-"\n"
-"            <a href=\"%(volume_url)s\">%(volume_label)s</a> on "
-"%(volume_device)s\n"
-"            "
-
-#, python-format
-msgid ""
-"\n"
-"        Other IPv6 modes: ipv6_ra_mode=%(ra_mode)s, ipv6_address_mode="
-"%(addr_mode)s\n"
-"        "
-msgstr ""
-"\n"
-"        Other IPv6 modes: ipv6_ra_mode=%(ra_mode)s, ipv6_address_mode="
-"%(addr_mode)s\n"
-"        "
-
-msgid ""
-"\n"
-"      Volume type is a type or label that can be selected at volume "
-"creation\n"
-"      time in OpenStack. It usually maps to a set of capabilities of the "
-"storage\n"
-"      back-end driver to be used for this volume. Examples: \"Performance"
-"\",\n"
-"      \"SSD\", \"Backup\", etc. This is equivalent to the\n"
-"      <tt>cinder type-create</tt> command. Once the volume type gets "
-"created,\n"
-"      click the \"View Extra Specs\" button to set up extra specs key-value\n"
-"      pair(s) for that volume type.\n"
-"     "
-msgstr ""
-"\n"
-"والیوم قِسم چُھ قِسم یا لیبِل یُس ژارنہ والیوم ہہ ژاریتھ والیوم کریشن پیٹھ  \n"
-"وَقت آپن سِٹیک مَنر۔ یہ چُھ عام پیٹھ نَقشہ کران کَصوصیت سِٹوریج \n"
-"بیک اینڈ ڈریور یُس اِستعمال چُھ والیوم خآطرہ ۔ مِثآل : \"Performance\",\n"
-"      \"SSD\", \"Backup\", etc. This is equivalent to the\n"
-"      <tt>cinder type-create</tt> command. یَلہ والیوم قِسم بَنہ,\n"
-"      click the \"View Extra Specs\" بَٹن علاوہ سِپیکس سیٹ کرنہ خآطرہ کی-"
-"ویلیو \n"
-"    خآطرہجورہ   والیوم قِسم.\n"
-"     "
-
-msgid ""
-"\n"
-"    Each QoS Specs entity will have a \"Consumer\" value which indicates "
-"where the\n"
-"    administrator would like the QoS policy to be enforced. This value can "
-"be \"front-end\"\n"
-"    (Nova Compute), \"back-end\" (Cinder back-end), or \"both\".\n"
-"    "
-msgstr ""
-"\n"
-"ہر کاہ QoSسِپیکس اییٹینٹی  آسہ \"Consumer\" ویلیو یُس نِشآن دِہ کرہ کتہ\n"
-" اِنتِظامیہ  یَژہ  پآلیسی گژہ لاگو ۔ یہ ویلیو ہیکہ   \"front-end\"\n"
-"      (Nova Compute), \"back-end\" (Cinder back-end), or \"both\".\n"
-"    "
-
-msgid ""
-"\n"
-"    The status of a volume is normally managed automatically.  In some "
-"circumstances an\n"
-"    administrator may need to explicitly update the status value.  This is "
-"equivalent to\n"
-"    the <tt>cinder reset-state</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-"والیوم سِٹیٹس چُہ پٲنے مینی گژہان۔  کونہ سورتس مَنز \n"
-" اِنتِظامیہ یا ہیکو اَپڈیٹ کریتھ سِٹیٹس ویلیو یہ چُھ برابر \n"
-" <tt>سِندر سِنیپ شآٹس-ریسیٹ -سِٹیٹ</tt> کمانڈ.\n"
-"    "
-
-msgid ""
-"\n"
-"    The status of a volume snapshot is normally managed automatically.  In "
-"some circumstances\n"
-"    an administrator may need to explicitly update the status value. This is "
-"equivalent to\n"
-"    the <tt>cinder snapshot-reset-state</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-"    The status of a volume snapshot is normally managed automatically.  In "
-"some circumstances\n"
-"    an administrator may need to explicitly update the status value. This is "
-"equivalent to\n"
-"    the <tt>cinder snapshot-reset-state</tt> command.\n"
-"    "
 
 msgid " - End"
 msgstr "خَتم"
@@ -232,9 +135,6 @@ msgstr ""
 "تُہندِس کھاتس مَنز۔ ڈیٹا گژہ آسون جمع ٲسُن کنٹینر مَنزتاکہ توہیہ آسہ اَکھ کنٹینر "
 "تُہندِس کھاتس مَنز ڈیٹا اَپلوڈ برونٹھ"
 
-msgid "A image or external image location must be specified."
-msgstr " وَضاحت کریو دونوے شکل تہ نیبرِم شکل جٲے"
-
 msgid "A local environment to upload."
 msgstr "اَکھ لوکل ماحول اَپلوڈ کئرنہٕ خآطرہ"
 
@@ -243,14 +143,6 @@ msgstr "لوکل شکل اَپلوڈ کرنہ خبببآطرہ"
 
 msgid "A local template to upload."
 msgstr " اَکھ لوکل ٹیمپلیٹ  اَپلوڈ کئرنہٕ خآطرہ"
-
-msgid ""
-"A more specific rule affects a portion of this traffic so a rule cannot be "
-"automatically generated to control the behavior of the entire source/"
-"destination combination."
-msgstr ""
-"اَکھ زیادہ  وَضاحت کئورمُت رول کئرہ اثر اَکس حِصس یَتھ ٹریفِکس تہِ ہیکئو نہٕ پآنے "
-"بَناویتھ  آٹومیٹِک  کئنٹرول کئریتھ طریقہٕ  سئوری /ضریعہٖ مَنزل ئلہٕ"
 
 msgid "A new uploaded file will replace the content of the current object"
 msgstr "اَکھ نوہ اَپلوڈیو فآیل رَٹہ جآے حآلی ٲبجیکٹ کین کنٹینٹ ہِنز"
@@ -307,9 +199,6 @@ msgstr "کئم لاگ"
 msgid "Action for the firewall rule"
 msgstr "کٔم فٲئر وال خٲظرہ"
 
-msgid "Action:"
-msgstr "کئم:"
-
 msgctxt "Current status of a Firewall"
 msgid "Active"
 msgstr "چآلو"
@@ -323,14 +212,6 @@ msgid "Active"
 msgstr "چآلو"
 
 msgctxt "Current status of a Pool"
-msgid "Active"
-msgstr "چآلو"
-
-msgctxt "Current status of a VPN Service"
-msgid "Active"
-msgstr "چآلو"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Active"
 msgstr "چآلو"
 
@@ -426,9 +307,6 @@ msgstr "جمع کئریئو پٲلیسی"
 
 msgid "Add Pool"
 msgstr "جمع کئریو پول"
-
-msgid "Add Router Rule"
-msgstr "جمع کئریو  راوٹر رول"
 
 msgid "Add Rule"
 msgstr "جمع کریو رول"
@@ -816,9 +694,6 @@ msgstr "CIDR کئریو وَضاحت"
 msgid "CPU time used"
 msgstr "CPU وَقت اِستعمال"
 
-msgid "Can not specify both image and external image location."
-msgstr "ہیکو نہ وَضاحت کریتھ دونوے شکل تہ نیبرِم شکل جٲے"
-
 msgid "Cancel"
 msgstr "مَنسوخ"
 
@@ -892,14 +767,6 @@ msgstr ""
 " توہیہ ہیکو بدلاویتھNIC آرڈر ڈریگ تہ ڈراپ سیتھ اریو رول  دَستِیاب رولز مَنز "
 "ژارنہ خآطرہ رول پُش بَٹن سیتھ یا ڈریگ تھ ڈراپ، "
 
-msgid ""
-"Choose rule(s) from Available Rules to Selected Rule by push button or drag "
-"and drop,\n"
-"you may change their order by drag and drop as well. "
-msgstr ""
-"ژاریو رول  دَستِیاب رولز مَنز ژارنہ خآطرہ رول پُش بَٹن سیتھ یا ڈریگ تھ ڈراپ، \n"
-" توہیہ ہیکو بدلاویتھ آرڈر ڈریگ تہ ڈراپ سیتھ"
-
 msgid "Choose the flavor to launch."
 msgstr "ژاریئو اَکھ فِلوئر لانچ خآطرہ"
 
@@ -960,9 +827,6 @@ msgstr "کئنفئرم یا واپس تَبدیل کئریو ریسآئز /مئ�
 
 msgid "Confirm new password"
 msgstr "کئنفئرم کئریو نئوہ  پآس وئرڈ "
-
-msgid "Conflicting Rule"
-msgstr "فسآد رول :"
 
 msgid "Connection Limit"
 msgstr "کئنیکشن حد"
@@ -1084,17 +948,6 @@ msgstr "بَنایئو گروپ"
 
 msgid "Create Host Aggregate"
 msgstr "بَنایئو ہوسٹ  ایگرِگیٹ"
-
-msgid ""
-"Create IPSec Site Connection for current project.\n"
-"\n"
-"Assign a name and description for the IPSec Site Connection. All fields in "
-"this tab are required."
-msgstr ""
-"بَنایئو IP سیک سآئٹ کئنیکشن حآلی پروجیکٹ خآطرہ \n"
-"\n"
-"دِیئو اَکھ نآو تہٕ تَفصیل IP سیک سآئٹ کئنیکشن خآطرہ ۔ سآری فیلڈس یَتھ ٹیبس مَنز "
-"چھ  ضروری"
 
 msgid "Create Image"
 msgstr "بَنایئو شکل"
@@ -1259,10 +1112,6 @@ msgid "Created"
 msgstr "بَناومُت"
 
 msgctxt "Current status of a Pool"
-msgid "Created"
-msgstr "بَناومُت"
-
-msgctxt "Current status of a VPN Service"
 msgid "Created"
 msgstr "بَناومُت"
 
@@ -1461,9 +1310,6 @@ msgctxt "Task status of an Instance"
 msgid "Deleting"
 msgstr "مِٹاوان"
 
-msgid "Deny"
-msgstr "منع"
-
 msgid "Description"
 msgstr "تَفصیل"
 
@@ -1502,9 +1348,6 @@ msgstr "مَنزل آبجیکٹ نآو"
 
 msgid "Destination port (integer in [1, 65535] or range in a:b)"
 msgstr "مَنزِل پورٹ  (اِنٹیجر [1, 65535] or range in a:b)"
-
-msgid "Destination:"
-msgstr "مِنزِل:"
 
 msgid "Detached"
 msgstr "اَلگ کئریتھ"
@@ -1678,14 +1521,6 @@ msgid "Down"
 msgstr "ڈاون"
 
 msgctxt "Current status of a Pool"
-msgid "Down"
-msgstr "ڈاون"
-
-msgctxt "Current status of a VPN Service"
-msgid "Down"
-msgstr "ڈاون"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Down"
 msgstr "ڈاون"
 
@@ -1885,9 +1720,6 @@ msgstr "داخل کریو ICMP کوڈ یَتھ رینج مَنز  (-1: 255)"
 msgid "Enter a value for ICMP type in the range (-1: 255)"
 msgstr "داخل کریو ICMP رینج یَتھ رینج مَنز  (-1: 255)"
 
-msgid "Enter an integer value between 0 and 255 (or -1 which means wildcard)."
-msgstr "داخل کریو اَکھ اینٹیجر  ویلیو ۰ تہ ۲۵۵ مَنز(یا -۱ یَمُک مَطلب چُھ)"
-
 msgid "Enter an integer value between 1 and 65535."
 msgstr "داخل کریو اَکھ اینٹیجر  ویلیو ۱ تہ ۶۵۵۳۵ مَنز"
 
@@ -1942,19 +1774,11 @@ msgctxt "Current status of a Pool"
 msgid "Error"
 msgstr "غَلطی"
 
-msgctxt "Current status of a VPN Service"
-msgid "Error"
-msgstr "غَلطی"
-
 msgctxt "Current status of a Volume"
 msgid "Error"
 msgstr "غَلطی"
 
 msgctxt "Current status of a Volume Backup"
-msgid "Error"
-msgstr "غَلطی"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Error"
 msgstr "غَلطی"
 
@@ -2062,10 +1886,6 @@ msgstr "Failed to add %s project groups and update project quotas."
 msgid "Failed to add agent %(agent_name)s for network %(network)s."
 msgstr ""
 "نا کامیاب ایجنٹ جمع کئرنہٕ خآطرہ %(agent_name)s نیٹ وئرک خآطرہ   %(network)s."
-
-#, python-format
-msgid "Failed to add router rule %s"
-msgstr "ناکامیاب  راوٹر رول جمع کئرنہٕ خآطرہ%s"
 
 #, python-format
 msgid "Failed to add_interface: %s"
@@ -2458,13 +2278,6 @@ msgstr ""
 "گروپس چہ  یوان  اِستعمال  کئرنہ ایکسس مینیج کرنہ خآطرہ تہ رول ایسآین کرنہ "
 "خآطرہ جَلدی ۔ گروپ بَناونہ خآطرہ، شیریو گروپ یوزر جمع کرنہ خآطرہ"
 
-msgid ""
-"Groups are used to manage access and assign roles to multiple users at once. "
-"Edit the group to add users."
-msgstr ""
-"گروپس چہ  یوان  اِستعمال  کئرنہ ایکسس مینیج کرنہ خآطرہ تہ رول ایسآین کرنہ "
-"خآطرہ جَلدی ۔ گروپ بَناونہ خآطرہ، شیریو گروپ یوزر جمع کرنہ خآطرہ"
-
 #. Translators: High Availability mode of Neutron router
 msgid "HA mode"
 msgstr "HA موڈ"
@@ -2784,9 +2597,6 @@ msgstr "اِنجیکٹِڈ فآئل پآتھ بئٹس"
 msgid "Injected Files"
 msgstr "اِنجیکٹِڈ فآئل"
 
-msgid "Input must be in CIDR format"
-msgstr "اِنپُٹ گئژہ آسون CIDR فارمیٹس ۄمَنز"
-
 msgid "Insert Rule"
 msgstr "ترایو رول"
 
@@ -2897,12 +2707,6 @@ msgstr "کی جورہ چھ کتھ کن کریو لاگِن تُہدِس اِنس
 
 msgid "Key Size (bits)"
 msgstr "کئی سآئز (بِٹس)"
-
-msgid ""
-"Key pair name may only contain letters, numbers, underscores, spaces and "
-"hyphens."
-msgstr ""
-"حروف، اعداد ، انڈر سکور ، خالی جگہبہ  ڈیش کی علامت کی جور نآو مَنز ہیکہ آسیتھ"
 
 msgid "Key pair to use for authentication."
 msgstr "کئی جورہ اِستعمال کئرنہٖ خآطرہ آتھینٹِکیشن"
@@ -3382,9 +3186,6 @@ msgstr "نئوہ سآئز گئژہ آسون بوڈہ حآلی سآئز خوتہ�
 msgid "Next"
 msgstr "بیاکھ "
 
-msgid "Next Hops"
-msgstr "بیاکھ ہاپس"
-
 msgid "No"
 msgstr "نہِ"
 
@@ -3645,9 +3446,6 @@ msgstr "کھولیو پورٹ / پورٹ رینج"
 msgid "Optional Parameters"
 msgstr "آپشنل پیرامینٹرس"
 
-msgid "Optional: Next Hop Addresses (comma delimited)"
-msgstr "آپشنل: بیاکھ ہاپ ایڈریس  (کامہٕ محدود نہٖ)"
-
 msgid "Optionally, you may choose to create a new volume."
 msgstr "آپشنلئی، توہیہٕ ہیکئو ژاریتھ بَناونہٕ خآطرہ اَکھ نئوہ والیوم"
 
@@ -3727,9 +3525,6 @@ msgstr "پیرڈ"
 
 msgid "Period:"
 msgstr "پیرڈ"
-
-msgid "Permit"
-msgstr "اِجازت"
 
 msgid "Physical Network"
 msgstr "فیزیکل نیٹ وئرک"
@@ -4053,9 +3848,6 @@ msgstr "دَرکواستID "
 msgid "Required for APP_COOKIE persistence; Ignored otherwise."
 msgstr " ضروری APP_COOKIE  پرسیسٹنس خآطرہ؛ نَمر اَنداز کریو نَتہ "
 
-msgid "Reset to Default"
-msgstr "ڈیفالٹ کئریو ری سیٹ"
-
 msgid "Resize"
 msgstr "ریسآئز"
 
@@ -4162,30 +3954,11 @@ msgstr "راوٹر  ID"
 msgid "Router Name"
 msgstr "راوٹر نٲو"
 
-msgid "Router Rule Grid"
-msgstr "راوٹر رول گریڈ"
-
-msgid "Router Rules"
-msgstr "راوٹر رولز"
-
-msgid "Router Rules Grid"
-msgstr "راوٹر رولز گریڈ"
-
 msgid "Router Type"
 msgstr "راوٹر قِسم"
 
-msgid "Router rule added"
-msgstr " راوٹر رول جمع کئریتھ"
-
 msgid "Routers"
 msgstr "راوٹرس"
-
-msgid ""
-"Routing rules to apply to router. Rules are matched by most specific source "
-"first and then by most specific destination."
-msgstr ""
-"راوٹِنگ رولز یِم راوٹرس پئھ لاگو گئزہن ۔ رولز چھ رئلان واریاہ وَضاحت کئرمِت "
-"ضریعہٖ سیتھ گوڈہ تہٕ پَتہٕ خآص ؤضاحت مَنزِل سیتھ"
 
 msgid "Rule"
 msgstr "رول"
@@ -4201,9 +3974,6 @@ msgstr "%(policy)s رول%(rule)s  ٲو کئڈنئ کآمیاب سٲن پٲلی�
 #, python-format
 msgid "Rule %s was successfully updated."
 msgstr "رئول  %s  گئو کامیابی سآن اَپڈیٹ  "
-
-msgid "Rule Conflict"
-msgstr "رول کئنفلیکٹ"
 
 msgid "Rule:"
 msgstr "رول"
@@ -4469,9 +4239,6 @@ msgstr "بئگراویتھ"
 msgid "Shared Storage"
 msgstr "بئگراویتھ ہوسٹ"
 
-msgid "Shared with Me"
-msgstr "بئگرایئو میہ سیتھ"
-
 msgid "Sign Out"
 msgstr "سآئن آوٹ"
 
@@ -4517,12 +4284,6 @@ msgstr "سِنیپ شآٹس ضریعہٕ کئریو وَضاحت"
 msgid "Something went wrong!"
 msgstr "کیا تھان گئو غَلط"
 
-msgid "Source"
-msgstr "ضریعہٖ "
-
-msgid "Source CIDR"
-msgstr "ضریعہٖ CIDR"
-
 msgid "Source IP"
 msgstr "سورس   IP"
 
@@ -4547,9 +4308,6 @@ msgstr "سورس پورٹ /پورٹ رینج"
 
 msgid "Source port (integer in [1, 65535] or range in a:b)"
 msgstr "سورس پورٹ (اِنٹیجر  [1, 65535] or range in a:b)"
-
-msgid "Source:"
-msgstr "ضریعہٕ :"
 
 msgid ""
 "Specifies how IPv6 addresses and additional information are configured. We "
@@ -4690,14 +4448,6 @@ msgstr "سب نیٹ نٲو"
 
 msgid "Subnet list can not be retrieved."
 msgstr "سب نیٹ  لِسٹ ہیکو نہٖ واپس اَنیتھ"
-
-#, python-format
-msgid "Subnet: %(dest_subnetname)s"
-msgstr "سب نیٹ: %(dest_subnetname)s"
-
-#, python-format
-msgid "Subnet: %(row_source_subnetname)s"
-msgstr "سب نیٹ: %(row_source_subnetname)s"
 
 msgid "Subnets"
 msgstr "سب نیٹس"
@@ -4890,14 +4640,8 @@ msgstr ""
 msgid "The Aggregate was updated."
 msgstr " ایگریگیٹ آو اَپڈیٹ کئرنہٕ"
 
-msgid "The ICMP code is invalid."
-msgstr "کوڈ چُھ نہ واجِب  ICMP "
-
 msgid "The ICMP code not in range (-1, 255)"
 msgstr "کوڈ چُھ نہ چُھ نہ رینج مَنز  ICMP  (-1, 255)"
-
-msgid "The ICMP type is invalid."
-msgstr "قِسم چُھ نہ واجِب  ICMP "
 
 msgid "The ICMP type not in range (-1, 255)"
 msgstr "قِسم چُھ نہ رینج مَنز  ICMP  (-1, 255)"
@@ -4951,10 +4695,6 @@ msgstr ""
 "The flavor '%(flavor)s' is too small for requested image.\n"
 "Minimum requirements: %(min_ram)s MB of RAM and %(min_disk)s GB of Root Disk."
 
-#, python-format
-msgid "The instance is preparing the live migration to host \"%s\"."
-msgstr "اِنسٹنس چھ تَیآری کران لآیو مےگریشن ہوسٹ خآطرہ \"%s\""
-
 msgid "The instance password encrypted with your public key."
 msgstr "اِنسٹنس پٲس ورڈ چُھ اینکریپٹ تُہندِ عام کی سیتھ"
 
@@ -4984,11 +4724,6 @@ msgid ""
 "The name of the physical network over which the virtual network is "
 "implemented."
 msgstr "فِیزیکل  نیٹورک یَمہ سیتھ ورچُیل نیٹورک یہ لاگو کرنہ نآو "
-
-msgid ""
-"The next hop addresses can be used to override the router used by the client."
-msgstr ""
-"بیاکھ ہاپ ایڈریس ہیکئو اِستعمال کئریتھ اوور رآئڈ کئرنہٕ خآطرہ  کئلائنٹ سیتھ"
 
 msgid "The page you were looking for doesn't exist"
 msgstr "پیج یُس توہِیہٕ ژہانڈان چھو چُھ نہٖ موجود"
@@ -5073,9 +4808,6 @@ msgid ""
 "This is required for operations to be performed throughout the lifecycle of "
 "the stack"
 msgstr "یہٕ چُھ ضروری اپریشن خآطرہ یُس کئرنہٕ یئہٕ   سِٹیک کئس لائف سآئکل مَنز"
-
-msgid "This name is already taken."
-msgstr "نآو گوڈے آمُت"
 
 msgid ""
 "This volume is currently attached to an instance. In some cases, creating a "
@@ -5363,9 +5095,6 @@ msgstr "ناقابِل پول مِٹاونہٕ  ٕ خآطرہ %s"
 #, python-format
 msgid "Unable to delete router \"%s\""
 msgstr "نا قابِل راوٹر مِٹاونہٕ خآطرہ\"%s\""
-
-msgid "Unable to delete router rule."
-msgstr "نا قابِل راوٹر کائدہ مِٹاونہٕ ٕ خآطرہ "
 
 #, python-format
 msgid "Unable to delete rule. %s"
@@ -6405,14 +6134,6 @@ msgstr "قیمت (Avg)"
 
 msgid "Value:"
 msgstr "ویلیو:"
-
-#, python-format
-msgid ""
-"Version: %(version_info)s\n"
-"      "
-msgstr ""
-"Version: %(version_info)s\n"
-"      "
 
 msgid "View Container"
 msgstr "وِچھیو کنٹینر "

@@ -500,14 +500,14 @@ class ComputeApiTests(test.APITestCase):
                                             flavor.disk)
 
         self.assertIsInstance(api_flavor, type(flavor))
-        self.assertEqual(api_flavor.name, flavor.name)
-        self.assertEqual(api_flavor.ram, flavor.ram)
-        self.assertEqual(api_flavor.vcpus, flavor.vcpus)
-        self.assertEqual(api_flavor.disk, flavor.disk)
-        self.assertEqual(api_flavor.ephemeral, 0)
-        self.assertEqual(api_flavor.swap, 0)
-        self.assertEqual(api_flavor.is_public, True)
-        self.assertEqual(api_flavor.rxtx_factor, 1)
+        self.assertEqual(flavor.name, api_flavor.name)
+        self.assertEqual(flavor.ram, api_flavor.ram)
+        self.assertEqual(flavor.vcpus, api_flavor.vcpus)
+        self.assertEqual(flavor.disk, api_flavor.disk)
+        self.assertEqual(0, api_flavor.ephemeral)
+        self.assertEqual(0, api_flavor.swap)
+        self.assertEqual(True, api_flavor.is_public)
+        self.assertEqual(1, api_flavor.rxtx_factor)
 
     def test_flavor_delete(self):
         flavor = self.flavors.first()
@@ -521,20 +521,17 @@ class ComputeApiTests(test.APITestCase):
 
         self.assertIsNone(api_val)
 
+    @test.create_stubs({api.nova: ('flavor_access_list',)})
     def test_flavor_access_list(self):
         flavor_access = self.flavor_access.list()
         flavor = [f for f in self.flavors.list() if f.id ==
                   flavor_access[0].flavor_id][0]
 
-        novaclient = self.stub_novaclient()
-        novaclient.flavors = self.mox.CreateMockAnything()
-        novaclient.flavor_access = self.mox.CreateMockAnything()
-        novaclient.flavor_access.list(flavor=flavor).AndReturn(flavor_access)
+        api.nova.flavor_access_list(self.request, flavor)\
+            .AndReturn(flavor_access)
 
         self.mox.ReplayAll()
-
         api_flavor_access = api.nova.flavor_access_list(self.request, flavor)
-
         self.assertEqual(len(flavor_access), len(api_flavor_access))
         for access in api_flavor_access:
             self.assertIsInstance(access, nova_flavor_access.FlavorAccess)

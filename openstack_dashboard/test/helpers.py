@@ -41,6 +41,7 @@ from keystoneclient.v2_0 import client as keystone_client
 import mock
 from mox3 import mox
 from neutronclient.v2_0 import client as neutron_client
+from novaclient import api_versions as nova_api_versions
 from novaclient.v2 import client as nova_client
 from openstack_auth import user
 from openstack_auth import utils
@@ -185,17 +186,21 @@ class TestCase(horizon_helpers.TestCase):
         # For some magical reason we need a copy of this here.
         self.factory = RequestFactoryWithMessages()
 
-    def _setup_user(self):
+    def _setup_user(self, **kwargs):
         self._real_get_user = utils.get_user
         tenants = self.context['authorized_tenants']
-        self.setActiveUser(id=self.user.id,
-                           token=self.token,
-                           username=self.user.name,
-                           domain_id=self.domain.id,
-                           user_domain_name=self.domain.name,
-                           tenant_id=self.tenant.id,
-                           service_catalog=self.service_catalog,
-                           authorized_tenants=tenants)
+        base_kwargs = {
+            'id': self.user.id,
+            'token': self.token,
+            'username': self.user.name,
+            'domain_id': self.domain.id,
+            'user_domain_name': self.domain.name,
+            'tenant_id': self.tenant.id,
+            'service_catalog': self.service_catalog,
+            'authorized_tenants': tenants
+        }
+        base_kwargs.update(kwargs)
+        self.setActiveUser(**base_kwargs)
 
     def _setup_request(self):
         super(TestCase, self)._setup_request()
@@ -231,6 +236,7 @@ class TestCase(horizon_helpers.TestCase):
                              domain_id=domain_id,
                              user_domain_name=user_domain_name,
                              tenant_id=tenant_id,
+                             tenant_name=tenant_name,
                              service_catalog=service_catalog,
                              roles=roles,
                              enabled=enabled,
@@ -437,6 +443,12 @@ class APITestCase(TestCase):
     def stub_novaclient(self):
         if not hasattr(self, "novaclient"):
             self.mox.StubOutWithMock(nova_client, 'Client')
+            # mock the api_version since MockObject.__init__ ignores it.
+            # The preferred version in the api.nova code is 2 but that's
+            # equivalent to 2.1 now and is the base version that's backward
+            # compatible to 2.0 anyway.
+            api_version = nova_api_versions.APIVersion('2.1')
+            nova_client.Client.api_version = api_version
             self.novaclient = self.mox.CreateMock(nova_client.Client)
         return self.novaclient
 
@@ -500,6 +512,17 @@ class APITestCase(TestCase):
             self.ceilometerclient = self.mox.\
                 CreateMock(ceilometer_client.Client)
         return self.ceilometerclient
+
+
+# Need this to test both Glance API V1 and V2 versions
+class ResetImageAPIVersionMixin(object):
+    def setUp(self):
+        super(ResetImageAPIVersionMixin, self).setUp()
+        api.glance.VERSIONS.clear_active_cache()
+
+    def tearDown(self):
+        api.glance.VERSIONS.clear_active_cache()
+        super(ResetImageAPIVersionMixin, self).tearDown()
 
 
 @unittest.skipUnless(os.environ.get('WITH_SELENIUM', False),

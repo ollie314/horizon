@@ -100,6 +100,9 @@ module.exports = function (config) {
       xstaticPath + 'angular_lrdragndrop/data/lrdragndrop.js',
       xstaticPath + 'spin/data/spin.js',
       xstaticPath + 'spin/data/spin.jquery.js',
+      xstaticPath + 'tv4/data/tv4.js',
+      xstaticPath + 'objectpath/data/ObjectPath.js',
+      xstaticPath + 'angular_schema_form/data/schema-form.js',
 
       // TODO: These should be mocked.  However, that could be complex
       // and there's less harm in exposing these directly.  These are
@@ -184,7 +187,7 @@ module.exports = function (config) {
     // Places coverage report in HTML format in the subdirectory below.
     coverageReporter: {
       type: 'html',
-      dir: './coverage-karma/'
+      dir: '../cover/openstack_dashboard'
     },
 
     // Coverage threshold values.

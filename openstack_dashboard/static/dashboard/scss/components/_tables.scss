@@ -51,6 +51,20 @@
   .normal_column ul {
     padding: 0;
   }
+
+  .dl-horizontal {
+    margin-bottom: 0;
+
+    @media (min-width: $grid-float-breakpoint) {
+      dt {
+        width: ($dl-horizontal-offset/2) - $padding-large-vertical;
+      }
+
+      dd {
+        margin-left: $dl-horizontal-offset/2;
+      }
+    }
+  }
 }
 
 // Sometimes the header is empty, lets keep the same look either way
@@ -74,20 +88,19 @@
   display: inline;
 }
 
-.tablesorter-headerAsc:after,
-.tablesorter-headerDesc:after {
-  @include fa-icon();
-  font-size: $font-size-h4;
-  color: $gray-light;
-  float: right;
+.tablesorter-headerAsc,
+.tablesorter-headerDesc {
+  .table-sort-indicator {
+    @extend .fa;
+  }
 }
 
-.tablesorter-headerAsc:after {
-  content: $fa-var-caret-up;
+.tablesorter-headerAsc .table-sort-indicator {
+  @extend .fa-caret-up;
 }
 
-.tablesorter-headerDesc:after {
-  content: $fa-var-caret-down;
+.tablesorter-headerDesc .table-sort-indicator {
+  @extend .fa-caret-down;
 }
 
 ///*
@@ -103,18 +116,10 @@
     td {
       background-color: $table-bg-odd;
     }
-
-    &.status_unknown td {
-      background-color: lighten($brand-warning, 6%);
-    }
   }
   tr.even {
     td {
       background-color: inherit;
-    }
-
-    &.status_unknown td {
-      background-color: lighten($brand-warning, 10%);
     }
   }
 
@@ -123,11 +128,6 @@
   tr.even:hover td,
   tr:hover th {
     background-color: $table-bg-hover;
-  }
-
-  tr.odd.status_unknown:hover td,
-  tr.even.status_unknown:hover td {
-    background-color: lighten($brand-warning, 6%);
   }
 }
 
@@ -141,7 +141,11 @@
   white-space: nowrap;
 }
 
-// Specialness for table pending bars
-.status_unknown .horizon-pending-bar-icon {
-  color: $text-color;
+// Make sure long UUIDs, names etc. don't force the table outside a
+// modal, by forcing a word break. The 'td' specificity is required
+// because the class is applied in a column, but we don't want the
+// <th> to wrap.
+// See launchpad bugs 1565724 && 1584785
+td.word-break {
+  word-break: break-all;
 }

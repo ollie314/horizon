@@ -7,8 +7,11 @@
   </div>
 
   <div class="modal-body">
+
+  <div class="alert alert-danger error-message" ng-show="viewModel.hasError" ng-bind="viewModel.errorMessage"></div>
+
     <div class="row">
-      <div class="col-xs-12 col-sm-3">
+      <div class="col-xs-12 col-sm-3 wizard-navigation">
         <button type="button" data-toggle="collapse"
                 data-target="#wizard-side-nav" aria-expanded="false"
                 class="navbar-toggle btn btn-default collapsed wizard-nav-toggle">
@@ -36,7 +39,7 @@
         </div>
       </div>
 
-      <div class="col-xs-12 col-sm-9">
+      <div class="col-xs-12 col-sm-9 wizard-steps">
         <div class="step"
           ng-repeat="step in steps"
           ng-show="currentIndex===$index">
@@ -46,14 +49,14 @@
           </ng-include>
         </div>
       </div>
-
-      <help-panel>
-        <ng-include src="step.helpUrl"
-                    ng-repeat="step in steps"
-                    ng-show="currentIndex===$index"></ng-include>
-      </help-panel>
-
     </div>
+
+    <help-panel class="wizard-help">
+      <ng-include src="step.helpUrl"
+                  ng-repeat="step in steps"
+                  ng-show="currentIndex===$index"></ng-include>
+    </help-panel>
+
   </div>
 
   <div class="modal-footer">
@@ -65,14 +68,16 @@
 
     <button type="button" class="btn btn-default back"
       ng-click="switchTo(currentIndex - 1)"
-      ng-disabled="currentIndex===0">
+      ng-disabled="currentIndex===0"
+      ng-show="steps.length > 1">
       <span ng-class="::viewModel.btnIcon.back||'fa fa-angle-left'"></span>
       <span ng-bind="::viewModel.btnText.back"></span>
     </button>
 
     <button type="button" class="btn btn-default next"
       ng-click="switchTo(currentIndex + 1)"
-      ng-disabled="currentIndex===steps.length - 1">
+      ng-disabled="currentIndex===steps.length - 1"
+      ng-show="steps.length > 1">
       <span ng-bind="::viewModel.btnText.next"></span>
       <span ng-class="::viewModel.btnIcon.next||'fa fa-angle-right'"></span>
     </button>
@@ -80,10 +85,12 @@
     <button type="button" class="btn btn-primary finish"
       ng-click="viewModel.onClickFinishBtn()"
       ng-disabled="wizardForm.$invalid||viewModel.isSubmitting">
-      <span ng-class="::viewModel.btnIcon.finish||'fa fa-check'"></span>
+      <span class="fa"
+        ng-class="viewModel.isSubmitting ? 'fa-spinner fa-spin' : 
+          (viewModel.btnIcon.finish || 'fa-check')">
+      </span>
       <span ng-bind="::viewModel.btnText.finish"></span>
     </button>
   </div>
 
-  <div class="error-message" ng-show="viewModel.hasError" ng-bind="viewModel.errorMessage"></div>
 </div>

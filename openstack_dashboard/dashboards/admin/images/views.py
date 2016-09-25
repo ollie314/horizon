@@ -20,9 +20,11 @@ import logging
 
 from oslo_utils import units
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
+from django.views import generic
 
 from horizon import exceptions
 from horizon import messages
@@ -40,7 +42,12 @@ from openstack_dashboard.dashboards.admin.images \
 LOG = logging.getLogger(__name__)
 
 
+class AngularIndexView(generic.TemplateView):
+    template_name = 'angular.html'
+
+
 class IndexView(tables.DataTableView):
+    DEFAULT_FILTERS = {'is_public': None}
     table_class = project_tables.AdminImagesTable
     template_name = 'admin/images/index.html'
     page_title = _("Images")
@@ -51,13 +58,28 @@ class IndexView(tables.DataTableView):
     def has_more_data(self, table):
         return self._more
 
+    def needs_filter_first(self, table):
+        return self._needs_filter_first
+
     def get_data(self):
         images = []
+
         if not policy.check((("image", "get_images"),), self.request):
             msg = _("Insufficient privilege level to retrieve image list.")
             messages.info(self.request, msg)
             return images
         filters = self.get_filters()
+
+        filter_first = getattr(settings, 'FILTER_DATA_FIRST', {})
+        if filter_first.get('admin.images', False) and \
+                len(filters) == len(self.DEFAULT_FILTERS):
+            self._prev = False
+            self._more = False
+            self._needs_filter_first = True
+            return images
+
+        self._needs_filter_first = False
+
         prev_marker = self.request.GET.get(
             project_tables.AdminImagesTable._meta.prev_pagination_param, None)
 
@@ -97,7 +119,7 @@ class IndexView(tables.DataTableView):
         return images
 
     def get_filters(self):
-        filters = {'is_public': None}
+        filters = self.DEFAULT_FILTERS.copy()
         filter_field = self.table.get_filter_field()
         filter_string = self.table.get_filter_string()
         filter_action = self.table._meta._filter_action

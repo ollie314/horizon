@@ -28,6 +28,7 @@ class SwiftRestTestCase(test.TestCase):
         self._containers = TEST.containers.list()
         self._objects = TEST.objects.list()
         self._folder = TEST.folder.list()
+        self._folder_alt = TEST.folder_alt.list()
         self._subfolder = TEST.subfolder.list()
 
     #
@@ -39,9 +40,8 @@ class SwiftRestTestCase(test.TestCase):
         nc.swift_get_capabilities.return_value = {'swift': {'version': '1.0'}}
         response = swift.Info().get(request)
         self.assertStatusCode(response, 200)
-        self.assertEqual(response.json, {
-            'info': {'swift': {'version': '1.0'}}
-        })
+        self.assertEqual({'info': {'swift': {'version': '1.0'}}},
+                         response.json)
         nc.swift_get_capabilities.assert_called_once_with(request)
 
     #
@@ -53,9 +53,9 @@ class SwiftRestTestCase(test.TestCase):
         nc.swift_get_containers.return_value = (self._containers, False)
         response = swift.Containers().get(request)
         self.assertStatusCode(response, 200)
-        self.assertEqual(response.json['items'][0]['name'],
-                         u'container one%\u6346')
-        self.assertEqual(response.json['has_more'], False)
+        self.assertEqual(u'container one%\u6346',
+                         response.json['items'][0]['name'])
+        self.assertEqual(False, response.json['has_more'])
         nc.swift_get_containers.assert_called_once_with(request)
 
     #
@@ -76,8 +76,8 @@ class SwiftRestTestCase(test.TestCase):
         request = self.mock_rest_request(body='{}')
         response = swift.Container().post(request, 'spam')
         self.assertStatusCode(response, 201)
-        self.assertEqual(response['location'],
-                         u'/api/swift/containers/spam')
+        self.assertEqual(u'/api/swift/containers/spam',
+                         response['location'])
         nc.swift_create_container.assert_called_once_with(
             request, 'spam', metadata={}
         )
@@ -87,8 +87,8 @@ class SwiftRestTestCase(test.TestCase):
         request = self.mock_rest_request(body='{"is_public": false}')
         response = swift.Container().post(request, 'spam')
         self.assertStatusCode(response, 201)
-        self.assertEqual(response['location'],
-                         u'/api/swift/containers/spam')
+        self.assertEqual(u'/api/swift/containers/spam',
+                         response['location'])
         nc.swift_create_container.assert_called_once_with(
             request, 'spam', metadata={'is_public': False}
         )
@@ -117,15 +117,27 @@ class SwiftRestTestCase(test.TestCase):
     @mock.patch.object(swift.api, 'swift')
     def test_objects_get(self, nc):
         request = self.mock_rest_request(GET={})
-        nc.swift_get_objects.return_value = (self._objects, False)
+        nc.swift_get_objects.return_value = (
+            self._objects + self._folder, False
+        )
         response = swift.Objects().get(request, u'container one%\u6346')
         self.assertStatusCode(response, 200)
-        self.assertEqual(len(response.json['items']), 4)
-        self.assertEqual(response.json['items'][3]['path'],
-                         u'test folder%\u6346/test.txt')
-        self.assertEqual(response.json['items'][3]['name'], 'test.txt')
-        self.assertEqual(response.json['items'][3]['is_object'], True)
-        self.assertEqual(response.json['items'][3]['is_subdir'], False)
+        self.assertEqual(5, len(response.json['items']))
+        self.assertEqual(u'test folder%\u6346/test.txt',
+                         response.json['items'][3]['path'])
+        self.assertEqual('test.txt', response.json['items'][3]['name'])
+        self.assertEqual(True, response.json['items'][3]['is_object'])
+        self.assertEqual(False, response.json['items'][3]['is_subdir'])
+        self.assertEqual(u'test folder%\u6346/test.txt',
+                         response.json['items'][3]['path'])
+
+        self.assertEqual(u'test folder%\u6346/',
+                         response.json['items'][4]['path'])
+        self.assertEqual(u'test folder%\u6346',
+                         response.json['items'][4]['name'])
+        self.assertEqual(False, response.json['items'][4]['is_object'])
+        self.assertEqual(True, response.json['items'][4]['is_subdir'])
+
         nc.swift_get_objects.assert_called_once_with(request,
                                                      u'container one%\u6346',
                                                      prefix=None)
@@ -136,9 +148,9 @@ class SwiftRestTestCase(test.TestCase):
         nc.swift_get_objects.return_value = (self._subfolder, False)
         response = swift.Objects().get(request, u'container one%\u6346')
         self.assertStatusCode(response, 200)
-        self.assertEqual(len(response.json['items']), 1)
-        self.assertEqual(response.json['items'][0]['is_object'], True)
-        self.assertEqual(response.json['items'][0]['is_subdir'], False)
+        self.assertEqual(1, len(response.json['items']))
+        self.assertEqual(True, response.json['items'][0]['is_object'])
+        self.assertEqual(False, response.json['items'][0]['is_subdir'])
         nc.swift_get_objects.assert_called_once_with(
             request,
             u'container one%\u6346', prefix=u'test folder%\u6346/'
@@ -184,9 +196,9 @@ class SwiftRestTestCase(test.TestCase):
         response = swift.Object().post(request, 'spam', real_name)
         self.assertStatusCode(response, 201)
         self.assertEqual(
-            response['location'],
             '=?utf-8?q?/api/swift/containers/spam/object/test_object'
-            '=25=E6=8D=86?='
+            '=25=E6=8D=86?=',
+            response['location']
         )
         self.assertTrue(nc.swift_upload_object.called)
         call = nc.swift_upload_object.call_args[0]
@@ -199,7 +211,7 @@ class SwiftRestTestCase(test.TestCase):
         uf.return_value.is_valid.return_value = True
         uf.return_value.clean.return_value = {}
         request = self.mock_rest_request()
-        nc.swift_create_pseudo_folder.return_value = self._folder[0]
+        nc.swift_create_pseudo_folder.return_value = self._folder_alt[0]
         response = swift.Object().post(request, 'spam', u'test_folder%\u6346/')
         self.assertStatusCode(response, 201)
         self.assertEqual(

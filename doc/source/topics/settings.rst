@@ -64,7 +64,7 @@ Horizon Dashboards are automatically discovered in the following way:
   directory (for more information see :ref:`pluggable-settings-label`).
   This is the default way in OpenStack Dashboard.
 * By traversing Django's list of
-  `INSTALLED_APPS <https://docs.djangoproject.com/en/1.4/ref/settings/#std:setting-INSTALLED_APPS>`_
+  `INSTALLED_APPS <https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-INSTALLED_APPS>`_
   and importing any files that have the name ``"dashboard.py"`` and include
   code to register themselves as a Horizon dashboard.
 
@@ -422,6 +422,23 @@ This example sorts flavors by vcpus in descending order::
          'reverse': True,
     }
 
+.. _angular_features:
+
+``ANGULAR_FEATURES``
+--------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default::
+
+  {
+    'images_panel': True
+  }
+
+A dictionary of currently available AngularJS features. This allows simple
+toggling of legacy or rewritten features, such as new panels, workflows etc.
+
+
 .. _available_themes:
 
 ``AVAILABLE_THEMES``
@@ -567,6 +584,16 @@ This setting sets the maximum number of items displayed in a dropdown.
 Dropdowns that limit based on this value need to support a way to observe
 the entire list.
 
+``ENABLE_CLIENT_TOKEN``
+--------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default: ``True``
+
+This setting will Enable/Disable access to the Keystone Token to the
+browser.
+
 ``ENFORCE_PASSWORD_CHECK``
 --------------------------
 
@@ -619,12 +646,17 @@ edited.
 ----------------------------
 
 .. versionadded:: 9.0.0(Mitaka)
+.. versionchanged:: 10.0.0(Newton)
 
 Default::
 
     {
         "config_drive": False,
         "enable_scheduler_hints": True
+        "disable_image": False,
+        "disable_instance_snapshot": False,
+        "disable_volume": False,
+        "disable_volume_snapshot": False,
     }
 
 A dictionary of settings which can be used to provide the default values for
@@ -635,6 +667,21 @@ Drive property.
 
 The ``enable_scheduler_hints`` setting specifies whether or not Scheduler Hints
 can be provided when launching an instance.
+
+The ``disable_image`` setting disables Images as a valid boot source for launching
+instances. Image sources won't show up in the Launch Instance modal.
+
+The ``disable_instance_snapshot`` setting disables Snapshots as a valid boot
+source for launching instances. Snapshots sources won't show up in the Launch
+Instance modal.
+
+The ``disable_volume`` setting disables Volumes as a valid boot
+source for launching instances. Volumes sources won't show up
+in the Launch Instance modal.
+
+The ``disable_volume_snapshot`` setting disables Volume Snapshots as a valid
+boot source for launching instances. Volume Snapshots sources won't show up
+in the Launch Instance modal.
 
 ``LAUNCH_INSTANCE_NG_ENABLED``
 ------------------------------
@@ -771,6 +818,7 @@ Default::
         'can_set_mount_point': False,
         'can_set_password': False,
         'requires_keypair': False,
+        'enable_quotas': True
     }
 
 A dictionary containing settings which can be used to identify the
@@ -787,6 +835,9 @@ an administrator password when launching or rebuilding an instance.
 Setting ``requires_keypair`` to ``True`` will require users to select
 a key pair when launching an instance.
 
+Setting ``enable_quotas`` to ``False`` will make Horizon treat all Nova
+quotas as disabled, thus it won't try to modify them. By default, quotas are
+enabled.
 
 ``OPENSTACK_IMAGE_BACKEND``
 ---------------------------
@@ -815,6 +866,22 @@ Used to customize features related to the image service, such as the list of
 supported image formats.
 
 
+``OVERVIEW_DAYS_RANGE``
+-----------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default:: ``1``
+
+When set to an integer N (as by default), the start date in the Overview panel
+meters will be today minus N days. This setting is used to limit the amount of
+data fetched by default when rendering the Overview panel. If set to ``None``
+(which corresponds to the behavior in past Horizon versions), the start date
+will be from the beginning of the current month until the current date. The
+legacy behaviour is not recommended for large deployments as Horizon suffers
+significant lags in this case.
+
+
 ``IMAGE_CUSTOM_PROPERTY_TITLES``
 --------------------------------
 
@@ -836,21 +903,80 @@ appear on image detail pages.
 
 
 ``HORIZON_IMAGES_ALLOW_UPLOAD``
---------------------------------
+-------------------------------
 
 .. versionadded:: 2013.1(Grizzly)
 
 Default: ``True``
+
+(Deprecated)
 
 If set to ``False``, this setting disables *local* uploads to prevent filling
 up the disk on the dashboard server since uploads to the Glance image store
 service tend to be particularly large - in the order of hundreds of megabytes
 to multiple gigabytes.
 
+The setting is marked as deprecated and will be removed in P or later release.
+It is superseded by the setting HORIZON_IMAGES_UPLOAD_MODE. Until the removal
+the ``False`` value of HORIZON_IMAGES_ALLOW_UPLOAD overrides the value of
+HORIZON_IMAGES_UPLOAD_MODE.
+
 .. note::
 
     This will not disable image creation altogether, as this setting does not
     affect images created by specifying an image location (URL) as the image source.
+
+
+``HORIZON_IMAGES_UPLOAD_MODE``
+------------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default: ``"legacy"``
+
+Valid values are  ``"direct"``, ``"legacy"`` (default) and ``"off"``. ``"off"``
+disables the ability to upload images via Horizon. It is equivalent to setting
+``False`` on the deprecated setting ``HORIZON_IMAGES_ALLOW_UPLOAD``. ``legacy``
+enables local file upload by piping the image file through the Horizon's
+web-server. It is equivalent to setting ``True`` on the deprecated setting
+``HORIZON_IMAGES_ALLOW_UPLOAD``. ``direct`` sends the image file directly from
+the web browser to Glance. This bypasses Horizon web-server which both reduces
+network hops and prevents filling up Horizon web-server's filesystem. ``direct``
+is the preferred mode, but due to the following requirements it is not the default.
+The ``direct`` setting requires a modern web browser, network access from the
+browser to the public Glance endpoint, and CORS support to be enabled on the
+Glance API service. Without CORS support, the browser will forbid the PUT request
+to a location different than the Horizon server. To enable CORS support for Glance
+API service, you will need to edit [cors] section of glance-api.conf file (see
+`here`_ how to do it). Set `allowed_origin` to the full hostname of Horizon
+web-server (e.g. http://<HOST_IP>/dashboard) and restart glance-api process.
+
+.. _here: http://docs.openstack.org/developer/oslo.middleware/cors.html#configuration-for-oslo-config
+
+.. note::
+
+    To maintain the compatibility with the deprecated HORIZON_IMAGES_ALLOW_UPLOAD
+    setting, neither ``"direct"``, nor ``"legacy"`` modes will have an effect if
+    HORIZON_IMAGES_ALLOW_UPLOAD is set to ``False`` - as if HORIZON_IMAGES_UPLOAD_MODE
+    was set to ``"off"`` itself. When HORIZON_IMAGES_ALLOW_UPLOAD is set to ``True``,
+    all three modes are considered, as if HORIZON_IMAGES_ALLOW_UPLOAD setting
+    was removed.
+
+
+``IMAGES_ALLOW_LOCATION``
+--------------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default: ``False``
+
+If set to ``True``, this setting allows users to specify an image location
+(URL) as the image source when creating or updating images. Depending on
+the Glance version, the ability to set an image location is controlled by
+policies and/or the Glance configuration. Therefore IMAGES_ALLOW_LOCATION
+should only be set to ``True`` if Glance is configured to allow specifying a
+location. This setting has no effect when the Keystone catalog doesn't contain
+a Glance v2 endpoint.
 
 
 ``OPENSTACK_KEYSTONE_BACKEND``
@@ -1021,6 +1147,16 @@ Example::
 .. note::
   The value is expected to be a tuple formatted as: (<idp_id>, <protocol_id>).
 
+``TOKEN_DELETE_DISABLED``
+-------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default: ``False``
+
+This setting allows deployers to control whether a token is deleted on log out.
+This can be helpful when there are often long running processes being run
+in the Horizon environment.
 
 ``OPENSTACK_CINDER_FEATURES``
 -----------------------------
@@ -1268,7 +1404,7 @@ the following items:
   this network type requires a physical network.
 * ``require_segmentation_id``: a boolean parameter which indicates
   this network type requires a segmentation ID.
-  If True, a valid segmentation ID range must be configureed
+  If True, a valid segmentation ID range must be configured
   in ``segmentation_id_range`` settings above.
 
 Example::
@@ -1354,12 +1490,18 @@ library.
 
 .. versionadded:: 8.0.0(Liberty)
 
+(Deprecated)
+
 Default: ``True``
 
 Hashing tokens from Keystone keeps the Horizon session data smaller, but it
 doesn't work in some cases when using PKI tokens.  Uncomment this value and
 set it to False if using PKI tokens and there are 401 errors due to token
 hashing.
+
+This option is now marked as "deprecated" and will be removed in Ocata or a
+later release. PKI tokens currently work with hashing, and Keystone will soon
+deprecate usage of PKI tokens.
 
 
 ``POLICY_FILES``
@@ -1458,7 +1600,7 @@ The absolute path to the directory where static files are collected when
 collectstatic is run.
 
 For more information see:
-https://docs.djangoproject.com/en/1.7/ref/settings/#static-root
+https://docs.djangoproject.com/en/dev/ref/settings/#static-root
 
 ``STATIC_URL``
 --------------
@@ -1483,7 +1625,7 @@ $static_url.  Make sure you run ``python manage.py collectstatic`` and
 ``python manage.py compress`` after any changes to this value in settings.py.
 
 For more information see:
-https://docs.djangoproject.com/en/1.7/ref/settings/#static-url
+https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 
 ``DISALLOW_IFRAME_EMBED``
 -------------------------
@@ -1518,6 +1660,140 @@ Default: ``[]``
 Ignore all listed Nova extensions, and behave as if they were unsupported.
 Can be used to selectively disable certain costly extensions for performance
 reasons.
+
+``ALLOWED_PRIVATE_SUBNET_CIDR``
+-------------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default: ``{'ipv4': [], 'ipv6': []}``
+
+Dict used to restrict user private subnet cidr range.
+An empty list means that user input will not be restricted
+for a corresponding IP version. By default, there is
+no restriction for both IPv4 and IPv6.
+
+Example: ``{'ipv4': ['192.168.0.0/16', '10.0.0.0/8'], 'ipv6': ['fc00::/7',]}``
+
+``FILTER_DATA_FIRST``
+---------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default::
+
+        {
+         'admin.instances': False,
+         'admin.images': False,
+         'admin.networks': False,
+         'admin.routers': False,
+         'admin.volumes': False
+         }
+
+If the dict key-value is True, when the view loads, an empty table will be rendered
+and the user will be asked to provide a search criteria first (in case no search
+criteria was provided) before loading any data.
+
+Examples::
+
+Override the dict::
+
+        {
+         'admin.instances': True,
+         'admin.images': True,
+         'admin.networks': False,
+         'admin.routers': False,
+         'admin.volumes': False
+        }
+
+Or, if you want to turn this on for an specific panel/view do: ``FILTER_DATA_FIRST['admin.instances'] = True``
+
+``OPERATION_LOG_ENABLED``
+-------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default: ``False``
+
+This setting can be used to log operations of all of users on Horizon.
+In this log, it can include date and time of an operation, an operation URL,
+user information such as domain, project and user, and so on.
+And this log format is configurable. In detail, you can see OPERATION_LOG_OPTIONS.
+
+.. note::
+
+  If you use this feature, you need to configure the logger setting like
+  a outputting path for operation log in ``local_settings.py``.
+
+
+``OPERATION_LOG_OPTIONS``
+-------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default::
+
+        {
+         'mask_fields': ['password'],
+         'target_methods': ['POST'],
+         'format': ("[%(domain_name)s] [%(domain_id)s] [%(project_name)s]"
+             " [%(project_id)s] [%(user_name)s] [%(user_id)s] [%(request_scheme)s]"
+             " [%(referer_url)s] [%(request_url)s] [%(message)s] [%(method)s]"
+             " [%(http_status)s] [%(param)s]"),
+        }
+
+This setting controls the behavior of the operation log.
+
+* ``mask_fields`` is a list of keys of post data which should be masked from the
+  point of view of security. Fields like ``password`` should be included.
+  The fields specified in ``mask_fields`` are logged as ``********``.
+* ``target_methods`` is a request method which is logged to a operation log.
+  The valid methods are ``POST``, ``GET``, ``PUT``, ``DELETE``.
+* ``format`` defines the operation log format.
+  Currently you can use the following keywords.
+  The default value contains all keywords.
+
+  * %(domain_name)s
+  * %(domain_id)s
+  * %(project_name)s
+  * %(project_id)s
+  * %(user_name)s
+  * %(user_id)s
+  * %(request_scheme)s
+  * %(referer_url)s
+  * %(request_url)s
+  * %(message)s
+  * %(method)s
+  * %(http_status)s
+  * %(param)s
+
+
+``PROJECT_TABLE_EXTRA_INFO``
+----------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default: ``{}``
+
+Add additional information for project as an extra attribute.
+Project and user can have any attributes by keystone mechanism.
+This setting can treat these attributes on Horizon when only
+using Keystone v3.
+For example::
+
+    PROJECT_TABLE_EXTRA_INFO = {
+        'phone_num': _('Phone Number'),
+    }
+
+
+``USER_TABLE_EXTRA_INFO``
+-------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Default: ``{}``
+
+Same as ``PROJECT_TABLE_EXTRA_INFO``, add additional information for user.
 
 
 Django Settings (Partial)
@@ -1571,14 +1847,14 @@ as the debug page can display sensitive information to users and attackers
 alike.
 
 ``TEMPLATE_LOADERS``
----------------------------
+--------------------
 
 .. versionadded:: 10.0.0(Newton)
 
 These template loaders will be the first loaders and get loaded before the
 CACHED_TEMPLATE_LOADERS. Use ADD_TEMPLATE_LOADERS if you want to add loaders at
 the end and not cache loaded templates.
-After the whole settings process has gone through, TEMPLATE_LOADERS will be:
+After the whole settings process has gone through, TEMPLATE_LOADERS will be::
 
     TEMPLATE_LOADERS += (
             ('django.template.loaders.cached.Loader', CACHED_TEMPLATE_LOADERS),
@@ -1593,12 +1869,20 @@ Template loaders defined here will have their output cached if DEBUG
 is set to False.
 
 ``ADD_TEMPLATE_LOADERS``
----------------------------
+------------------------
 
 .. versionadded:: 10.0.0(Newton)
 
 Template loaders defined here will be be loaded at the end of TEMPLATE_LOADERS,
 after the CACHED_TEMPLATE_LOADERS and will never have a cached output.
+
+``NG_TEMPLATE_CACHE_AGE``
+-------------------------
+
+.. versionadded:: 10.0.0(Newton)
+
+Angular Templates are cached using this duration (in seconds) if DEBUG
+is set to False.  Default value is ``2592000`` (or 30 days).
 
 ``SECRET_KEY``
 --------------
@@ -1656,7 +1940,7 @@ to override it completely.
 .. _pluggable-settings-label:
 
 Pluggable Settings
-=================================
+==================
 Horizon allows dashboards, panels and panel groups to be added without
 modifying the default settings. Pluggable settings are a mechanism to allow
 settings to be stored in separate files.  Those files are read at startup and
@@ -1699,7 +1983,7 @@ A list of AngularJS modules to be loaded when Angular bootstraps. These modules
 are added as dependencies on the root Horizon application ``horizon``.
 
 ``ADD_JS_FILES``
-----------------------
+----------------
 
 .. versionadded:: 2014.2(Juno)
 
@@ -1708,7 +1992,7 @@ loaded on every page. This is needed for AngularJS modules that are referenced i
 ``ADD_ANGULAR_MODULES`` and therefore need to be included in every page.
 
 ``ADD_JS_SPEC_FILES``
-----------------------
+---------------------
 
 .. versionadded:: 2015.1(Kilo)
 
@@ -1716,7 +2000,7 @@ A list of javascript spec files to include for integration with the Jasmine spec
 Jasmine is a behavior-driven development framework for testing JavaScript code.
 
 ``ADD_SCSS_FILES``
-----------------------
+------------------
 
 .. versionadded:: 8.0.0(Liberty)
 

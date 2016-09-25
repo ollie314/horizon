@@ -122,6 +122,7 @@ class CreateView(forms.ModalFormView):
         return context
 
     def _get_volume_types(self):
+        volume_types = []
         try:
             volume_types = cinder.volume_type_list(self.request)
         except Exception:
@@ -138,7 +139,7 @@ class CreateView(forms.ModalFormView):
 
             no_type_description = encoding.force_text(message)
 
-        type_descriptions = [{'name': 'no_type',
+        type_descriptions = [{'name': '',
                               'description': no_type_description}] + \
                             [{'name': type.name,
                               'description': getattr(type, "description", "")}

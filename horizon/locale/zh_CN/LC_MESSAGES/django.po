@@ -1,81 +1,24 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # zhangjingwen <zhangjingwen@cn.fujitsu.com>, 2015. #zanata
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
-# Zheng Xi Zhou <zzxwill@gmail.com>, 2016. #zanata
-# liujunpeng <liujunpeng@inspur.com>, 2016. #zanata
+# Long Yu <yulong10@163.com>, 2016. #zanata
+# maoshuai <fwsakura@163.com>, 2016. #zanata
 # vuuv <froms2008@gmail.com>, 2016. #zanata
+# zzxwill <zzxwill@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 9.0.1.dev108\n"
+"Project-Id-Version: horizon 10.0.0.0rc2.dev6\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-04-18 19:07+0000\n"
+"POT-Creation-Date: 2016-09-18 15:09+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-23 12:46+0000\n"
-"Last-Translator: vuuv <froms2008@gmail.com>\n"
+"PO-Revision-Date: 2016-08-20 08:10+0000\n"
+"Last-Translator: maoshuai <fwsakura@163.com>\n"
 "Language-Team: Chinese (China)\n"
 "Language: zh-CN\n"
 "X-Generator: Zanata 3.7.3\n"
 "Plural-Forms: nplurals=1; plural=0\n"
-
-#, python-format
-msgid ""
-"\n"
-"                Login as different user or go back to <a href=\"%(home_url)s"
-"\">home page</a>\n"
-"              "
-msgstr ""
-"\n"
-"                使用其他用户登录或返回 <a href=\"%(home_url)s\">首页</a>\n"
-"              "
-
-#, python-format
-msgid ""
-"\n"
-"                Used <span> %(used)s </span>(No Limit)\n"
-"              "
-msgstr ""
-"\n"
-"                已用 <span> %(used)s </span>(无限制)\n"
-"              "
-
-#, python-format
-msgid ""
-"\n"
-"                Used <span> %(used)s </span>of<span> %(available)s </span>\n"
-"              "
-msgstr ""
-"\n"
-"                已用 <span> %(used)s </span>, 可用 <span> %(available)s </"
-"span>\n"
-"              "
-
-#, python-format
-msgid ""
-"\n"
-"      <label>From:</label> %(start)s"
-msgstr ""
-"\n"
-"<label>从:</label> %(start)s"
-
-#, python-format
-msgid ""
-"\n"
-"      <label>To:</label>%(end)s"
-msgstr ""
-"\n"
-"<label>到:</label>%(end)s"
-
-msgid ""
-"\n"
-"      If you are not sure which authentication method to use, contact your "
-"administrator.\n"
-"    "
-msgstr ""
-"\n"
-"如果你不确定使用哪种认证方式，请联系管理员。\n"
-" "
 
 #, python-format
 msgctxt "past"
@@ -143,6 +86,14 @@ msgstr "-"
 
 msgid "0 Bytes"
 msgstr "0 字节"
+
+#, python-format
+msgid "<label>From:</label> %(start)s"
+msgstr "<label>From:</label> %(start)s"
+
+#, python-format
+msgid "<label>To:</label>%(end)s"
+msgstr "<label>To:</label>%(end)s"
 
 #, python-format
 msgid "A %(resource)s with the name \"%(name)s\" already exists."
@@ -232,6 +183,11 @@ msgstr "筛选"
 msgid "Horizon"
 msgstr "Horizon"
 
+msgid ""
+"If you are not sure which authentication method to use, contact your "
+"administrator."
+msgstr "如果你不确定使用哪种认证方式，请联系管理员。"
+
 msgid "Incorrect format for IP address"
 msgstr "IP地址格式不对"
 
@@ -255,6 +211,11 @@ msgstr "登录"
 
 msgid "Login"
 msgstr "登录"
+
+#, python-format
+msgid ""
+"Login as different user or go back to <a href=\"%(home_url)s\">home page</a>"
+msgstr "用其他账户登陆或后退至<a href=\"%(home_url)s\">home page</a>"
 
 msgid "Members"
 msgstr "成员"
@@ -291,6 +252,12 @@ msgstr "没有成员。"
 msgid "None available."
 msgstr "没有可用成员。"
 
+msgid "Not a valid ICMP code"
+msgstr "无效的ICMP码"
+
+msgid "Not a valid ICMP type"
+msgstr "无效的ICMP类型"
+
 msgid "Not a valid IP protocol number"
 msgstr "不是一个有效的IP协议号"
 
@@ -306,11 +273,17 @@ msgstr "其它"
 msgid "Password is not accepted"
 msgstr "密码不符合要求"
 
+msgid "Please confirm your selection."
+msgstr "请确认你的选择。"
+
 msgid "Please log in to continue."
 msgstr "请先登录。"
 
 msgid "Please select a row before taking that action."
 msgstr "请在执行前选择一行。"
+
+msgid "Please specify a search criteria first."
+msgstr "请先指定一个搜索条件。"
 
 msgid "Processing..."
 msgstr "正在处理..."
@@ -351,6 +324,10 @@ msgstr "概要"
 msgid "The attribute %(attr)s doesn't exist on %(obj)s."
 msgstr "%(obj)s 不存在 %(attr)s 属性。"
 
+msgid ""
+"The current user has insufficient permission to complete the requested task."
+msgstr "当前用户没有足够的权限完成请求的任务。"
+
 msgid "The date should be in YYYY-mm-dd format."
 msgstr "日期应是YYYY-mm-dd格式。"
 
@@ -363,8 +340,8 @@ msgid ""
 "stack from this interface, the value must start with \"http://\" or "
 "\"https://\""
 msgstr ""
-"在模板中，%(resource)s 的值是%(name)s 。当从这个接口启动栈时，值必须以"
-"\"http://\" 或\"https://\"开头。"
+"在模板中%(resource)s 值是%(name)s 。当从这个接口启动栈时，值必须以\"http://"
+"\" 或\"https://\"开头。"
 
 msgid "This Period's GB-Hours:"
 msgstr "周期内磁盘GB-小时数:"
@@ -409,6 +386,14 @@ msgstr[0] "Upped Item"
 
 msgid "Usage Summary"
 msgstr "使用情况摘要"
+
+#, python-format
+msgid "Used <span> %(used)s </span>(No Limit)"
+msgstr "使用<span> %(used)s </span>(无限制)"
+
+#, python-format
+msgid "Used <span> %(used)s </span>of<span> %(available)s </span>"
+msgstr "使用<span> %(used)s </span>of<span> %(available)s </span>"
 
 msgid "Warning: "
 msgstr "警告："

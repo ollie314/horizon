@@ -32,6 +32,7 @@ from cinderclient.v2.contrib import list_extensions as cinder_list_extensions
 from horizon import exceptions
 from horizon.utils import functions as utils
 from horizon.utils.memoized import memoized  # noqa
+from horizon.utils.memoized import memoized_with_request  # noqa
 
 from openstack_dashboard.api import base
 from openstack_dashboard.api import nova
@@ -93,7 +94,8 @@ class VolumeSnapshot(BaseCinderAPIResourceWrapper):
 
     _attrs = ['id', 'name', 'description', 'size', 'status',
               'created_at', 'volume_id',
-              'os-extended-snapshot-attributes:project_id']
+              'os-extended-snapshot-attributes:project_id',
+              'metadata']
 
 
 class VolumeType(BaseCinderAPIResourceWrapper):
@@ -107,6 +109,12 @@ class VolumeConsistencyGroup(BaseCinderAPIResourceWrapper):
 
     _attrs = ['id', 'name', 'description', 'status', 'availability_zone',
               'created_at', 'volume_types']
+
+
+class VolumeCGSnapshot(BaseCinderAPIResourceWrapper):
+
+    _attrs = ['id', 'name', 'description', 'status',
+              'created_at', 'consistencygroup_id']
 
 
 class VolumeBackup(BaseCinderAPIResourceWrapper):
@@ -157,13 +165,10 @@ class VolumePool(base.APIResourceWrapper):
               'storage_protocol', 'extra_specs']
 
 
-@memoized
-def cinderclient(request):
+def get_auth_params_from_request(request):
     api_version = VERSIONS.get_active_version()
-
-    insecure = getattr(settings, 'OPENSTACK_SSL_NO_VERIFY', False)
-    cacert = getattr(settings, 'OPENSTACK_SSL_CACERT', None)
     cinder_url = ""
+    auth_url = base.url_for(request, 'identity')
     try:
         # The cinder client assumes that the v2 endpoint type will be
         # 'volumev2'.
@@ -176,14 +181,32 @@ def cinderclient(request):
     except exceptions.ServiceCatalogException:
         LOG.debug('no volume service configured.')
         raise
-    c = api_version['client'].Client(request.user.username,
-                                     request.user.token.id,
-                                     project_id=request.user.tenant_id,
-                                     auth_url=cinder_url,
+
+    return(
+        request.user.username,
+        request.user.token.id,
+        request.user.tenant_id,
+        cinder_url,
+        auth_url,
+    )
+
+
+@memoized_with_request(get_auth_params_from_request)
+def cinderclient(request_auth_params):
+    api_version = VERSIONS.get_active_version()
+    insecure = getattr(settings, 'OPENSTACK_SSL_NO_VERIFY', False)
+    cacert = getattr(settings, 'OPENSTACK_SSL_CACERT', None)
+
+    username, token_id, tenant_id, cinder_url, auth_url =\
+        request_auth_params
+    c = api_version['client'].Client(username,
+                                     token_id,
+                                     project_id=tenant_id,
+                                     auth_url=auth_url,
                                      insecure=insecure,
                                      cacert=cacert,
                                      http_log_debug=settings.DEBUG)
-    c.client.auth_token = request.user.token.id
+    c.client.auth_token = token_id
     c.client.management_url = cinder_url
     return c
 
@@ -432,6 +455,18 @@ def volume_cgroup_get(request, cgroup_id):
     return VolumeConsistencyGroup(cgroup)
 
 
+def volume_cgroup_get_with_vol_type_names(request, cgroup_id):
+    cgroup = volume_cgroup_get(request, cgroup_id)
+    vol_types = volume_type_list(request)
+    cgroup.volume_type_names = []
+    for vol_type_id in cgroup.volume_types:
+        for vol_type in vol_types:
+            if vol_type.id == vol_type_id:
+                cgroup.volume_type_names.append(vol_type.name)
+                break
+    return cgroup
+
+
 def volume_cgroup_list(request, search_opts=None):
     c_client = cinderclient(request)
     if c_client is None:
@@ -442,23 +477,41 @@ def volume_cgroup_list(request, search_opts=None):
 
 def volume_cgroup_list_with_vol_type_names(request, search_opts=None):
     cgroups = volume_cgroup_list(request, search_opts)
+    vol_types = volume_type_list(request)
     for cgroup in cgroups:
         cgroup.volume_type_names = []
         for vol_type_id in cgroup.volume_types:
-            vol_type = volume_type_get(request, vol_type_id)
-            cgroup.volume_type_names.append(vol_type.name)
+            for vol_type in vol_types:
+                if vol_type.id == vol_type_id:
+                    cgroup.volume_type_names.append(vol_type.name)
+                    break
 
     return cgroups
 
 
 def volume_cgroup_create(request, volume_types, name,
                          description=None, availability_zone=None):
+    data = {'name': name,
+            'description': description,
+            'availability_zone': availability_zone}
+
+    cgroup = cinderclient(request).consistencygroups.create(volume_types,
+                                                            **data)
+    return VolumeConsistencyGroup(cgroup)
+
+
+def volume_cgroup_create_from_source(request, name, cg_snapshot_id=None,
+                                     source_cgroup_id=None,
+                                     description=None,
+                                     user_id=None, project_id=None):
     return VolumeConsistencyGroup(
-        cinderclient(request).consistencygroups.create(
-            volume_types,
+        cinderclient(request).consistencygroups.create_from_src(
+            cg_snapshot_id,
+            source_cgroup_id,
             name,
             description,
-            availability_zone=availability_zone))
+            user_id,
+            project_id))
 
 
 def volume_cgroup_delete(request, cgroup_id, force=False):
@@ -478,6 +531,32 @@ def volume_cgroup_update(request, cgroup_id, name=None, description=None,
         cgroup_data['remove_volumes'] = remove_vols
     return cinderclient(request).consistencygroups.update(cgroup_id,
                                                           **cgroup_data)
+
+
+def volume_cg_snapshot_create(request, cgroup_id, name,
+                              description=None):
+    return VolumeCGSnapshot(
+        cinderclient(request).cgsnapshots.create(
+            cgroup_id,
+            name,
+            description))
+
+
+def volume_cg_snapshot_get(request, cg_snapshot_id):
+    cgsnapshot = cinderclient(request).cgsnapshots.get(cg_snapshot_id)
+    return VolumeCGSnapshot(cgsnapshot)
+
+
+def volume_cg_snapshot_list(request, search_opts=None):
+    c_client = cinderclient(request)
+    if c_client is None:
+        return []
+    return [VolumeCGSnapshot(s) for s in c_client.cgsnapshots.list(
+        search_opts=search_opts)]
+
+
+def volume_cg_snapshot_delete(request, cg_snapshot_id):
+    return cinderclient(request).cgsnapshots.delete(cg_snapshot_id)
 
 
 @memoized
@@ -643,14 +722,17 @@ def volume_type_list(request):
     return cinderclient(request).volume_types.list()
 
 
-def volume_type_create(request, name, description=None):
-    return cinderclient(request).volume_types.create(name, description)
+def volume_type_create(request, name, description=None, is_public=True):
+    return cinderclient(request).volume_types.create(name, description,
+                                                     is_public)
 
 
-def volume_type_update(request, volume_type_id, name=None, description=None):
+def volume_type_update(request, volume_type_id, name=None, description=None,
+                       is_public=None):
     return cinderclient(request).volume_types.update(volume_type_id,
                                                      name,
-                                                     description)
+                                                     description,
+                                                     is_public)
 
 
 @memoized
@@ -790,17 +872,15 @@ def availability_zone_list(request, detailed=False):
     return cinderclient(request).availability_zones.list(detailed=detailed)
 
 
-@memoized
-def list_extensions(request):
-    return cinder_list_extensions.ListExtManager(cinderclient(request))\
-        .show_all()
+@memoized_with_request(cinderclient)
+def list_extensions(cinder_api):
+    return tuple(cinder_list_extensions.ListExtManager(cinder_api).show_all())
 
 
-@memoized
-def extension_supported(request, extension_name):
+@memoized_with_request(list_extensions)
+def extension_supported(extensions, extension_name):
     """This method will determine if Cinder supports a given extension name.
     """
-    extensions = list_extensions(request)
     for extension in extensions:
         if extension.name == extension_name:
             return True

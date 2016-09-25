@@ -28,13 +28,17 @@ class RouterTests(test.BaseAdminViewTests, r_test.RouterTests):
     INDEX_URL = reverse('horizon:%s:routers:index' % DASHBOARD)
     DETAIL_PATH = 'horizon:%s:routers:detail' % DASHBOARD
 
+    def _get_detail(self, router, extraroute=True):
+        res = super(RouterTests, self)._get_detail(router, extraroute,
+                                                   lookup_l3=True)
+        return res
+
     @test.create_stubs({api.neutron: ('router_list', 'network_list'),
                         api.keystone: ('tenant_list',)})
     def test_index(self):
         tenants = self.tenants.list()
         api.neutron.router_list(
-            IsA(http.HttpRequest),
-            search_opts=None).AndReturn(self.routers.list())
+            IsA(http.HttpRequest)).AndReturn(self.routers.list())
         api.keystone.tenant_list(IsA(http.HttpRequest))\
             .AndReturn([tenants, False])
         self._mock_external_network_list()
@@ -51,8 +55,7 @@ class RouterTests(test.BaseAdminViewTests, r_test.RouterTests):
                         api.keystone: ('tenant_list',)})
     def test_index_router_list_exception(self):
         api.neutron.router_list(
-            IsA(http.HttpRequest),
-            search_opts=None).AndRaise(self.exceptions.neutron)
+            IsA(http.HttpRequest)).AndRaise(self.exceptions.neutron)
         self.mox.ReplayAll()
 
         res = self.client.get(self.INDEX_URL)
@@ -93,8 +96,7 @@ class RouterTests(test.BaseAdminViewTests, r_test.RouterTests):
     def test_set_external_network_empty(self):
         router = self.routers.first()
         api.neutron.router_list(
-            IsA(http.HttpRequest),
-            search_opts=None).AndReturn([router])
+            IsA(http.HttpRequest)).AndReturn([router])
         api.keystone.tenant_list(IsA(http.HttpRequest))\
             .AndReturn([self.tenants.list(), False])
         self._mock_external_network_list(alter_ids=True)
@@ -116,14 +118,12 @@ class RouterTests(test.BaseAdminViewTests, r_test.RouterTests):
         router = self.routers.first()
         tenants = self.tenants.list()
         api.neutron.router_list(
-            IsA(http.HttpRequest),
-            search_opts=None).AndReturn(self.routers.list())
+            IsA(http.HttpRequest)).AndReturn(self.routers.list())
         api.keystone.tenant_list(IsA(http.HttpRequest))\
             .AndReturn([tenants, False])
         self._mock_external_network_list()
         api.neutron.router_list(
-            IsA(http.HttpRequest),
-            search_opts=None).AndReturn(self.routers.list())
+            IsA(http.HttpRequest)).AndReturn(self.routers.list())
         api.keystone.tenant_list(IsA(http.HttpRequest))\
             .AndReturn([tenants, False])
         self._mock_external_network_list()
@@ -132,8 +132,7 @@ class RouterTests(test.BaseAdminViewTests, r_test.RouterTests):
             .AndReturn([])
         api.neutron.router_delete(IsA(http.HttpRequest), router.id)
         api.neutron.router_list(
-            IsA(http.HttpRequest),
-            search_opts=None).AndReturn(self.routers.list())
+            IsA(http.HttpRequest)).AndReturn(self.routers.list())
         api.keystone.tenant_list(IsA(http.HttpRequest))\
             .AndReturn([tenants, False])
         self._mock_external_network_list()
@@ -157,14 +156,12 @@ class RouterTests(test.BaseAdminViewTests, r_test.RouterTests):
         ports = self.ports.list()
         tenants = self.tenants.list()
         api.neutron.router_list(
-            IsA(http.HttpRequest),
-            search_opts=None).AndReturn(self.routers.list())
+            IsA(http.HttpRequest)).AndReturn(self.routers.list())
         api.keystone.tenant_list(IsA(http.HttpRequest))\
             .AndReturn([tenants, False])
         self._mock_external_network_list()
         api.neutron.router_list(
-            IsA(http.HttpRequest),
-            search_opts=None).AndReturn(self.routers.list())
+            IsA(http.HttpRequest)).AndReturn(self.routers.list())
         api.keystone.tenant_list(IsA(http.HttpRequest))\
             .AndReturn([tenants, False])
         self._mock_external_network_list()
@@ -176,8 +173,7 @@ class RouterTests(test.BaseAdminViewTests, r_test.RouterTests):
                                                 router.id, port_id=port.id)
         api.neutron.router_delete(IsA(http.HttpRequest), router.id)
         api.neutron.router_list(
-            IsA(http.HttpRequest),
-            search_opts=None).AndReturn(self.routers.list())
+            IsA(http.HttpRequest)).AndReturn(self.routers.list())
         api.keystone.tenant_list(IsA(http.HttpRequest))\
             .AndReturn([tenants, False])
         self._mock_external_network_list()
@@ -191,6 +187,13 @@ class RouterTests(test.BaseAdminViewTests, r_test.RouterTests):
         self.assertMessageCount(response=res, success=1)
         self.assertIn('Deleted Router: ' + router.name,
                       res.content.decode('utf-8'))
+
+    @test.update_settings(FILTER_DATA_FIRST={'admin.routers': True})
+    def test_routers_list_with_admin_filter_first(self):
+        res = self.client.get(self.INDEX_URL)
+        self.assertTemplateUsed(res, '%s/routers/index.html' % self.DASHBOARD)
+        routers = res.context['table'].data
+        self.assertItemsEqual(routers, [])
 
 
 class RouterRouteTest(test.BaseAdminViewTests, r_test.RouterRouteTests):

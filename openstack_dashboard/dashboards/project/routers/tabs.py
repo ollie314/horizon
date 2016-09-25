@@ -16,10 +16,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from horizon import tabs
 
+from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.routers.extensions.extraroutes\
     import tabs as er_tabs
-from openstack_dashboard.dashboards.project.routers.extensions.routerrules\
-    import tabs as rr_tabs
 from openstack_dashboard.dashboards.project.routers.ports import tables as ptbl
 
 
@@ -29,7 +28,10 @@ class OverviewTab(tabs.Tab):
     template_name = "project/routers/_detail_overview.html"
 
     def get_context_data(self, request):
-        return {"router": self.tab_group.kwargs['router']}
+        return {"router": self.tab_group.kwargs['router'],
+                'ha_supported': api.neutron.
+                get_feature_permission(self.request, "l3-ha", "get")
+                }
 
 
 class InterfacesTab(tabs.TableTab):
@@ -44,6 +46,5 @@ class InterfacesTab(tabs.TableTab):
 
 class RouterDetailTabs(tabs.TabGroup):
     slug = "router_details"
-    tabs = (OverviewTab, InterfacesTab, er_tabs.ExtraRoutesTab,
-            rr_tabs.RulesGridTab, rr_tabs.RouterRulesTab)
+    tabs = (OverviewTab, InterfacesTab, er_tabs.ExtraRoutesTab)
     sticky = True

@@ -26,6 +26,7 @@ import inspect
 import logging
 import os
 
+import django
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls import url
@@ -54,7 +55,13 @@ LOG = logging.getLogger(__name__)
 def _decorate_urlconf(urlpatterns, decorator, *args, **kwargs):
     for pattern in urlpatterns:
         if getattr(pattern, 'callback', None):
-            pattern._callback = decorator(pattern.callback, *args, **kwargs)
+            decorated = decorator(pattern.callback, *args, **kwargs)
+            if django.VERSION >= (1, 10):
+                pattern.callback = decorated
+            else:
+                # prior to 1.10 callback was a property and we had
+                # to modify the private attribute behind the property
+                pattern._callback = decorated
         if getattr(pattern, 'url_patterns', []):
             _decorate_urlconf(pattern.url_patterns, decorator, *args, **kwargs)
 
@@ -623,7 +630,7 @@ class Dashboard(Registry, HorizonComponent):
     def allowed(self, context):
         """Checks for role based access for this dashboard.
 
-        Checks for access to any panels in the dashboard and of the the
+        Checks for access to any panels in the dashboard and of the
         dashboard itself.
 
         This method should be overridden to return the result of

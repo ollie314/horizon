@@ -19,7 +19,10 @@
     .module('horizon.framework.widgets.table')
     .controller('TableController', TableController);
 
-  TableController.$inject = ['$scope'];
+  TableController.$inject = [
+    '$scope',
+    'horizon.framework.widgets.table.events'
+  ];
 
   /**
    * @ngdoc controller
@@ -32,12 +35,13 @@
    *
    * Note that clearSelected is private and event driven.
    * To clear all of the selected checkboxes after an action, such as
-   * delete, emit the event `hzTable:clearSelected` from your table
+   * delete, broadcast the event `hzTable:clearSelected` from your table
    * controller.
    */
-  function TableController($scope) {
+  function TableController($scope, events) {
 
     var ctrl = this;
+    ctrl.trackId = 'id';
     ctrl.isSelected = isSelected;
     ctrl.toggleSelect = toggleSelect;
     ctrl.broadcastExpansion = broadcastExpansion;
@@ -46,7 +50,7 @@
 
     ////////////////////
 
-    var clearWatcher = $scope.$on('hzTable:clearSelected', clearSelected);
+    var clearWatcher = $scope.$on(events.CLEAR_SELECTIONS, clearSelected);
     $scope.$on('$destroy', function() {
       clearWatcher();
     });
@@ -57,7 +61,7 @@
      * return true if the row is selected
      */
     function isSelected(row) {
-      var rowState = ctrl.selections[row.id];
+      var rowState = ctrl.selections[row[ctrl.trackId]];
       return angular.isDefined(rowState) && rowState.checked;
     }
 
@@ -76,7 +80,8 @@
      * Toggle the row selection state
      */
     function toggleSelect(row, checkedState, broadcast) {
-      ctrl.selections[row.id] = { checked: checkedState, item: row };
+      var key = row[ctrl.trackId];
+      ctrl.selections[key] = { checked: checkedState, item: row };
       ctrl.selected = getSelected(ctrl.selections);
       if (broadcast) {
         /*
@@ -84,7 +89,7 @@
          * matching event bindings
          */
         var rowObj = { row: row, checkedState: checkedState };
-        $scope.$broadcast('hzTable:rowSelected', rowObj);
+        $scope.$broadcast(events.ROW_SELECTED, rowObj);
       }
     }
 
@@ -92,7 +97,7 @@
      * Broadcast row expansion
      */
     function broadcastExpansion(item) {
-      $scope.$broadcast('hzTable:rowExpanded', item);
+      $scope.$broadcast(events.ROW_EXPANDED, item);
     }
   }
 })();

@@ -55,6 +55,7 @@ def data(TEST):
     TEST.firewalls = utils.TestDataContainer()
     TEST.fw_policies = utils.TestDataContainer()
     TEST.fw_rules = utils.TestDataContainer()
+    TEST.ip_availability = utils.TestDataContainer()
 
     # Data return by neutronclient.
     TEST.api_agents = utils.TestDataContainer()
@@ -83,6 +84,7 @@ def data(TEST):
     TEST.api_firewalls = utils.TestDataContainer()
     TEST.api_fw_policies = utils.TestDataContainer()
     TEST.api_fw_rules = utils.TestDataContainer()
+    TEST.api_ip_availability = utils.TestDataContainer()
 
     # 1st network.
     network_dict = {'admin_state_up': True,
@@ -438,7 +440,10 @@ def data(TEST):
                 'port_id': None,
                 'router_id': None}
     TEST.api_q_floating_ips.add(fip_dict)
-    TEST.q_floating_ips.add(neutron.FloatingIp(fip_dict))
+    fip_with_instance = copy.deepcopy(fip_dict)
+    fip_with_instance.update({'instance_id': None,
+                              'instance_type': None})
+    TEST.q_floating_ips.add(neutron.FloatingIp(fip_with_instance))
 
     # Associated (with compute port on 1st network).
     fip_dict = {'tenant_id': '1',
@@ -449,7 +454,10 @@ def data(TEST):
                 'port_id': assoc_port['id'],
                 'router_id': router_dict['id']}
     TEST.api_q_floating_ips.add(fip_dict)
-    TEST.q_floating_ips.add(neutron.FloatingIp(fip_dict))
+    fip_with_instance = copy.deepcopy(fip_dict)
+    fip_with_instance.update({'instance_id': '1',
+                              'instance_type': 'compute'})
+    TEST.q_floating_ips.add(neutron.FloatingIp(fip_with_instance))
 
     # Security group.
 
@@ -1317,3 +1325,27 @@ def data(TEST):
                  'binding:host_id': 'host'}
     TEST.api_ports.add(port_dict)
     TEST.ports.add(neutron.Port(port_dict))
+
+    availability = {'network_ip_availability': {
+        'used_ips': 2,
+        'subnet_ip_availability': [{
+            'used_ips': 1,
+            'subnet_id': '2c90f321-9cc7-41b4-a3cf-88110f120a94',
+            'subnet_name': 'ipv6-public-subnet',
+            'ip_version': 6,
+            'cidr': '2001:db8::/64',
+            'total_ips': 18446744073709551614},
+            {'used_ips': 1,
+             'subnet_id': '4d77d5fb-c26c-4ac5-b2ca-fca2f89b0fc1',
+             'subnet_name': 'public-subnet',
+             'ip_version': 4,
+             'cidr': '172.24.4.0/24',
+             'total_ips': 253}],
+        'network_id': 'd87d5be5-cfca-486f-8db5-a446330e4513',
+        'tenant_id': 'd564b2a4fc0544fb89f8a0434dd96863',
+        'network_name': 'public',
+        'total_ips': 18446744073709551867}
+    }
+
+    TEST.ip_availability.add(availability)
+    TEST.api_ip_availability.add(availability)

@@ -22,6 +22,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from openstack_auth import utils
+
 from horizon import exceptions
 from horizon import forms
 from horizon import messages
@@ -33,7 +35,7 @@ from openstack_dashboard.api import cinder
 from openstack_dashboard.api import keystone
 from openstack_dashboard.api import nova
 from openstack_dashboard.usage import quotas
-from openstack_dashboard.utils.identity import IdentityMixIn
+
 
 LOG = logging.getLogger(__name__)
 
@@ -167,6 +169,14 @@ class CreateProjectInfoAction(workflows.Action):
             readonlyInput = forms.TextInput(attrs={'readonly': 'readonly'})
             self.fields["domain_id"].widget = readonlyInput
             self.fields["domain_name"].widget = readonlyInput
+            self.add_extra_fields()
+
+    def add_extra_fields(self):
+        # add extra column defined by setting
+        EXTRA_INFO = getattr(settings, 'PROJECT_TABLE_EXTRA_INFO', {})
+        for key, value in EXTRA_INFO.items():
+            form = forms.CharField(label=value, required=False,)
+            self.fields[key] = form
 
     class Meta(object):
         name = _("Project Information")
@@ -182,6 +192,12 @@ class CreateProjectInfo(workflows.Step):
                    "name",
                    "description",
                    "enabled")
+
+    def __init__(self, workflow):
+        super(CreateProjectInfo, self).__init__(workflow)
+        if keystone.VERSIONS.active >= 3:
+            EXTRA_INFO = getattr(settings, 'PROJECT_TABLE_EXTRA_INFO', {})
+            self.contributes += tuple(EXTRA_INFO.keys())
 
 
 class UpdateProjectMembersAction(workflows.MembershipAction):
@@ -383,10 +399,13 @@ class UpdateProjectGroups(workflows.UpdateMembersStep):
 
 class CommonQuotaWorkflow(workflows.Workflow):
     def _update_project_quota(self, request, data, project_id):
-        # Update the project quota.
-        nova_data = dict(
-            [(key, data[key]) for key in quotas.NOVA_QUOTA_FIELDS])
-        nova.tenant_quota_update(request, project_id, **nova_data)
+        disabled_quotas = quotas.get_disabled_quotas(request)
+
+        # Update the project quotas.
+        if api.base.is_service_enabled(request, 'compute'):
+            nova_data = {key: data[key] for key in
+                         set(quotas.NOVA_QUOTA_FIELDS) - disabled_quotas}
+            nova.tenant_quota_update(request, project_id, **nova_data)
 
         if cinder.is_volume_service_enabled(request):
             cinder_data = dict([(key, data[key]) for key in
@@ -398,7 +417,6 @@ class CommonQuotaWorkflow(workflows.Workflow):
         if api.base.is_service_enabled(request, 'network') and \
                 api.neutron.is_quotas_extension_supported(request):
             neutron_data = {}
-            disabled_quotas = quotas.get_disabled_quotas(request)
             for key in quotas.NEUTRON_QUOTA_FIELDS:
                 if key not in disabled_quotas:
                     neutron_data[key] = data[key]
@@ -441,12 +459,20 @@ class CreateProject(CommonQuotaWorkflow):
         # create the project
         domain_id = data['domain_id']
         try:
+            # add extra information
+            if keystone.VERSIONS.active >= 3:
+                EXTRA_INFO = getattr(settings, 'PROJECT_TABLE_EXTRA_INFO', {})
+                kwargs = dict((key, data.get(key)) for key in EXTRA_INFO)
+            else:
+                kwargs = {}
+
             desc = data['description']
             self.object = api.keystone.tenant_create(request,
                                                      name=data['name'],
                                                      description=desc,
                                                      enabled=data['enabled'],
-                                                     domain=domain_id)
+                                                     domain=domain_id,
+                                                     **kwargs)
             return self.object
         except exceptions.Conflict:
             msg = _('Project name "%s" is already used.') % data['name']
@@ -604,8 +630,14 @@ class UpdateProjectInfo(workflows.Step):
                    "description",
                    "enabled")
 
+    def __init__(self, workflow):
+        super(UpdateProjectInfo, self).__init__(workflow)
+        if keystone.VERSIONS.active >= 3:
+            EXTRA_INFO = getattr(settings, 'PROJECT_TABLE_EXTRA_INFO', {})
+            self.contributes += tuple(EXTRA_INFO.keys())
 
-class UpdateProject(CommonQuotaWorkflow, IdentityMixIn):
+
+class UpdateProject(CommonQuotaWorkflow):
     slug = "update_project"
     name = _("Edit Project")
     finalize_button_name = _("Save")
@@ -645,13 +677,22 @@ class UpdateProject(CommonQuotaWorkflow, IdentityMixIn):
         domain_id = api.keystone.get_effective_domain_id(self.request)
         try:
             project_id = data['project_id']
+
+            # add extra information
+            if keystone.VERSIONS.active >= 3:
+                EXTRA_INFO = getattr(settings, 'PROJECT_TABLE_EXTRA_INFO', {})
+                kwargs = dict((key, data.get(key)) for key in EXTRA_INFO)
+            else:
+                kwargs = {}
+
             return api.keystone.tenant_update(
                 request,
                 project_id,
                 name=data['name'],
                 description=data['description'],
                 enabled=data['enabled'],
-                domain=domain_id)
+                domain=domain_id,
+                **kwargs)
         except exceptions.Conflict:
             msg = _('Project name "%s" is already used.') % data['name']
             self.failure_message = msg
@@ -698,7 +739,7 @@ class UpdateProject(CommonQuotaWorkflow, IdentityMixIn):
                                      available_roles, current_role_ids):
         is_current_user = user_id == request.user.id
         is_current_project = project_id == request.user.tenant_id
-        _admin_roles = self.get_admin_roles()
+        _admin_roles = utils.get_admin_roles()
         available_admin_role_ids = [role.id for role in available_roles
                                     if role.name.lower() in _admin_roles]
         admin_roles = [role for role in current_role_ids

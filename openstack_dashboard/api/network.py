@@ -27,33 +27,41 @@ from openstack_dashboard.api import nova
 class NetworkClient(object):
     def __init__(self, request):
         neutron_enabled = base.is_service_enabled(request, 'network')
+        nova_enabled = base.is_service_enabled(request, 'compute')
 
+        self.secgroups, self.floating_ips = None, None
         if neutron_enabled:
             self.floating_ips = neutron.FloatingIpManager(request)
-        else:
+        elif nova_enabled:
             self.floating_ips = nova.FloatingIpManager(request)
 
         if (neutron_enabled and
                 neutron.is_extension_supported(request, 'security-group')):
             self.secgroups = neutron.SecurityGroupManager(request)
-        else:
+        elif nova_enabled:
             self.secgroups = nova.SecurityGroupManager(request)
+
+    @property
+    def enabled(self):
+        return self.floating_ips is not None
 
 
 def floating_ip_pools_list(request):
     return NetworkClient(request).floating_ips.list_pools()
 
 
-def tenant_floating_ip_list(request):
-    return NetworkClient(request).floating_ips.list()
+def tenant_floating_ip_list(request, all_tenants=False):
+    return NetworkClient(request).floating_ips.list(all_tenants=all_tenants)
 
 
 def tenant_floating_ip_get(request, floating_ip_id):
     return NetworkClient(request).floating_ips.get(floating_ip_id)
 
 
-def tenant_floating_ip_allocate(request, pool=None):
-    return NetworkClient(request).floating_ips.allocate(pool)
+def tenant_floating_ip_allocate(request, pool=None, tenant_id=None, **params):
+    return NetworkClient(request).floating_ips.allocate(pool,
+                                                        tenant_id,
+                                                        **params)
 
 
 def tenant_floating_ip_release(request, floating_ip_id):
@@ -88,7 +96,8 @@ def floating_ip_simple_associate_supported(request):
 
 
 def floating_ip_supported(request):
-    return NetworkClient(request).floating_ips.is_supported()
+    nwc = NetworkClient(request)
+    return nwc.enabled and nwc.floating_ips.is_supported()
 
 
 def security_group_list(request):

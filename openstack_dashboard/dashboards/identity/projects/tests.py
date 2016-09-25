@@ -12,12 +12,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import copy
 import datetime
 import logging
 import os
 import unittest
 
+import django
 from django.core.urlresolvers import reverse
 from django import http
 from django.test.utils import override_settings
@@ -26,7 +26,6 @@ from django.utils import timezone
 from mox3.mox import IgnoreArg  # noqa
 from mox3.mox import IsA  # noqa
 
-from horizon import exceptions
 from horizon.workflows import views
 from openstack_auth import policy as policy_backend
 
@@ -35,13 +34,6 @@ from openstack_dashboard.dashboards.identity.projects import workflows
 from openstack_dashboard.test import helpers as test
 from openstack_dashboard import usage
 from openstack_dashboard.usage import quotas
-
-with_sel = os.environ.get('WITH_SELENIUM', False)
-if with_sel:
-    from selenium.webdriver import ActionChains  # noqa
-    from selenium.webdriver.common import keys
-
-from socket import timeout as socket_timeout  # noqa
 
 
 INDEX_URL = reverse('horizon:identity:projects:index')
@@ -53,17 +45,22 @@ PROJECT_DETAIL_URL = reverse('horizon:identity:projects:detail', args=[1])
 class TenantsViewTests(test.BaseAdminViewTests):
     @test.create_stubs({api.keystone: ('domain_get',
                                        'tenant_list',
-                                       'domain_lookup')})
+                                       'domain_lookup'),
+                        quotas: ('enabled_quotas',)})
     def test_index(self):
         domain = self.domains.get(id="1")
+        filters = {}
         api.keystone.domain_get(IsA(http.HttpRequest), '1').AndReturn(domain)
         api.keystone.tenant_list(IsA(http.HttpRequest),
                                  domain=None,
                                  paginate=True,
+                                 filters=filters,
                                  marker=None) \
             .AndReturn([self.tenants.list(), False])
         api.keystone.domain_lookup(IgnoreArg()).AndReturn({domain.id:
                                                            domain.name})
+        quotas.enabled_quotas(IsA(http.HttpRequest)).MultipleTimes()\
+            .AndReturn(('instances',))
         self.mox.ReplayAll()
 
         res = self.client.get(INDEX_URL)
@@ -72,10 +69,11 @@ class TenantsViewTests(test.BaseAdminViewTests):
 
     @test.create_stubs({api.keystone: ('tenant_list',
                                        'get_effective_domain_id',
-                                       'domain_lookup')})
+                                       'domain_lookup'),
+                        quotas: ('enabled_quotas',)})
     def test_index_with_domain_context(self):
         domain = self.domains.get(id="1")
-
+        filters = {}
         self.setSessionValues(domain_context=domain.id,
                               domain_context_name=domain.name)
 
@@ -87,10 +85,12 @@ class TenantsViewTests(test.BaseAdminViewTests):
         api.keystone.tenant_list(IsA(http.HttpRequest),
                                  domain=domain.id,
                                  paginate=True,
-                                 marker=None) \
+                                 marker=None,
+                                 filters=filters) \
                     .AndReturn([domain_tenants, False])
         api.keystone.domain_lookup(IgnoreArg()).AndReturn({domain.id:
                                                            domain.name})
+        quotas.enabled_quotas(IsA(http.HttpRequest)).AndReturn(('instances',))
         self.mox.ReplayAll()
 
         res = self.client.get(INDEX_URL)
@@ -105,10 +105,12 @@ class ProjectsViewNonAdminTests(test.TestCase):
                                        'domain_lookup')})
     def test_index(self):
         domain = self.domains.get(id="1")
+        filters = {}
         api.keystone.tenant_list(IsA(http.HttpRequest),
                                  user=self.user.id,
                                  paginate=True,
                                  marker=None,
+                                 filters=filters,
                                  admin=False) \
             .AndReturn([self.tenants.list(), False])
         api.keystone.domain_lookup(IgnoreArg()).AndReturn({domain.id:
@@ -201,6 +203,8 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
         # init
         api.base.is_service_enabled(IsA(http.HttpRequest), 'network') \
             .MultipleTimes().AndReturn(True)
+        api.base.is_service_enabled(IsA(http.HttpRequest), 'compute') \
+            .MultipleTimes().AndReturn(True)
         api.cinder.is_volume_service_enabled(IsA(http.HttpRequest)) \
             .MultipleTimes().AndReturn(True)
         api.keystone.get_default_domain(IsA(http.HttpRequest)) \
@@ -285,11 +289,15 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
         res = self.client.get(reverse('horizon:identity:projects:create'))
 
         self.assertTemplateUsed(res, views.WorkflowView.template_name)
-        self.assertContains(res, '''
-                            <input class="form-control"
-                            id="id_subnet" min="-1"
-                            name="subnet" type="number" value="10" />
-                            ''', html=True)
+        if django.VERSION >= (1, 10):
+            pattern = ('<input class="form-control" '
+                       'id="id_subnet" min="-1" '
+                       'name="subnet" type="number" value="10" required/>')
+        else:
+            pattern = ('<input class="form-control" '
+                       'id="id_subnet" min="-1" '
+                       'name="subnet" type="number" value="10"/>')
+        self.assertContains(res, pattern, html=True)
 
         workflow = res.context['workflow']
         self.assertEqual(res.context['workflow'].name,
@@ -300,6 +308,7 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
         self.assertEqual(step.action.initial['subnet'],
                          neutron_quotas.get('subnet').limit)
 
+    @override_settings(PROJECT_TABLE_EXTRA_INFO={'phone_num': 'Phone Number'})
     @test.create_stubs({api.keystone: ('get_default_role',
                                        'add_tenant_user_role',
                                        'tenant_create',
@@ -312,22 +321,22 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
                                  'tenant_quota_usages',),
                         api.cinder: ('tenant_quota_update',),
                         api.nova: ('tenant_quota_update',)})
-    def test_add_project_post(self, neutron=False):
+    def test_add_project_post(self):
         project = self.tenants.first()
         quota = self.quotas.first()
+        disabled_quotas = self.disabled_quotas.first()
         default_role = self.roles.first()
         default_domain = self._get_default_domain()
         domain_id = default_domain.id
         users = self._get_all_users(domain_id)
         groups = self._get_all_groups(domain_id)
         roles = self.roles.list()
+        # extra info
+        phone_number = "+81-3-1234-5678"
 
         # init
         quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
             .AndReturn(self.disabled_quotas.first())
-        if neutron:
-            quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
-                .AndReturn(self.disabled_quotas.first())
         quotas.get_default_quota_data(IsA(http.HttpRequest)).AndReturn(quota)
 
         api.keystone.get_default_role(IsA(http.HttpRequest)) \
@@ -341,6 +350,8 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
 
         # handle
         project_details = self._get_project_info(project)
+        # add extra info
+        project_details.update({'phone_num': phone_number})
         quota_data = self._get_quota_info(quota)
 
         api.keystone.tenant_create(IsA(http.HttpRequest), **project_details) \
@@ -364,8 +375,10 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
                                                 group=group_id,
                                                 project=self.tenant.id)
 
-        nova_updated_quota = dict([(key, quota_data[key]) for key in
-                                   quotas.NOVA_QUOTA_FIELDS])
+        nova_updated_quota = {key: quota_data[key] for key in
+                              set(quotas.NOVA_QUOTA_FIELDS) - disabled_quotas}
+        quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
+            .AndReturn(disabled_quotas)
         api.nova.tenant_quota_update(IsA(http.HttpRequest),
                                      project.id,
                                      **nova_updated_quota)
@@ -378,6 +391,7 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
         self.mox.ReplayAll()
 
         workflow_data.update(self._get_workflow_data(project, quota))
+        workflow_data.update({'phone_num': phone_number})
 
         url = reverse('horizon:identity:projects:create')
         res = self.client.post(url, workflow_data)
@@ -406,7 +420,7 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
         api.neutron.tenant_quota_update(IsA(http.HttpRequest),
                                         self.tenant.id,
                                         **neutron_updated_quota)
-        self.test_add_project_post(neutron=True)
+        self.test_add_project_post()
 
     @test.create_stubs({api.keystone: ('user_list',
                                        'role_list',
@@ -531,6 +545,7 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
     def test_add_project_quota_update_error(self):
         project = self.tenants.first()
         quota = self.quotas.first()
+        disabled_quotas = self.disabled_quotas.first()
         default_role = self.roles.first()
         default_domain = self._get_default_domain()
         domain_id = default_domain.id
@@ -579,8 +594,10 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
                                                 group=group_id,
                                                 project=self.tenant.id)
 
-        nova_updated_quota = dict([(key, quota_data[key]) for key in
-                                   quotas.NOVA_QUOTA_FIELDS])
+        nova_updated_quota = {key: quota_data[key] for key in
+                              set(quotas.NOVA_QUOTA_FIELDS) - disabled_quotas}
+        quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
+            .AndReturn(disabled_quotas)
         api.nova.tenant_quota_update(IsA(http.HttpRequest),
                                      project.id,
                                      **nova_updated_quota) \
@@ -617,6 +634,7 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
     def test_add_project_user_update_error(self):
         project = self.tenants.first()
         quota = self.quotas.first()
+        disabled_quotas = self.disabled_quotas.first()
         default_role = self.roles.first()
         default_domain = self._get_default_domain()
         domain_id = default_domain.id
@@ -660,8 +678,10 @@ class CreateProjectWorkflowTests(test.BaseAdminViewTests):
                     break
             break
 
-        nova_updated_quota = dict([(key, quota_data[key]) for key in
-                                   quotas.NOVA_QUOTA_FIELDS])
+        nova_updated_quota = {key: quota_data[key] for key in
+                              set(quotas.NOVA_QUOTA_FIELDS) - disabled_quotas}
+        quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
+            .AndReturn(disabled_quotas)
         api.nova.tenant_quota_update(IsA(http.HttpRequest),
                                      project.id,
                                      **nova_updated_quota)
@@ -961,11 +981,12 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
                         quotas: ('get_tenant_quota_data',
                                  'get_disabled_quotas',
                                  'tenant_quota_usages',)})
-    def test_update_project_save(self, neutron=False):
+    def test_update_project_save(self):
         keystone_api_version = api.keystone.VERSIONS.active
 
         project = self.tenants.first()
         quota = self.quotas.first()
+        disabled_quotas = self.disabled_quotas.first()
         default_role = self.roles.first()
         domain_id = project.domain_id
         users = self._get_all_users(domain_id)
@@ -983,9 +1004,6 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
             .AndReturn(self.domain)
         quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
             .AndReturn(self.disabled_quotas.first())
-        if neutron:
-            quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
-                .AndReturn(self.disabled_quotas.first())
         quotas.get_tenant_quota_data(IsA(http.HttpRequest),
                                      tenant_id=self.tenant.id) \
             .AndReturn(quota)
@@ -1047,8 +1065,10 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
         quotas.tenant_quota_usages(IsA(http.HttpRequest), tenant_id=project.id) \
             .AndReturn(quota_usages)
 
-        nova_updated_quota = dict([(key, updated_quota[key]) for key in
-                                   quotas.NOVA_QUOTA_FIELDS])
+        nova_updated_quota = {key: updated_quota[key] for key in
+                              set(quotas.NOVA_QUOTA_FIELDS) - disabled_quotas}
+        quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
+            .AndReturn(disabled_quotas)
         api.nova.tenant_quota_update(IsA(http.HttpRequest),
                                      project.id,
                                      **nova_updated_quota)
@@ -1093,7 +1113,7 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
         api.neutron.tenant_quota_update(IsA(http.HttpRequest),
                                         self.tenant.id,
                                         **neutron_updated_quota)
-        self.test_update_project_save(neutron=True)
+        self.test_update_project_save()
 
     @test.create_stubs({api.keystone: ('tenant_get',)})
     def test_update_project_get_error(self):
@@ -1256,6 +1276,7 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
 
         project = self.tenants.first()
         quota = self.quotas.first()
+        disabled_quotas = self.disabled_quotas.first()
         default_role = self.roles.first()
         domain_id = project.domain_id
         users = self._get_all_users(domain_id)
@@ -1335,8 +1356,10 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
         quotas.tenant_quota_usages(IsA(http.HttpRequest), tenant_id=project.id) \
             .AndReturn(quota_usages)
 
-        nova_updated_quota = dict([(key, updated_quota[key]) for key in
-                                   quotas.NOVA_QUOTA_FIELDS])
+        nova_updated_quota = {key: updated_quota[key] for key in
+                              set(quotas.NOVA_QUOTA_FIELDS) - disabled_quotas}
+        quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
+            .AndReturn(disabled_quotas)
         api.nova.tenant_quota_update(IsA(http.HttpRequest),
                                      project.id,
                                      **nova_updated_quota) \
@@ -1458,6 +1481,8 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
 
         api.keystone.user_list(IsA(http.HttpRequest),
                                domain=domain_id).AndReturn(users)
+        quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
+            .AndReturn(self.disabled_quotas.first())
 
         self._check_role_list(keystone_api_version, role_assignments, groups,
                               proj_users, roles, workflow_data)
@@ -1482,41 +1507,41 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
         self.assertMessageCount(error=2, warning=1)
         self.assertRedirectsNoFollow(res, INDEX_URL)
 
-        @test.create_stubs({api.keystone: ('get_default_role',
-                                           'tenant_get',
-                                           'domain_get'),
-                            quotas: ('get_tenant_quota_data',
-                                     'get_disabled_quotas')})
-        def test_update_project_when_default_role_does_not_exist(self):
-            project = self.tenants.first()
-            domain_id = project.domain_id
-            quota = self.quotas.first()
+    @test.create_stubs({api.keystone: ('get_default_role',
+                                       'tenant_get',
+                                       'domain_get'),
+                        quotas: ('get_tenant_quota_data',
+                                 'get_disabled_quotas')})
+    def test_update_project_when_default_role_does_not_exist(self):
+        project = self.tenants.first()
+        domain_id = project.domain_id
+        quota = self.quotas.first()
 
-            api.keystone.get_default_role(IsA(http.HttpRequest)) \
-                .MultipleTimes().AndReturn(None)  # Default role doesn't exist
-            api.keystone.tenant_get(IsA(http.HttpRequest), self.tenant.id,
-                                    admin=True) \
-                .AndReturn(project)
-            api.keystone.domain_get(IsA(http.HttpRequest), domain_id) \
-                .AndReturn(self.domain)
-            quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
-                .AndReturn(self.disabled_quotas.first())
-            quotas.get_tenant_quota_data(IsA(http.HttpRequest),
-                                         tenant_id=self.tenant.id) \
-                .AndReturn(quota)
-            self.mox.ReplayAll()
+        api.keystone.get_default_role(IsA(http.HttpRequest)) \
+            .MultipleTimes().AndReturn(None)  # Default role doesn't exist
+        api.keystone.tenant_get(IsA(http.HttpRequest), self.tenant.id,
+                                admin=True).AndReturn(project)
+        api.keystone.domain_get(IsA(http.HttpRequest), domain_id) \
+            .AndReturn(self.domain)
+        quotas.get_disabled_quotas(IsA(http.HttpRequest)) \
+            .AndReturn(self.disabled_quotas.first())
+        quotas.get_tenant_quota_data(IsA(http.HttpRequest),
+                                     tenant_id=self.tenant.id).AndReturn(quota)
+        self.mox.ReplayAll()
 
-            url = reverse('horizon:identity:projects:update',
-                          args=[self.tenant.id])
+        url = reverse('horizon:identity:projects:update',
+                      args=[self.tenant.id])
 
-            try:
-                # Avoid the log message in the test output when the workflow's
-                # step action cannot be instantiated
-                logging.disable(logging.ERROR)
-                with self.assertRaises(exceptions.NotFound):
-                    self.client.get(url)
-            finally:
-                logging.disable(logging.NOTSET)
+        try:
+            # Avoid the log message in the test output when the workflow's
+            # step action cannot be instantiated
+            logging.disable(logging.ERROR)
+            res = self.client.get(url)
+        finally:
+            logging.disable(logging.NOTSET)
+
+        self.assertNoFormErrors(res)
+        self.assertMessageCount(error=1, warning=0)
 
 
 class UsageViewTests(test.BaseAdminViewTests):
@@ -1553,21 +1578,30 @@ class UsageViewTests(test.BaseAdminViewTests):
     def test_usage_csv_disabled(self):
         self._test_usage_csv(nova_stu_enabled=False)
 
-    def _test_usage_csv(self, nova_stu_enabled=True):
+    @override_settings(OVERVIEW_DAYS_RANGE=1)
+    def test_usage_csv_1_day(self):
+        self._test_usage_csv(nova_stu_enabled=True, overview_days_range=1)
+
+    def _test_usage_csv(self, nova_stu_enabled=True, overview_days_range=None):
         now = timezone.now()
         usage_obj = api.nova.NovaUsage(self.usages.first())
         self._stub_nova_api_calls(nova_stu_enabled)
         api.nova.extension_supported(
             'SimpleTenantUsage', IsA(http.HttpRequest)) \
             .AndReturn(nova_stu_enabled)
-        start = datetime.datetime(now.year, now.month, 1, 0, 0, 0, 0)
+        if overview_days_range:
+            start_day = now - datetime.timedelta(days=overview_days_range)
+        else:
+            start_day = datetime.date(now.year, now.month, 1)
+        start = datetime.datetime(start_day.year, start_day.month,
+                                  start_day.day, 0, 0, 0, 0)
         end = datetime.datetime(now.year, now.month, now.day, 23, 59, 59, 0)
 
         if nova_stu_enabled:
             api.nova.usage_get(IsA(http.HttpRequest),
                                self.tenant.id,
                                start, end).AndReturn(usage_obj)
-        api.nova.tenant_absolute_limits(IsA(http.HttpRequest))\
+        api.nova.tenant_absolute_limits(IsA(http.HttpRequest), reserved=True)\
             .AndReturn(self.limits['absolute'])
         api.cinder.tenant_absolute_limits(IsA(http.HttpRequest)) \
             .AndReturn(self.cinder_limits['absolute'])
@@ -1587,12 +1621,14 @@ class UsageViewTests(test.BaseAdminViewTests):
 
 
 class DetailProjectViewTests(test.BaseAdminViewTests):
-    @test.create_stubs({api.keystone: ('tenant_get',)})
+    @test.create_stubs({api.keystone: ('tenant_get',),
+                        quotas: ('enabled_quotas',)})
     def test_detail_view(self):
         project = self.tenants.first()
 
         api.keystone.tenant_get(IsA(http.HttpRequest), self.tenant.id) \
             .AndReturn(project)
+        quotas.enabled_quotas(IsA(http.HttpRequest)).AndReturn(('instances',))
         self.mox.ReplayAll()
 
         res = self.client.get(PROJECT_DETAIL_URL, args=[project.id])
@@ -1617,143 +1653,6 @@ class DetailProjectViewTests(test.BaseAdminViewTests):
 @unittest.skipUnless(os.environ.get('WITH_SELENIUM', False),
                      "The WITH_SELENIUM env variable is not set.")
 class SeleniumTests(test.SeleniumAdminTestCase):
-    @test.create_stubs(
-        {api.keystone: ('tenant_list', 'tenant_get', 'tenant_update',
-                        'domain_lookup')})
-    def test_inline_editing_update(self):
-        # Tenant List
-        api.keystone.tenant_list(IgnoreArg(),
-                                 domain=None,
-                                 marker=None,
-                                 paginate=True) \
-            .AndReturn([self.tenants.list(), False])
-        api.keystone.domain_lookup(IgnoreArg()).AndReturn({None: None})
-        # Edit mod
-        api.keystone.tenant_get(IgnoreArg(),
-                                u'1',
-                                admin=True) \
-            .AndReturn(self.tenants.list()[0])
-        # Update - requires get and update
-        api.keystone.tenant_get(IgnoreArg(),
-                                u'1',
-                                admin=True) \
-            .AndReturn(self.tenants.list()[0])
-        api.keystone.tenant_update(
-            IgnoreArg(),
-            u'1',
-            description='a test tenant.',
-            enabled=True,
-            name=u'Changed test_tenant')
-        # Refreshing cell with changed name
-        changed_tenant = copy.copy(self.tenants.list()[0])
-        changed_tenant.name = u'Changed test_tenant'
-        api.keystone.tenant_get(IgnoreArg(),
-                                u'1',
-                                admin=True) \
-            .AndReturn(changed_tenant)
-
-        self.mox.ReplayAll()
-
-        self.selenium.get("%s%s" % (self.live_server_url, INDEX_URL))
-
-        # Check the presence of the important elements
-        td_element = self.selenium.find_element_by_xpath(
-            "//td[@data-update-url='/identity/?action=cell_update"
-            "&table=tenants&cell_name=name&obj_id=1']")
-        cell_wrapper = td_element.find_element_by_class_name(
-            'table_cell_wrapper')
-        edit_button_wrapper = td_element.find_element_by_class_name(
-            'table_cell_action')
-        edit_button = edit_button_wrapper.find_element_by_tag_name('button')
-        # Hovering over td and clicking on edit button
-        action_chains = ActionChains(self.selenium)
-        action_chains.move_to_element(cell_wrapper).click(edit_button)
-        action_chains.perform()
-        # Waiting for the AJAX response for switching to editing mod
-        wait = self.ui.WebDriverWait(self.selenium, 10,
-                                     ignored_exceptions=[socket_timeout])
-        wait.until(lambda x: self.selenium.find_element_by_name("name__1"))
-        # Changing project name in cell form
-        td_element = self.selenium.find_element_by_xpath(
-            "//td[@data-update-url='/identity/?action=cell_update"
-            "&table=tenants&cell_name=name&obj_id=1']")
-        name_input = td_element.find_element_by_tag_name('input')
-        name_input.send_keys(keys.Keys.HOME)
-        name_input.send_keys("Changed ")
-        # Saving new project name by AJAX
-        td_element.find_element_by_class_name('inline-edit-submit').click()
-        # Waiting for the AJAX response of cell refresh
-        wait = self.ui.WebDriverWait(self.selenium, 10,
-                                     ignored_exceptions=[socket_timeout])
-        wait.until(lambda x: self.selenium.find_element_by_xpath(
-            "//td[@data-update-url='/identity/?action=cell_update"
-            "&table=tenants&cell_name=name&obj_id=1']"
-            "/div[@class='table_cell_wrapper']"
-            "/div[@class='table_cell_data_wrapper']"))
-        # Checking new project name after cell refresh
-        data_wrapper = self.selenium.find_element_by_xpath(
-            "//td[@data-update-url='/identity/?action=cell_update"
-            "&table=tenants&cell_name=name&obj_id=1']"
-            "/div[@class='table_cell_wrapper']"
-            "/div[@class='table_cell_data_wrapper']")
-        self.assertTrue(data_wrapper.text == u'Changed test_tenant',
-                        "Error: saved tenant name is expected to be "
-                        "'Changed test_tenant'")
-
-    @test.create_stubs(
-        {api.keystone: ('tenant_list', 'tenant_get', 'domain_lookup')})
-    def test_inline_editing_cancel(self):
-        # Tenant List
-        api.keystone.tenant_list(IgnoreArg(),
-                                 domain=None,
-                                 marker=None,
-                                 paginate=True) \
-            .AndReturn([self.tenants.list(), False])
-        api.keystone.domain_lookup(IgnoreArg()).AndReturn({None: None})
-        # Edit mod
-        api.keystone.tenant_get(IgnoreArg(),
-                                u'1',
-                                admin=True) \
-            .AndReturn(self.tenants.list()[0])
-        # Cancel edit mod is without the request
-
-        self.mox.ReplayAll()
-
-        self.selenium.get("%s%s" % (self.live_server_url, INDEX_URL))
-
-        # Check the presence of the important elements
-        td_element = self.selenium.find_element_by_xpath(
-            "//td[@data-update-url='/identity/?action=cell_update"
-            "&table=tenants&cell_name=name&obj_id=1']")
-        cell_wrapper = td_element.find_element_by_class_name(
-            'table_cell_wrapper')
-        edit_button_wrapper = td_element.find_element_by_class_name(
-            'table_cell_action')
-        edit_button = edit_button_wrapper.find_element_by_tag_name('button')
-        # Hovering over td and clicking on edit
-        action_chains = ActionChains(self.selenium)
-        action_chains.move_to_element(cell_wrapper).click(edit_button)
-        action_chains.perform()
-        # Waiting for the AJAX response for switching to editing mod
-        wait = self.ui.WebDriverWait(self.selenium, 10,
-                                     ignored_exceptions=[socket_timeout])
-        wait.until(lambda x: self.selenium.find_element_by_name("name__1"))
-        # Click on cancel button
-        td_element = self.selenium.find_element_by_xpath(
-            "//td[@data-update-url='/identity/?action=cell_update"
-            "&table=tenants&cell_name=name&obj_id=1']")
-        td_element.find_element_by_class_name('inline-edit-cancel').click()
-        # Cancel is via javascript, so it should be immediate
-        # Checking that tenant name is not changed
-        data_wrapper = self.selenium.find_element_by_xpath(
-            "//td[@data-update-url='/identity/?action=cell_update"
-            "&table=tenants&cell_name=name&obj_id=1']"
-            "/div[@class='table_cell_wrapper']"
-            "/div[@class='table_cell_data_wrapper']")
-        self.assertTrue(data_wrapper.text == u'test_tenant',
-                        "Error: saved tenant name is expected to be "
-                        "'test_tenant'")
-
     @test.create_stubs({api.keystone: ('get_default_domain',
                                        'get_default_role',
                                        'user_list',
@@ -1796,9 +1695,3 @@ class SeleniumTests(test.SeleniumAdminTestCase):
 
         for user in users:
             self.assertIn(user.name, members.text)
-
-    @override_settings(OPENSTACK_KEYSTONE_ADMIN_ROLES=['foO', 'BAR', 'admin'])
-    def test_get_admin_roles(self):
-        mix_in = workflows.IdentityMixIn()
-        admin_roles = mix_in.get_admin_roles()
-        self.assertEqual(['foo', 'bar', 'admin'], admin_roles)

@@ -130,7 +130,7 @@ class Objects(generic.View):
         # filter out the folder from the listing if we're filtering for
         # contents of a (pseudo) folder
         contents = [{
-            'path': o.name,
+            'path': o.subdir if isinstance(o, swift.PseudoFolder) else o.name,
             'name': o.name.split('/')[-1],
             'bytes': o.bytes,
             'is_subdir': isinstance(o, swift.PseudoFolder),
@@ -154,7 +154,7 @@ class Object(generic.View):
     # note: not an AJAX request - the body will be raw file content
     @csrf_exempt
     def post(self, request, container, object_name):
-        """Create a new object or pseudo-folder
+        """Create or replace an object or pseudo-folder
 
         :param request:
         :param container:
@@ -176,23 +176,19 @@ class Object(generic.View):
 
         data = form.clean()
 
-        try:
-            if object_name[-1] == '/':
-                result = api.swift.swift_create_pseudo_folder(
-                    request,
-                    container,
-                    object_name
-                )
-            else:
-                result = api.swift.swift_upload_object(
-                    request,
-                    container,
-                    object_name,
-                    data['file']
-                )
-        except exceptions.AlreadyExists as e:
-            # 409 Conflict
-            return rest_utils.JSONResponse(str(e), 409)
+        if object_name[-1] == '/':
+            result = api.swift.swift_create_pseudo_folder(
+                request,
+                container,
+                object_name
+            )
+        else:
+            result = api.swift.swift_upload_object(
+                request,
+                container,
+                object_name,
+                data['file']
+            )
 
         return rest_utils.CreatedResponse(
             u'/api/swift/containers/%s/object/%s' % (container, result.name)

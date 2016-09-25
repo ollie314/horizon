@@ -49,7 +49,8 @@ ON_STATE = 'ON'
 
 ROUTER_INTERFACE_OWNERS = (
     'network:router_interface',
-    'network:router_interface_distributed'
+    'network:router_interface_distributed',
+    'network:ha_router_replicated_interface'
 )
 
 
@@ -72,7 +73,7 @@ class NeutronAPIDictWrapper(base.APIDictWrapper):
 
     def set_id_as_name_if_empty(self, length=8):
         try:
-            if not self._apidict['name']:
+            if not self._apidict['name'].strip():
                 id = self._apidict['id']
                 if length:
                     id = id[:length]
@@ -85,7 +86,7 @@ class NeutronAPIDictWrapper(base.APIDictWrapper):
 
     @property
     def name_or_id(self):
-        return (self._apidict.get('name') or
+        return (self._apidict.get('name').strip() or
                 '(%s)' % self._apidict['id'][:13])
 
 
@@ -417,10 +418,15 @@ class FloatingIpManager(network_base.FloatingIpManager):
         self._set_instance_info(fip)
         return FloatingIp(fip)
 
-    def allocate(self, pool):
-        body = {'floatingip': {'floating_network_id': pool,
-                               'tenant_id': self.request.user.project_id}}
-        fip = self.client.create_floatingip(body).get('floatingip')
+    def allocate(self, pool, tenant_id=None, **params):
+        if not tenant_id:
+            tenant_id = self.request.user.project_id
+        create_dict = {'floating_network_id': pool,
+                       'tenant_id': tenant_id}
+        if 'floating_ip_address' in params:
+            create_dict['floating_ip_address'] = params['floating_ip_address']
+        fip = self.client.create_floatingip(
+            {'floatingip': create_dict}).get('floatingip')
         self._set_instance_info(fip)
         return FloatingIp(fip)
 
@@ -638,20 +644,34 @@ def network_list_for_tenant(request, tenant_id, include_external=False,
     LOG.debug("network_list_for_tenant(): tenant_id=%s, params=%s"
               % (tenant_id, params))
 
-    # If a user has admin role, network list returned by Neutron API
-    # contains networks that do not belong to that tenant.
-    # So we need to specify tenant_id when calling network_list().
-    networks = network_list(request, tenant_id=tenant_id,
-                            shared=False, **params)
+    networks = []
+    shared = params.get('shared')
+    if shared is not None:
+        del params['shared']
 
-    # In the current Neutron API, there is no way to retrieve
-    # both owner networks and public networks in a single API call.
-    networks += network_list(request, shared=True, **params)
+    if shared in (None, False):
+        # If a user has admin role, network list returned by Neutron API
+        # contains networks that do not belong to that tenant.
+        # So we need to specify tenant_id when calling network_list().
+        networks += network_list(request, tenant_id=tenant_id,
+                                 shared=False, **params)
 
-    if include_external:
+    if shared in (None, True):
+        # In the current Neutron API, there is no way to retrieve
+        # both owner networks and public networks in a single API call.
+        networks += network_list(request, shared=True, **params)
+    params['router:external'] = params.get('router:external', True)
+    if params['router:external'] and include_external:
+        if shared is not None:
+            params['shared'] = shared
         fetched_net_ids = [n.id for n in networks]
-        ext_nets = network_list(request, **{'router:external': True})
-        networks += [n for n in ext_nets if n.id not in fetched_net_ids]
+        # Retrieves external networks when router:external is not specified
+        # in (filtering) params or router:external=True filter is specified.
+        # When router:external=False is specified there is no need to query
+        # networking API because apparently nothing will match the filter.
+        ext_nets = network_list(request, **params)
+        networks += [n for n in ext_nets if
+                     n.id not in fetched_net_ids]
 
     return networks
 
@@ -1058,6 +1078,18 @@ def list_dhcp_agent_hosting_networks(request, network, **params):
     return [Agent(a) for a in agents['agents']]
 
 
+def list_l3_agent_hosting_router(request, router, **params):
+    agents = neutronclient(request).list_l3_agent_hosting_routers(router,
+                                                                  **params)
+    return [Agent(a) for a in agents['agents']]
+
+
+def show_network_ip_availability(request, network_id):
+    ip_availability = neutronclient(request).show_network_ip_availability(
+        network_id)
+    return ip_availability
+
+
 def add_network_to_dhcp_agent(request, dhcp_agent, network_id):
     body = {'network_id': network_id}
     return neutronclient(request).add_network_to_dhcp_agent(dhcp_agent, body)
@@ -1132,11 +1164,11 @@ def _server_get_addresses(request, server, ports, floating_ips, network_names):
     def _format_address(mac, ip, type):
         try:
             version = netaddr.IPAddress(ip).version
-        except Exception as e:
+        except Exception:
             error_message = _('Unable to parse IP address %s.') % ip
             LOG.error(error_message)
             messages.error(request, error_message)
-            raise e
+            raise
         return {u'OS-EXT-IPS-MAC:mac_addr': mac,
                 u'version': version,
                 u'addr': ip,
@@ -1166,9 +1198,9 @@ def _server_get_addresses(request, server, ports, floating_ips, network_names):
 def list_extensions(request):
     extensions_list = neutronclient(request).list_extensions()
     if 'extensions' in extensions_list:
-        return extensions_list['extensions']
+        return tuple(extensions_list['extensions'])
     else:
-        return {}
+        return ()
 
 
 @memoized
@@ -1275,8 +1307,7 @@ def get_feature_permission(request, feature, operation=None):
 
     # Check policy
     feature_policies = feature_info.get('policies')
-    policy_check = getattr(settings, "POLICY_CHECK_FUNCTION", None)
-    if feature_policies and policy_check:
+    if feature_policies:
         policy_name = feature_policies.get(operation)
         if not policy_name:
             # Translators: Only used inside Horizon code and invisible to users

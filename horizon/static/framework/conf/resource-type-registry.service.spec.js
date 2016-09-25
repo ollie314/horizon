@@ -38,20 +38,8 @@
       expect(service.getResourceType('something').detailsViews).toBeDefined();
     });
 
-    it('init calls initScope on item and batch actions', function() {
-      var action = { service: { initScope: angular.noop } };
-      spyOn(action.service, 'initScope');
-      service.getResourceType('newthing').batchActions.push(action);
-      service.initActions('newthing', { '$new': function() { return 4; }} );
-      expect(action.service.initScope).toHaveBeenCalledWith(4);
-    });
-
-    it('init ignores initScope when not present', function() {
-      var action = { service: { } };
-      service.getResourceType('newthing').batchActions.push(action);
-      var returned = service.initActions('newthing', {} );
-      // but we got here
-      expect(returned).toBeUndefined();
+    it('establishes filterFacets on a resourceType object', function() {
+      expect(service.getResourceType('something').filterFacets).toBeDefined();
     });
 
     describe('getResourceType', function() {
@@ -61,25 +49,19 @@
       });
 
       it('returns a new resource type object', function() {
-        var value = service.getResourceType('something', {here: "I am"});
+        var value = service.getResourceType('something');
         expect(value).toBeDefined();
       });
 
-      it('takes the given properties', function() {
-        var value = service.getResourceType('something', {here: "I am"});
-        expect(value.here).toEqual('I am');
-      });
-
       it('has an setProperty function', function() {
-        var value = service.getResourceType('something', {here: "I am"});
+        var value = service.getResourceType('something');
         expect(value.setProperty).toBeDefined();
       });
 
-      it('can be called multiple times, overlaying values', function() {
-        var value = service.getResourceType('something', {here: "I am"});
-        service.getResourceType('something', {another: "Thing"});
-        expect(value.here).toBe('I am');
-        expect(value.another).toBe('Thing');
+      it('can be called multiple times', function() {
+        var value = service.getResourceType('something');
+        var value2 = service.getResourceType('something');
+        expect(value).toBe(value2);
       });
     });
 
@@ -88,12 +70,22 @@
       expect(service.getDefaultDetailsTemplateUrl()).toBe('/my/path.html');
     });
 
+    it('get/setDefaultSummaryTemplateUrl sets/retrieves a URL', function() {
+      service.setDefaultSummaryTemplateUrl('/my/path.html');
+      expect(service.getDefaultSummaryTemplateUrl()).toBe('/my/path.html');
+    });
+
     describe('label', function() {
       var label;
       beforeEach(function() {
+        var properties = {
+          id: 'eyedee',
+          bd: { label: 'beedee' }
+        };
         var value = service.getResourceType('something', {})
           .setProperty('example', {label: gettext("Example")})
-          .setProperty('bad_example', {});
+          .setProperty('bad_example', {})
+          .setProperties(properties);
         label = value.label;
       });
 
@@ -108,86 +100,127 @@
       it('returns the nice label if there is one', function() {
         expect(label('example')).toBe('Example');
       });
-    });
 
-    describe('format', function() {
-      var format;
-      beforeEach(function() {
-        var value = service.getResourceType('something', {})
-          .setProperty('mapping', {value_mapping: {'a': 'apple', 'j': 'jacks'}})
-          .setProperty('func', {value_function: function(x) { return x.replace('a', 'y'); }})
-          .setProperty('default-func', {value_mapping: {a: 'apple'},
-             value_mapping_default_function: function(x) { return x.replace('i', 'a'); }})
-          .setProperty('multi-func', {value_function: [
-            function(x) { return x.replace('a', 'y'); },
-            function(x) { return x.replace('y', 'x'); }
-          ]})
-          .setProperty('default', {value_mapping: {},
-            value_mapping_default_value: 'Fell Thru'})
-          .setProperty('bad_example', {});
-        format = value.format;
-      });
-
-      it('returns the value if there is no such property', function() {
-        expect(format('not_exist', 'apple')).toBe('apple');
-      });
-
-      it('returns the value if there is no mapping, function, or default', function() {
-        expect(format('bad_example', 'apple')).toBe('apple');
-      });
-
-      it('returns the mapped value if there is one', function() {
-        expect(format('mapping', 'a')).toBe('apple');
-      });
-
-      it('returns the function return value if there is a value', function() {
-        expect(format('func', 'apple')).toBe('ypple');
-      });
-
-      it('returns the multiple function return value if there is an array', function() {
-        expect(format('multi-func', 'apple')).toBe('xpple');
-      });
-
-      it('returns the default mapping value if there is no mapping or function', function() {
-        expect(format('default', 'apple')).toBe('Fell Thru');
-      });
-
-      it('returns the original value if there is no matching mapping & no default', function() {
-        expect(format('mapping', 'what')).toBe('what');
-      });
-
-      it('returns the value_mapping_default_function result when no matching mapping', function() {
-        expect(format('default-func', 'missing')).toBe('massing');
+      it('returns the properties set via the properties descriptor', function() {
+        expect(label('id')).toBe('eyedee');
+        expect(label('bd')).toBe('beedee');
       });
     });
 
     describe('getName', function() {
       it('returns nothing if names not provided', function() {
-        var type = service.getResourceType('something', {});
+        var type = service.getResourceType('something');
         expect(type.getName(2)).toBeUndefined();
       });
 
       it('returns plural if count not provided', function() {
-        var type = service.getResourceType('something',
-          {names: ['Name', 'Names']});
+        var type = service.getResourceType('something')
+          .setNames('Name', 'Names');
         expect(type.getName()).toBe('Names');
       });
 
       it('returns singular if given one', function() {
-        var type = service.getResourceType('something', {names: ["Image", "Images"]});
+        var type = service.getResourceType('something')
+          .setNames("Image", "Images");
         expect(type.getName(1)).toBe('Image');
       });
 
       it('returns plural if given two', function() {
-        var type = service.getResourceType('something', {names: ["Image", "Images"]});
+        var type = service.getResourceType('something')
+          .setNames("Image", "Images");
         expect(type.getName(2)).toBe('Images');
       });
+    });
+
+    it('manages the tableColumns', function() {
+      var type = service.getResourceType('something');
+      type.tableColumns.push({id: "im-an-id"});
+      type.tableColumns.push({title: "im-a-title"});
+      expect(type.getTableColumns()).toEqual([{id: "im-an-id", title: "im-an-id"},
+        {title: "im-a-title"}]);
+    });
+
+    it('places property .values and .filters on table', function() {
+      var type = service.getResourceType('something');
+      var func = angular.noop;
+      type.setProperty('im-an-id', {filters: [func], values: {a: 'apple'}});
+      type.tableColumns.push({id: "im-an-id"});
+      expect(type.getTableColumns()[0].filters).toEqual([func]);
+      expect(type.getTableColumns()[0].values).toEqual({a: 'apple'});
+    });
+
+    it('getProperties returns a copy of the properties', function() {
+      var type = service.getResourceType('something');
+      type.setProperty('im-an-id', {values: {a: 'apple'}});
+      expect(type.getProperties()['im-an-id']).toEqual({values: {a: 'apple'}});
+    });
+
+    it('manages the globalActions', function() {
+      var typeA = service.getResourceType('a');
+      var typeB = service.getResourceType('b');
+      typeA.globalActions.push({id: "action-a"});
+      typeB.globalActions.push({id: "action-b"});
+      expect(service.getGlobalActions()).toEqual([{id: "action-a"}, {id: "action-b"}]);
     });
 
     describe('functions the resourceType object', function() {
       var type;
       beforeEach(function() {
         type = service.getResourceType('something');
+      });
+
+      it('initActions calls initScope on item and batch actions', function () {
+        var action = {service: {initScope: angular.noop}};
+        spyOn(action.service, 'initScope');
+        type.batchActions.push(action);
+        type.initActions({
+          '$new': function () {
+            return 4;
+          }
+        });
+        expect(action.service.initScope).toHaveBeenCalledWith(4);
+      });
+
+      it('initActions ignores initScope when not present', function () {
+        var action = {service: {}};
+        type.batchActions.push(action);
+        var returned = type.initActions({});
+        // but we got here
+        expect(returned).toBeUndefined();
+      });
+
+      it("sets a default path generator", function() {
+        expect(type.path({id: 'hello'})).toBe('hello');
+      });
+
+      it("default load function returns a promise", function() {
+        expect(type.load()).toBeDefined();
+      });
+
+      it("allows setting a list function", function() {
+        function list() {
+          return 'this would be a promise';
+        }
+        type.setListFunction(list);
+        expect(type.list()).toBe('this would be a promise');
+      });
+
+      it("has a default isInTransition function that returns false", function() {
+        expect(type.itemInTransitionFunction()).toBe(false);
+      });
+
+      it("allows setting an isInTransition function", function() {
+        function isInTransitionTest() {
+          return "would return a boolean";
+        }
+        type.setItemInTransitionFunction(isInTransitionTest);
+        expect(type.itemInTransitionFunction()).toBe("would return a boolean");
+      });
+
+      it("allows setting of a summary template URL", function() {
+        type.setSummaryTemplateUrl('/my/path.html');
+        expect(type.summaryTemplateUrl).toBe('/my/path.html');
+        expect(type.setSummaryTemplateUrl('/what')).toBe(type);
       });
 
       it('itemName defaults to returning the name of an item', function() {
@@ -202,12 +235,8 @@
         expect(type.itemName(item)).toBe('Mr. MegaMan');
       });
 
-      it("pathParser return has resourceTypeCode embedded", function() {
-        expect(type.parsePath('abcd').resourceTypeCode).toBe('something');
-      });
-
       it("pathParser defaults to using the full path as the id", function() {
-        expect(type.parsePath('abcd').identifier).toBe('abcd');
+        expect(type.parsePath('abcd')).toBe('abcd');
       });
 
       it("setPathParser sets the function for parsing the path", function() {
@@ -215,16 +244,13 @@
           var y = x.split('/');
           return {poolId: y[0], memberId: y[1]};
         };
-        var expected = {
-          identifier: {poolId: '12', memberId: '42'},
-          resourceTypeCode: 'something'
-        };
+        var expected = {poolId: '12', memberId: '42'};
         type.setPathParser(func);
         expect(type.parsePath('12/42')).toEqual(expected);
       });
 
       it("pathParser defaults to using the full path as the id", function() {
-        expect(type.parsePath('abcd').identifier).toBe('abcd');
+        expect(type.parsePath('abcd')).toBe('abcd');
       });
 
       it("setPathParser sets the function for parsing the path", function() {
@@ -232,10 +258,7 @@
           var y = x.split('/');
           return {poolId: y[0], memberId: y[1]};
         };
-        var expected = {
-          identifier: {poolId: '12', memberId: '42'},
-          resourceTypeCode: 'something'
-        };
+        var expected = {poolId: '12', memberId: '42'};
         type.setPathParser(func);
         expect(type.parsePath('12/42')).toEqual(expected);
       });
@@ -245,8 +268,8 @@
           return x.poolId + '/' + x.memberId;
         };
         type.setPathGenerator(func);
-        var identifier = {poolId: '12', memberId: '42'};
-        expect(type.pathGenerator(identifier)).toBe('12/42');
+        var item = {poolId: '12', memberId: '42'};
+        expect(type.path(item)).toBe('12/42');
       });
 
       it('setLoadFunction sets the function used by "load"', function() {
@@ -255,6 +278,24 @@
         };
         type.setLoadFunction(api.loadMe);
         expect(type.load()).toEqual({an: 'object'});
+      });
+
+      it('detects that a load function has not been set', function() {
+        expect(type.isLoadFunctionSet()).toEqual(false);
+      });
+
+      it('detects that a load function has been set', function() {
+        type.setLoadFunction(angular.noop);
+        expect(type.isLoadFunctionSet()).toEqual(true);
+      });
+
+      it('detects that a list function has not been set', function() {
+        expect(type.isListFunctionSet()).toEqual(false);
+      });
+
+      it('detects that a list function has been set', function() {
+        type.setListFunction(angular.noop);
+        expect(type.isListFunctionSet()).toEqual(true);
       });
     });
   });

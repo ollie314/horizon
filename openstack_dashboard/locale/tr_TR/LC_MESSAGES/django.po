@@ -1,14 +1,12 @@
-# Daisy <guoyingc@cn.ibm.com>, 2015. #zanata
-# Doug Fish <drfish@us.ibm.com>, 2015. #zanata
 # Mücahit Büyükyılmaz <mucahit@deltanoc.com>, 2015. #zanata
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 # Mücahit Büyükyılmaz <mucahit@deltanoc.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 9.0.1.dev276\n"
+"Project-Id-Version: horizon 10.0.0.0b4.dev98\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-05-15 05:33+0000\n"
+"POT-Creation-Date: 2016-09-07 18:08+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,318 +16,6 @@ msgstr ""
 "Language: tr-TR\n"
 "X-Generator: Zanata 3.7.3\n"
 "Plural-Forms: nplurals=2; plural=(n>1)\n"
-
-#, python-format
-msgid ""
-"\n"
-"            <a href=\"%(volume_url)s\">%(volume_label)s</a> on "
-"%(volume_device)s\n"
-"            "
-msgstr ""
-"\n"
-"            <a href=\"%(volume_url)s\">%(volume_label)s</a> "
-"%(volume_device)s\n"
-"            "
-
-#, python-format
-msgid ""
-"\n"
-"        Other IPv6 modes: ipv6_ra_mode=%(ra_mode)s, ipv6_address_mode="
-"%(addr_mode)s\n"
-"        "
-msgstr ""
-"\n"
-"        Diğer IPv6 kipleri: ipv6_ra_mode=%(ra_mode)s, ipv6_address_mode="
-"%(addr_mode)s\n"
-"        "
-
-msgid ""
-"\n"
-"        When the volume status is \"in-use\", you can use \"Force\" to "
-"upload the\n"
-"        volume to an image.\n"
-"       "
-msgstr ""
-"\n"
-"        Mantıksal sürücü durumu \"kullanımda\" olduğunda, \"Zorla\" "
-"kullanarak mantıksal sürücüyü\n"
-"        bir imaja yükleyebilirsiniz.\n"
-"       "
-
-#, python-format
-msgid ""
-"\n"
-"      <a href=\"%(instance_url)s\">%(instance_name)s</a> on %(device)s\n"
-"      "
-msgstr ""
-"\n"
-"      %(device)s üzerindeki <a href=\"%(instance_url)s\">%(instance_name)s</"
-"a>\n"
-"      "
-
-msgid ""
-"\n"
-"      Change the volume type of a volume after its creation.\n"
-"      This is equivalent to the <tt>cinder retype</tt> command.\n"
-"     "
-msgstr ""
-"\n"
-"      Bir mantıksal sürücünün mantıksal sürücü türünü oluşturulmasından\n"
-"      sonra değiştir. Bu, <tt>cinder retype</tt> komutuna denktir.\n"
-"     "
-
-msgid ""
-"\n"
-"      Choose \"Disk Format\" for the image. The volume images are created "
-"with\n"
-"      the QEMU disk image utility.\n"
-"     "
-msgstr ""
-"\n"
-"      İmaj için \"Disk Biçimi\" seçin. Mantıksal sürücü imajları QEMU disk "
-"imaj yardımcı uygulaması ile oluşturulur.\n"
-"     "
-
-msgid ""
-"\n"
-"      QoS Specs can be associated with volume types.\n"
-"      It is used to map to a set of quality of service capabilities "
-"requested\n"
-"      by the volume owner. This is equivalent to the\n"
-"      <tt>cinder qos-create</tt> command. Once the QoS Spec gets created,\n"
-"      click the \"Manage Specs\" button to manage the key-value specs for "
-"the QoS Spec.\n"
-"      <br>\n"
-"      <br>\n"
-"      Each QoS Specs entity will have a \"Consumer\" value which indicates "
-"where the\n"
-"      administrator would like the QoS policy to be enforced. This value can "
-"be \"front-end\"\n"
-"      (Nova Compute), \"back-end\" (Cinder back-end), or \"both\".\n"
-"  "
-msgstr ""
-"\n"
-"      QoS Özellikleri mantıksal sürücü türleriyle ilişkilendirilebilir.\n"
-"      Mantıksal sürücü sahibi tarafından istenen bir servis kalitesi "
-"kapasitesine\n"
-"      haritalama için kullanılır. Bu <tt>cinder qos-create</tt> komutuna "
-"karşılık gelir.\n"
-"      QoS Özelliği oluşturulduğunda, \"Özellikleri Yönet\" düğmesine "
-"tıklayarak\n"
-"      QoS Özelliğinin anahtar-değer özelliklerini yönetebilirsiniz.\n"
-"      <br>\n"
-"      <br>\n"
-"      Her QoS Özelliği girdisinin yöneticinin QoS ilkesinin nerde "
-"zorlanmasını istediğini\n"
-"      belirten bir \"Tüketici\" değeri vardır. Bu değer \"ön-uç\" (Nova "
-"Hesaplama), \"arka-uç\"\n"
-"      (Cinder arka-ucu), veya \"ikisi de\" olabilir.\n"
-"  "
-
-msgid ""
-"\n"
-"      The \"Migration Policy\" is only used if the volume retype cannot be\n"
-"      completed. If the \"Migration Policy\" is \"On Demand\", the back end "
-"will\n"
-"      perform volume migration. Note that migration may take a significant\n"
-"      amount of time to complete, in some cases hours.\n"
-"     "
-msgstr ""
-"\n"
-"      \"Göç İlkesi\" yalnızca mantıksal sürücü yeniden yazımı tamamlanamazsa "
-"kullanılır.\n"
-"      \"Göç İlkesi\" \"İstenildiğinde\" ise, arka uç mantıksal sürücü göçünü "
-"gerçekleştirir.\n"
-"      Göçün kayda değer zaman alabileceğini unutmayın, bazı durumlarda "
-"saatler alabilir.\n"
-"     "
-
-msgid ""
-"\n"
-"      The \"Volume Type\" selected must be different from the current volume "
-"type.\n"
-"     "
-msgstr ""
-"\n"
-"      Seçilen \"Mantıksal Sürücü Türü\" mevcut mantıksal sürücü türünden "
-"farklı olmalıdır.\n"
-"     "
-
-msgid ""
-"\n"
-"      Upload the volume to the Image Service as an image.\n"
-"      This is equivalent to the <tt>cinder upload-to-image</tt> command.\n"
-"     "
-msgstr ""
-"\n"
-"      Mantıksal Sürücüyü İmaj Servisine imaj olarak yükle.\n"
-"      Bu, <tt>cinder upload-to-image</tt> komutuna denktir.\n"
-"     "
-
-msgid ""
-"\n"
-"      Volume type is a type or label that can be selected at volume "
-"creation\n"
-"      time in OpenStack. It usually maps to a set of capabilities of the "
-"storage\n"
-"      back-end driver to be used for this volume. Examples: \"Performance"
-"\",\n"
-"      \"SSD\", \"Backup\", etc. This is equivalent to the\n"
-"      <tt>cinder type-create</tt> command. Once the volume type gets "
-"created,\n"
-"      click the \"View Extra Specs\" button to set up extra specs key-value\n"
-"      pair(s) for that volume type.\n"
-"     "
-msgstr ""
-"\n"
-"      Mantıksal sürücü türü Openstack'de mantıksal sürücü oluştururken "
-"seçilebilecek bir tür ya da\n"
-"      etikettir. Genellikle bu mantıksal sürücü için kullanılacak depolama "
-"art-alan sürücüsünün\n"
-"      yetenek kümesine karşılık gelir. Örnekler: \"Performans\", \"SSD\", "
-"\"Yedek\", vs.\n"
-"      Bu <tt>cinder type-create</tt> komutuna karşılık gelir. Mantıksal "
-"sürücü türü\n"
-"      oluşturulduğunda, \"Ek Özellikleri Görüntüle\" düğmesine tıklayarak bu "
-"mantıksal sürücü\n"
-"      için ek özellik anahtar-değer çiftleri ayarlayabilirsiniz.\n"
-"     "
-
-msgid ""
-"\n"
-"    \"Manage\" an existing volume from a Cinder host. This will make the "
-"volume visible within\n"
-"    OpenStack.\n"
-"    <br>\n"
-"    <br>\n"
-"    This is equivalent to the <tt>cinder manage</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-"    Mevcut bir mantıksal sürücüyü Cinder istemciden \"Yönet\". Bu, mantıksal "
-"sürücüyü OpenStack\n"
-"    içinde görünür yapar.\n"
-"    <br>\n"
-"    <br>\n"
-"    Bu, <tt>cinder manage</tt> komutuna denktir.\n"
-"    "
-
-msgid ""
-"\n"
-"    Each QoS Specs entity will have a \"Consumer\" value which indicates "
-"where the\n"
-"    administrator would like the QoS policy to be enforced. This value can "
-"be \"front-end\"\n"
-"    (Nova Compute), \"back-end\" (Cinder back-end), or \"both\".\n"
-"    "
-msgstr ""
-"\n"
-"    Her QoS Özellikleri biriminin yöneticinin QoS ilkesinin nerede "
-"zorlanması gerektiğini\n"
-"    gösterdiği bir \"Tüketici\" değeri olacaktır. Bu değer \"ön-uç\" (Nova "
-"Hesaplama), \"arka-uç\"\n"
-"    (Cinder arka-ucu), veya \"ikisi de\" olabilir.\n"
-"    "
-
-msgid ""
-"\n"
-"    Migrate a volume to a specific host.\n"
-"    <br>\n"
-"    <br>\n"
-"    Force Host Copy: Enables or disables generic host-based force-migration, "
-"which bypasses driver optimizations.\n"
-"    "
-msgstr ""
-"\n"
-"    Bir mantıksal sürücüyü belirli bir istemciye göç ettir.\n"
-"    <br>\n"
-"    <br>\n"
-"    İstemci Kopyalamaya Zorla: Genel istemci tabanlı göçe zorlamayı açar ya "
-"da kapatır, bu işlem sürücü iyileştirmelerinin atlanmasına sebep olur.\n"
-"    "
-
-msgid ""
-"\n"
-"    The status of a volume is normally managed automatically.  In some "
-"circumstances an\n"
-"    administrator may need to explicitly update the status value.  This is "
-"equivalent to\n"
-"    the <tt>cinder reset-state</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-"    Bir mantıksal sürücünün durumu normalde otomatik yönetilir.  Bazı "
-"durumlarda\n"
-"    yönetici durum değerini ayrıca güncellemek isteyebilir.  Bu <tt>cinder "
-"reset-state</tt>\n"
-"    komutuna eşdir.\n"
-"    "
-
-msgid ""
-"\n"
-"    The status of a volume snapshot is normally managed automatically.  In "
-"some circumstances\n"
-"    an administrator may need to explicitly update the status value. This is "
-"equivalent to\n"
-"    the <tt>cinder snapshot-reset-state</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-"    Mantıksal sürücü anlık görüntüsünün durumu normalde otomatik yönetilir.\n"
-"    Bazı durumlarda yönetici ayrıca durum değerini güncellemek isteyebilir.  "
-"Bu,\n"
-"    <tt>cinder snapshot-reset-state</tt> komutuna denktir.\n"
-"    "
-
-msgid ""
-"\n"
-"    When a volume is \"unmanaged\", the volume will no longer be visible "
-"within OpenStack. Note that the\n"
-"    volume will not be deleted from the Cinder host.\n"
-"    <br>\n"
-"    <br>\n"
-"    This is equivalent to the <tt>cinder unmanage</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-"    Bir mantıksal sürücü \"yönetilmiyor\" olduğunda, mantıksal sürücü "
-"OpenStack içinde görünmez.\n"
-"    Mantıksal sürücünün Cinder istemcisinden silinmeyeceğini unutmayın.\n"
-"    <br>\n"
-"    <br>\n"
-"    Bu, <tt>cinder unmanage</tt> komutuna denktir.\n"
-"    "
-
-msgid ""
-"\n"
-"  Assign a name and description for the pool. Choose one subnet where all\n"
-"  members of this pool must be on. Select the protocol and load balancing\n"
-"  method for this pool. Admin State is UP (checked) by default.\n"
-"  "
-msgstr ""
-"\n"
-"  Havuz için bir isim ve açıklama atayın. Bu havuzun tüm üyelerinin "
-"bulunması\n"
-"  gereken bir alt ağ seçin. Bu havuz için iletişim kuralı ve yük dengeleme\n"
-"  yöntemi seçin. Varsayılan olarak Yönetici Durumu Açık (işaretli).\n"
-"  "
-
-msgid ""
-"\n"
-" Create a VIP for this pool. Assign a name, description, IP address, port,\n"
-" and maximum connections allowed for the VIP. Choose the protocol and "
-"session persistence\n"
-" method for the VIP. Admin State is UP (checked) by default.\n"
-" "
-msgstr ""
-"\n"
-" Bu havuz için bir VIP oluştur. Bir isim, tanımlama, IP adresi, bağlantı "
-"noktası,\n"
-" ve VIP için izin verilen azami bağlantıları ata. Varsayılan iletişim kuralı "
-"ve VIP için\n"
-" oturum kalıcılığı yöntemini seç. Yönetici Durumu varsayılan olarak açıktır "
-"(işaretli).\n"
-" "
 
 msgid " - End"
 msgstr " - Bitiş"
@@ -473,9 +159,6 @@ msgstr ""
 "Veri bir kapta saklanmalıdır, dolayısıyla veri yüklemeden önce hesabınızda "
 "tanımlı en az bir kap olmak zorundadır."
 
-msgid "A image or external image location must be specified."
-msgstr "Bir imaj ya da harici imaj konumu belirtilmelidir."
-
 msgid "A local environment to upload."
 msgstr "Yüklenecek yerel çevre."
 
@@ -487,15 +170,6 @@ msgstr "Yüklenecek bir yerel üst veri tanımlama dosyası."
 
 msgid "A local template to upload."
 msgstr "Yüklenecek yerel bir şablon."
-
-msgid ""
-"A more specific rule affects a portion of this traffic so a rule cannot be "
-"automatically generated to control the behavior of the entire source/"
-"destination combination."
-msgstr ""
-"Daha özel bir kural bu trafiğin belli bir kısmını etkiliyor, yani tüm kaynak/"
-"hedef kombinasyonlarının davranışını kontrol eden bir kural otomatik olarak "
-"üretilemiyor."
 
 msgid "A new uploaded file will replace the content of the current object"
 msgstr "Yeni yüklenen dosya mevcut nesnenin içeriğini değiştirecek"
@@ -526,14 +200,6 @@ msgstr "İZİNVER"
 msgid "ALLOW %(ethertype)s %(proto_port)s %(direction)s %(remote)s"
 msgstr "İzin ver %(ethertype)s %(proto_port)s %(direction)s %(remote)s"
 
-#, python-format
-msgid "ALLOW %(from)s:%(to)s/%(ip_protocol)s from %(cidr)s"
-msgstr "%(cidr)s 'dan izin ver %(from)s:%(to)s/%(ip_protocol)s"
-
-#, python-format
-msgid "ALLOW %(from)s:%(to)s/%(ip_protocol)s from %(group)s"
-msgstr "%(group)s 'dan izin ver %(from)s:%(to)s/%(ip_protocol)s"
-
 msgid "AMI - Amazon Machine Image"
 msgstr "AMI - Amazon Makine İmajı"
 
@@ -548,9 +214,6 @@ msgstr "API Endpoints"
 
 msgid "ARI - Amazon Ramdisk Image"
 msgstr "ARI - Amazon Ramdisk İmajı"
-
-msgid "AWS compatible"
-msgstr "AWS uyumlu"
 
 msgid "Accept Transfer"
 msgstr "Aktarımı Kabul Et"
@@ -576,9 +239,6 @@ msgstr "Eylem Günlüğü"
 msgid "Action for the firewall rule"
 msgstr "Güvenlik duvarı için eylem"
 
-msgid "Action:"
-msgstr "Eylem:"
-
 msgctxt "Current status of a Firewall"
 msgid "Active"
 msgstr "Etkin"
@@ -592,14 +252,6 @@ msgid "Active"
 msgstr "Etkin"
 
 msgctxt "Current status of a Pool"
-msgid "Active"
-msgstr "Etkin"
-
-msgctxt "Current status of a VPN Service"
-msgid "Active"
-msgstr "Etkin"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Active"
 msgstr "Etkin"
 
@@ -704,9 +356,6 @@ msgstr "Router Ekle"
 
 msgid "Add Router Route"
 msgstr "Router Rotası Ekle"
-
-msgid "Add Router Rule"
-msgstr "Router Kuralı Ekle"
 
 msgid "Add Router to Firewall"
 msgstr "Güvenlik Duvarına Router Ekle"
@@ -951,11 +600,6 @@ msgstr "Ayrılmış"
 #, python-format
 msgid "Allocated Floating IP %(ip)s."
 msgstr "Değişken IP %(ip)s ayrılıyor."
-
-msgid ""
-"Allocates requests to the instance with the least number of\n"
-"          active connections."
-msgstr "İstekleri en az etkin bağlantısı olan sunucuya aktarır."
 
 msgid "Allocation Pools"
 msgstr "Ayırma Havuzları"
@@ -1267,9 +911,6 @@ msgstr "CIDR belirtilmeli."
 msgid "CPU time used"
 msgstr "Kullanılan CPU Süresi"
 
-msgid "Can not specify both image and external image location."
-msgstr "Hem imaj hem harici imaj konumu belirtilemez."
-
 msgid "Cancel"
 msgstr "İptal"
 
@@ -1388,15 +1029,6 @@ msgstr ""
 "Kullanılabilir Routerlar dan Seçilen Routerlara button veya sürükle bırak "
 "yardımıyla Router(lar) seçin. "
 
-msgid ""
-"Choose rule(s) from Available Rules to Selected Rule by push button or drag "
-"and drop,\n"
-"you may change their order by drag and drop as well. "
-msgstr ""
-"Kullanılabilir Kurallardan Seçili Kurala düğme yardımıyla veya sürükleyip "
-"bırakarak kural seçin,\n"
-"sıralarını da sürükleyip bırakarak değiştirebilirsiniz. "
-
 msgid "Choose the flavor to launch."
 msgstr "Başlatma için şablon seçin."
 
@@ -1456,9 +1088,6 @@ msgstr "Soğuk Göç"
 msgid "Comma-separated key=value pairs"
 msgstr "Virgülle ayrılmış anahtar=değer çiftleri"
 
-msgid "Component"
-msgstr "Bileşen"
-
 msgid "Compute"
 msgstr "Compute"
 
@@ -1510,9 +1139,6 @@ msgstr "Yeniden Boyutlama/Göç'ü Doğrula ya da Geri Al"
 msgctxt "Task status of an Instance"
 msgid "Confirming Resize or Migrate"
 msgstr "Yeniden Boyutlama veya Göç Doğrulanıyor"
-
-msgid "Conflicting Rule"
-msgstr "Çatışan Kural"
 
 msgid "Connection Limit"
 msgstr "Bağlantı Sınırı"
@@ -1655,17 +1281,6 @@ msgstr "Grup Oluştur"
 
 msgid "Create Host Aggregate"
 msgstr "Host Kümesi Oluştur"
-
-msgid ""
-"Create IPSec Site Connection for current project.\n"
-"\n"
-"Assign a name and description for the IPSec Site Connection. All fields in "
-"this tab are required."
-msgstr ""
-"Mevcut proje için IPSec Site Bağlantısı Oluştur.\n"
-"\n"
-"IPSec Site Bağlantısı için bir isim ve tanımlama atayın. Bu sekmedeki tüm "
-"alanlar gereklidir."
 
 msgid "Create Image"
 msgstr "İmaj Oluştur"
@@ -1860,10 +1475,6 @@ msgctxt "Current status of a Pool"
 msgid "Created"
 msgstr "Oluşturuldu"
 
-msgctxt "Current status of a VPN Service"
-msgid "Created"
-msgstr "Oluşturuldu"
-
 #, python-format
 msgid "Created extra spec \"%s\"."
 msgstr "\"%s\" ekstra özellik oluşturuldu."
@@ -1895,9 +1506,6 @@ msgstr "\"%s\" özelliği oluşturuldu."
 #, python-format
 msgid "Created subnet \"%s\"."
 msgstr "Alt ağ \"%s\" oluşturuldu."
-
-msgid "Created volume transfer."
-msgstr "Oluşturulan birim aktarımı."
 
 #, python-format
 msgid "Created volume transfer: \"%s\"."
@@ -2233,11 +1841,6 @@ msgid_plural "Delete Routers"
 msgstr[0] "Yönlendiricileri Sil"
 msgstr[1] ""
 
-msgid "Delete Router Rule"
-msgid_plural "Delete Router Rules"
-msgstr[0] "Yönlendirici Kurallarını Sil"
-msgstr[1] ""
-
 msgid "Delete Rule"
 msgid_plural "Delete Rules"
 msgstr[0] "Kuralları Sil"
@@ -2401,11 +2004,6 @@ msgid_plural "Deleted Routers"
 msgstr[0] "Yönlendiriciler Silindi"
 msgstr[1] ""
 
-msgid "Deleted Router Rule"
-msgid_plural "Deleted Router Rules"
-msgstr[0] "Yönlendirici Kuralları Silindi"
-msgstr[1] ""
-
 msgid "Deleted Rule"
 msgid_plural "Deleted Rules"
 msgstr[0] "Kurallar Silindi"
@@ -2467,9 +2065,6 @@ msgstr "Siliniyor"
 msgid "Deleting VIP %s from this pool cannot be undone."
 msgstr "%s VIP'inin bu havuzdan silinmesi geri alınamaz."
 
-msgid "Deny"
-msgstr "Reddet"
-
 msgid "Description"
 msgstr "Açıklama"
 
@@ -2511,9 +2106,6 @@ msgstr "Hedef nesne ismi"
 
 msgid "Destination port (integer in [1, 65535] or range in a:b)"
 msgstr "Hedef bağlantı noktası  ([1, 65535] veya a:b aralığında tam sayı)"
-
-msgid "Destination:"
-msgstr "Hedef:"
 
 msgid "Detach Interface"
 msgstr "Arayüzü Ayır"
@@ -2732,14 +2324,6 @@ msgid "Down"
 msgstr "Alt"
 
 msgctxt "Current status of a Pool"
-msgid "Down"
-msgstr "Alt"
-
-msgctxt "Current status of a VPN Service"
-msgid "Down"
-msgstr "Alt"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Down"
 msgstr "Alt"
 
@@ -2987,9 +2571,6 @@ msgstr "ICMP kodu için (-1: 255) aralığında bir değer girin. "
 msgid "Enter a value for ICMP type in the range (-1: 255)"
 msgstr "ICMP tipi için (-1: 255) aralığında bir değer girin. "
 
-msgid "Enter an integer value between 0 and 255 (or -1 which means wildcard)."
-msgstr "0 ile 255 arası bir tam sayı girin (veya wildcard için -1)"
-
 msgid "Enter an integer value between 1 and 65535."
 msgstr "1 ile 65535 arası bir tam sayı girin."
 
@@ -3044,19 +2625,11 @@ msgctxt "Current status of a Pool"
 msgid "Error"
 msgstr "Hata"
 
-msgctxt "Current status of a VPN Service"
-msgid "Error"
-msgstr "Hata"
-
 msgctxt "Current status of a Volume"
 msgid "Error"
 msgstr "Hata"
 
 msgctxt "Current status of a Volume Backup"
-msgid "Error"
-msgstr "Hata"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Error"
 msgstr "Hata"
 
@@ -3236,10 +2809,6 @@ msgstr "Ajan %(agent_name)s %(network)s ağı için eklenemedi."
 #, python-format
 msgid "Failed to add route : %s"
 msgstr "Rota ekleme başarısız : %s"
-
-#, python-format
-msgid "Failed to add router rule %s"
-msgstr "Router kuralı %s eklenemedi"
 
 #, python-format
 msgid "Failed to add router(s) to firewall %(name)s: %(reason)s"
@@ -3718,13 +3287,6 @@ msgstr ""
 "atamak için kullanılırlar. Grubu oluşturduktan sonra, grubu düzenleyerek "
 "kullanıcıları gruba ekleyin."
 
-msgid ""
-"Groups are used to manage access and assign roles to multiple users at once. "
-"Edit the group to add users."
-msgstr ""
-"Gruplar birden çok kullanıcıya aynı anda rol atama ve erişimi yönetme için "
-"kullanılırlar. Kullanıcı eklemek için grubu düzenleyin."
-
 #. Translators: High Availability mode of Neutron router
 msgid "HA mode"
 msgstr "HA kipi"
@@ -4063,9 +3625,6 @@ msgstr "İmaj başarıyla güncellendi."
 msgid "Images"
 msgstr "İmajlar"
 
-msgid "Implementation"
-msgstr "Uygulama"
-
 msgid "Import Key Pair"
 msgstr "Anahtar Çiftini İçe Aktar"
 
@@ -4094,10 +3653,6 @@ msgid "Inactive"
 msgstr "Etkin değil"
 
 msgctxt "Current status of a Pool"
-msgid "Inactive"
-msgstr "Etkin değil"
-
-msgctxt "Current status of a VPN Service"
 msgid "Inactive"
 msgstr "Etkin değil"
 
@@ -4136,9 +3691,6 @@ msgstr "İçeri Atılan Dosya Yolu Byte'ı"
 
 msgid "Injected Files"
 msgstr "İçeri Atılan Dosyalar"
-
-msgid "Input must be in CIDR format"
-msgstr "Girdi CIDR biçiminde olmalıdır"
 
 msgid "Insert Rule"
 msgstr "Kural Ekle"
@@ -4269,13 +3821,6 @@ msgstr "Anahtar Çiftleri açıldıktan sonra sunucularınıza girme yöntemidir
 
 msgid "Key Size (bits)"
 msgstr "Anahtar Boyutu (bit)"
-
-msgid ""
-"Key pair name may only contain letters, numbers, underscores, spaces and "
-"hyphens."
-msgstr ""
-"Anahtar çifti ismi yalnızca harf, numara, alt çizgi, boşluk ve tire "
-"içerebilir."
 
 msgid "Key pair to use for authentication."
 msgstr "Kimlik doğrulama için kullanılacak anahtar çifti."
@@ -4613,9 +4158,7 @@ msgid "Migrate"
 msgstr "Geçiş"
 
 msgid "Migrate Host"
-msgid_plural "Migrate Hosts"
-msgstr[0] "İstemcileri Göç Ettir"
-msgstr[1] ""
+msgstr "İstemcileri Göç Ettir"
 
 msgid "Migrate Instance"
 msgid_plural "Migrate Instances"
@@ -4635,11 +4178,6 @@ msgstr ""
 "İsteğe bağlı olarak göç türünü de seçebilirsiniz. İstemcinin tüm canlı "
 "sunucuları Canlı Göç ettirilebilir. Soğuk Göç göç edilen istemcide her bir "
 "sunucu için 'nova migrate' kullanmaya çalışır."
-
-msgid "Migrated Host"
-msgid_plural "Migrated Hosts"
-msgstr[0] "İstemciler Göç Ettirildi"
-msgstr[1] ""
 
 msgctxt "Current status of an Instance"
 msgid "Migrating"
@@ -4724,9 +4262,6 @@ msgstr "Mantıksal sürücü adı ve tanımlamasını değiştir."
 
 msgid "Modify the name and description of a snapshot."
 msgstr "Anlık görüntünün ismini ve tanımlamasını değiştir."
-
-msgid "Modify volume type name and description."
-msgstr "Mantıksal Sürücü türü ismi ve tanımını düzenle."
 
 msgid "Monitor"
 msgstr "İzleyici"
@@ -4922,9 +4457,6 @@ msgid ""
 msgstr ""
 "Sonraki Atlama IP'si yönlendirici arayüzlerinin bağlı olduğu alt ağlardan "
 "birinin parçası olmalı."
-
-msgid "Next Hops"
-msgstr "Sonraki Hops"
 
 msgid "No"
 msgstr "Hayır"
@@ -5238,9 +4770,6 @@ msgstr "Açık Bağlantı Noktası / Bağlantı Noktası Aralığı:"
 msgid "Optional Parameters"
 msgstr "İsteğe Bağlı Parametreler"
 
-msgid "Optional: Next Hop Addresses (comma delimited)"
-msgstr "İsteğe bağlı: Sonraki Nokta Adresi (virgülle ayrılmış)"
-
 msgid "Optionally, you may choose to create a new volume."
 msgstr ""
 "İsteğe bağlı olarak, yeni bir mantıksal sürücü oluşturmayı da seçebilirsiniz."
@@ -5376,19 +4905,11 @@ msgctxt "Current status of a Pool"
 msgid "Pending Create"
 msgstr "Oluşturma Beklemede"
 
-msgctxt "Current status of a VPN Service"
-msgid "Pending Create"
-msgstr "Oluşturma Beklemede"
-
 msgctxt "Current status of a Firewall"
 msgid "Pending Delete"
 msgstr "Silme Beklemede"
 
 msgctxt "Current status of a Pool"
-msgid "Pending Delete"
-msgstr "Silme Beklemede"
-
-msgctxt "Current status of a VPN Service"
 msgid "Pending Delete"
 msgstr "Silme Beklemede"
 
@@ -5404,10 +4925,6 @@ msgctxt "Current status of a Pool"
 msgid "Pending Update"
 msgstr "Güncelleme Beklemede"
 
-msgctxt "Current status of a VPN Service"
-msgid "Pending Update"
-msgstr "Güncelleme Beklemede"
-
 msgid "Perfect Forward Secrecy"
 msgstr "Mükemmel İleri Gizlilik"
 
@@ -5416,9 +4933,6 @@ msgstr "Periyod"
 
 msgid "Period:"
 msgstr "Dönem:"
-
-msgid "Permit"
-msgstr "İzin Ver"
 
 msgid "Physical Network"
 msgstr "Fiziksel Ağ"
@@ -5882,12 +5396,6 @@ msgstr "İstek ID'si"
 msgid "Requested snapshot would exceed the allowed quota."
 msgstr "İstenen anlık görüntü izin verilen kotayı aşardı."
 
-msgid ""
-"Requests from a unique source IP address are consistently\n"
-"          directed to the same instance."
-msgstr ""
-"Benzersiz kaynak IP adresine sahip istekler hep aynı sunucuya yönlendirilir"
-
 msgid "Required for APP_COOKIE persistence; Ignored otherwise."
 msgstr "APP_COOKIE kalıcılığı için gereklidir; Aksi halde göz ardı edilir."
 
@@ -5898,9 +5406,6 @@ msgstr "Kurtar"
 msgctxt "Task status of an Instance"
 msgid "Rescuing"
 msgstr "Kurtarılıyor"
-
-msgid "Reset to Default"
-msgstr "Varsayılana Sıfırla"
 
 msgid "Resize"
 msgstr "Yeniden boyutlandır"
@@ -6110,20 +5615,8 @@ msgstr "Router ID'si"
 msgid "Router Name"
 msgstr "Router İsmi"
 
-msgid "Router Rule Grid"
-msgstr "Router Kural Izgarası"
-
-msgid "Router Rules"
-msgstr "Router Kuralları"
-
-msgid "Router Rules Grid"
-msgstr "Router Kuralları Izgarası"
-
 msgid "Router Type"
 msgstr "Router Türü"
-
-msgid "Router rule added"
-msgstr "Router kuralı eklendi"
 
 #, python-format
 msgid "Router(s)  was successfully removed from firewall %(firewall)s."
@@ -6135,13 +5628,6 @@ msgstr "Routerlar %(firewall)s güvenlik duvarına başarıyla eklendi."
 
 msgid "Routers"
 msgstr "Routers"
-
-msgid ""
-"Routing rules to apply to router. Rules are matched by most specific source "
-"first and then by most specific destination."
-msgstr ""
-"Routerye uygulanacak yönlendirme kuralları. Kurallar en özel kaynak önce ve "
-"en özel hedef önce olacak şekilde eşleşir."
 
 msgid "Rule"
 msgstr "Kural"
@@ -6157,9 +5643,6 @@ msgstr "%(rule)s kuralı başarıyla %(policy)s ilkesinden çıkarıldı."
 #, python-format
 msgid "Rule %s was successfully updated."
 msgstr "%s kuralı başarıyla güncellendi."
-
-msgid "Rule Conflict"
-msgstr "Kural Çakışması"
 
 msgid "Rule:"
 msgstr "Kural:"
@@ -6571,9 +6054,6 @@ msgstr "Paylaşılmış"
 msgid "Shared Storage"
 msgstr "Paylaşılan Depolama"
 
-msgid "Shared with Me"
-msgstr "Benimle Paylaşılan"
-
 msgctxt "Current status of an Instance"
 msgid "Shelved"
 msgstr "Askıda"
@@ -6712,12 +6192,6 @@ msgstr[1] ""
 msgid "Something went wrong!"
 msgstr "Bir şeyler ters gitti!"
 
-msgid "Source"
-msgstr "Kaynak"
-
-msgid "Source CIDR"
-msgstr "Kaynak CIDR"
-
 msgid "Source IP"
 msgstr "Kaynak IP"
 
@@ -6742,9 +6216,6 @@ msgstr "Kaynak Bağlantı Noktası Aralığı"
 
 msgid "Source port (integer in [1, 65535] or range in a:b)"
 msgstr "Kaynak bağlantı noktası ([1, 65535] veya a:b aralığında tam sayı)"
-
-msgid "Source:"
-msgstr "Kaynak:"
 
 msgctxt "Task status of an Instance"
 msgid "Spawning"
@@ -6938,14 +6409,6 @@ msgstr "Alt Ağ İsmi"
 
 msgid "Subnet list can not be retrieved."
 msgstr "Subnet listesi alınamadı."
-
-#, python-format
-msgid "Subnet: %(dest_subnetname)s"
-msgstr "Alt Ağ: %(dest_subnetname)s"
-
-#, python-format
-msgid "Subnet: %(row_source_subnetname)s"
-msgstr "Alt Ağ: %(row_source_subnetname)s"
 
 msgid "Subnets"
 msgstr "Subnetler"
@@ -7235,14 +6698,8 @@ msgstr ""
 msgid "The Aggregate was updated."
 msgstr "Takım güncellendi."
 
-msgid "The ICMP code is invalid."
-msgstr "ICMP kodu geçersiz."
-
 msgid "The ICMP code not in range (-1, 255)"
 msgstr "ICMP kodu uygun aralıkta değil: (-1, 255)"
-
-msgid "The ICMP type is invalid."
-msgstr "ICMP tipi geçersiz."
 
 msgid "The ICMP type not in range (-1, 255)"
 msgstr "ICMP tipi uygun aralıkta değil: (-1, 255)"
@@ -7332,10 +6789,6 @@ msgstr ""
 "'%(flavor)s' niteliği istenen imaj için çok küçük.\n"
 "Asgari gereksinimler: %(min_ram)s MB RAM ve %(min_disk)s GB Kök Diski."
 
-#, python-format
-msgid "The instance is preparing the live migration to host \"%s\"."
-msgstr "Sunucu, \"%s\" istemcisine canlı geçişi hazırlıyor."
-
 msgid "The instance password encrypted with your public key."
 msgstr "Genel anahtarınızla şifrelenmiş sunucu parolası."
 
@@ -7382,12 +6835,6 @@ msgid ""
 "The name of the physical network over which the virtual network is "
 "implemented."
 msgstr "Sanal ağın üzerinde uygulandığı fiziksel ağın ismi."
-
-msgid ""
-"The next hop addresses can be used to override the router used by the client."
-msgstr ""
-"Sonraki nokta adresi istemci tarafından kullanılan yönlendiricinin üzerine "
-"yazmak için kullanılabilir."
 
 msgid "The page you were looking for doesn't exist"
 msgstr "Aradığınız sayfa mevcut değil"
@@ -7517,9 +6964,6 @@ msgid ""
 "This is required for operations to be performed throughout the lifecycle of "
 "the stack"
 msgstr "Yığının ömrü sürecinde yürütülecek işlemler için gereklidir"
-
-msgid "This name is already taken."
-msgstr "Bu ad zaten alınmış."
 
 msgid ""
 "This volume is currently attached to an instance. In some cases, creating a "
@@ -7904,9 +7348,6 @@ msgstr "Havuz silinemedi. %s"
 #, python-format
 msgid "Unable to delete router \"%s\""
 msgstr "Router \"%s\" silinemedi"
-
-msgid "Unable to delete router rule."
-msgstr "Router kuralı silinemedi."
 
 #, python-format
 msgid "Unable to delete rule. %s"
@@ -8746,9 +8187,6 @@ msgstr "Kullanıcı parolası değiştirilemedi."
 msgid "Unable to update the user."
 msgstr "Kullanıcı güncellenemedi."
 
-msgid "Unable to update the volume type."
-msgstr "Mantıksal sürücü türü güncellenemiyor."
-
 msgid "Unable to update volume snapshot status."
 msgstr "Mantıksal sürücü anlık görüntü durumu güncellenemedi."
 
@@ -9167,14 +8605,6 @@ msgstr "Değer (Ort)"
 msgid "Value:"
 msgstr "Değer:"
 
-#, python-format
-msgid ""
-"Version: %(version_info)s\n"
-"      "
-msgstr ""
-"Sürüm: %(version_info)s\n"
-"      "
-
 msgid "View Container"
 msgstr "Kap Görüntüle"
 
@@ -9353,17 +8783,6 @@ msgid "Weight"
 msgstr "Ağırlık"
 
 msgid ""
-"When no IP address is provided, the VIP will obtain an address from\n"
-"  the selected subnet. If a specific IP address is desired, it may be "
-"provided and\n"
-"  must also be an address within the selected subnet.\n"
-"  "
-msgstr ""
-"IP adresi sağlanmadığında, VIP seçili alt ağdan bir adres\n"
-"  alır. Belirli bir IP adresi isteniyorsa, sağlanabilir ve seçili alt\n"
-"  ağdan bir adres olmak zorundadır."
-
-msgid ""
 "Within a container you can group your objects into pseudo-folders, which "
 "behave similarly to folders in your desktop operating system, with the "
 "exception that they are virtual collections defined by a common prefix on "
@@ -9437,15 +8856,6 @@ msgstr ""
 "Şu anda login olduğunuz projeden yönetici haklarınızı kaldıramazsınız. "
 "Lütfen yönetici hakkınızın olduğu başka bir projeye geçiş yapın, veya bu "
 "hakları CLI komutuyla yapın."
-
-msgid ""
-"You do not have the required\n"
-"          privileges to access this content. If you believe this message to\n"
-"          be in error, please contact your project manager."
-msgstr ""
-"Bu içeriğe erişmek için gerekli\n"
-"          izinlere sahip değilsiniz. Bu iletinin hatalı olduğunu\n"
-"          düşünüyorsanız, proje yöneticinizle iletişime geçin."
 
 msgid "You may have mistyped the address or the page may have moved."
 msgstr "Adresi yanlış yazmış olabilirsiniz ya da sayfa taşınmış olabilir."

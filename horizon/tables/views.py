@@ -30,7 +30,6 @@ class MultiTableMixin(object):
         self.table_classes = getattr(self, "table_classes", [])
         self._data = {}
         self._tables = {}
-
         self._data_methods = defaultdict(list)
         self.get_data_methods(self.table_classes, self._data_methods)
 
@@ -116,10 +115,15 @@ class MultiTableMixin(object):
     def has_more_data(self, table):
         return False
 
+    def needs_filter_first(self, table):
+        return False
+
     def handle_table(self, table):
         name = table.name
         data = self._get_data_dict()
         self._tables[name].data = data[table._meta.name]
+        self._tables[name].needs_filter_first = \
+            self.needs_filter_first(table)
         self._tables[name]._meta.has_more_data = self.has_more_data(table)
         self._tables[name]._meta.has_prev_data = self.has_prev_data(table)
         handled = self._tables[name].maybe_handle()
@@ -277,6 +281,29 @@ class DataTableView(MultiTableView):
         if self.handle_server_filter(request):
             return shortcuts.redirect(self.get_table().get_absolute_url())
         return self.get(request, *args, **kwargs)
+
+    def get_filters(self, filters=None, filters_map=None):
+        """Converts a string given by the user into a valid api filter value.
+        :filters: Default filter values.
+          {'filter1': filter_value, 'filter2': filter_value}
+        :filters_map: mapping between user input and valid api filter values.
+          {'filter_name':{_("true_value"):True, _("false_value"):False}
+        """
+        filters = filters or {}
+        filters_map = filters_map or {}
+        filter_action = self.table._meta._filter_action
+        if filter_action:
+            filter_field = self.table.get_filter_field()
+            if filter_action.is_api_filter(filter_field):
+                filter_string = self.table.get_filter_string().strip()
+                if filter_field and filter_string:
+                    filter_map = filters_map.get(filter_field, {})
+                    # We use the filter_string given by the user and
+                    # look for valid values in the filter_map that's why
+                    # we apply lower()
+                    filters[filter_field] = filter_map.get(
+                        filter_string.lower(), filter_string)
+        return filters
 
 
 class MixedDataTableView(DataTableView):

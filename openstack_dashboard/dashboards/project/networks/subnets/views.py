@@ -15,7 +15,6 @@
 """
 Views for managing Neutron Subnets.
 """
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -33,9 +32,11 @@ from openstack_dashboard.dashboards.project.networks.subnets \
 from openstack_dashboard.dashboards.project.networks.subnets import utils
 from openstack_dashboard.dashboards.project.networks.subnets \
     import workflows as project_workflows
+from openstack_dashboard.dashboards.project.networks.views \
+    import DefaultSubnetWorkflowMixin
 
 
-class CreateView(workflows.WorkflowView):
+class CreateView(DefaultSubnetWorkflowMixin, workflows.WorkflowView):
     workflow_class = project_workflows.CreateSubnet
 
     @memoized.memoized_method
@@ -48,12 +49,6 @@ class CreateView(workflows.WorkflowView):
             redirect = reverse('horizon:project:networks:index')
             msg = _("Unable to retrieve network.")
             exceptions.handle(self.request, msg, redirect=redirect)
-
-    def get_default_dns_servers(self):
-        # this returns the default dns servers to be used for new subnets
-        dns_default = "\n".join(getattr(settings, 'OPENSTACK_NEUTRON_NETWORK',
-                                        {}).get('default_dns_nameservers', ''))
-        return dns_default
 
     def get_initial(self):
         network = self.get_object()
@@ -159,10 +154,12 @@ class DetailView(tabs.TabView):
         # TODO(robcresswell) Add URL for "Subnets" crumb after bug/1416838
         breadcrumb = [
             (network_nav, subnet.network_url),
-            (_("Subnets"),), ]
+            (_("Subnets"), None)
+        ]
         context["custom_breadcrumb"] = breadcrumb
         context["subnet"] = subnet
-        context["url"] = self.get_redirect_url()
+        context["url"] = \
+            reverse("horizon:project:networks:subnets_tab", args=[network.id])
         context["actions"] = table.render_row_actions(subnet)
         return context
 

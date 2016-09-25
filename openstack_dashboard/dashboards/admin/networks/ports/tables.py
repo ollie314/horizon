@@ -24,6 +24,8 @@ from horizon import tables
 from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.networks.ports import \
     tables as project_tables
+from openstack_dashboard.dashboards.project.networks.ports.tabs \
+    import PortsTab as project_port_tab
 from openstack_dashboard import policy
 
 LOG = logging.getLogger(__name__)
@@ -78,13 +80,17 @@ class UpdatePort(project_tables.UpdatePort):
 
 
 class PortsTable(project_tables.PortsTable):
-    name = tables.Column("name_or_id",
-                         verbose_name=_("Name"),
-                         link="horizon:admin:networks:ports:detail")
+    name = tables.WrappingColumn("name_or_id",
+                                 verbose_name=_("Name"),
+                                 link="horizon:admin:networks:ports:detail")
 
     class Meta(object):
         name = "ports"
         verbose_name = _("Ports")
-        table_actions = (CreatePort, DeletePort)
+        table_actions = (CreatePort, DeletePort, tables.FilterAction)
         row_actions = (UpdatePort, DeletePort,)
         hidden_title = False
+
+
+class PortsTab(project_port_tab):
+    table_classes = (PortsTable,)

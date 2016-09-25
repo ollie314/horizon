@@ -40,7 +40,6 @@
       createFolder: createFolder,
       deleteContainer: deleteContainer,
       deleteObject: deleteObject,
-      formData: formData,
       getContainer: getContainer,
       getContainers: getContainers,
       getInfo: getInfo,
@@ -54,11 +53,6 @@
 
     return service;
 
-    // this exists solely so that we can mock FormData
-    function formData() {
-      return new FormData();
-    }
-
     // internal use only
     function getContainerURL(container) {
       return '/api/swift/containers/' + encodeURIComponent(container);
@@ -66,7 +60,7 @@
 
     /**
      * @name getObjectURL
-     * @param {Object} container - A container
+     * @param {Object} container - A container name
      * @param {Object} object - The object to be encoded
      * @param {string} type - String representation of the type
      * @description
@@ -217,37 +211,21 @@
     /**
      * @name uploadObject
      * @param {Object} container - The container
-     * @param {string} objectName - The new object's name
+     * @param {string} objectName - The object's name (and optional path)
      * @param {Object} file - File data
      * @description
-     * Add a file to the specified container with the given objectName (which
-     * may include pseudo-folder path), the mimetype and raw file data.
+     * Add or replace a file in the specified container with the given objectName
+     * (which may include pseudo-folder path), the mimetype and raw file data.
      * @returns {Object} The result of the API call
      *
      */
     function uploadObject(container, objectName, file) {
-      var fd = service.formData();
-      fd.append("file", file);
       return apiService.post(
         service.getObjectURL(container, objectName),
-        fd,
-        {
-          headers: {
-            // This is seriously weird magic on the part of various JS things here, but
-            // in short, setting the Content-Type to undefined (and *not* empty-string)
-            // will result in the AJAX POST filling in multipart/form-data with an
-            // appropriate boundary because we're including a FormData object with a
-            // file as the post data. Seriously.
-            'Content-Type': undefined
-          }
-        }
+        {file: file}
       )
-        .error(function (response, status) {
-          if (status === 409) {
-            toastService.add('error', response);
-          } else {
-            toastService.add('error', gettext('Unable to upload the object.'));
-          }
+        .error(function () {
+          toastService.add('error', gettext('Unable to upload the object.'));
         });
     }
 
@@ -282,16 +260,23 @@
      * @param {string} objectName - The name of the object to get info about
      * @description
      * Get the metadata for an object.
+     *
+     * If you just wish to test for the existence of the object, set
+     * ignoreError so user-visible error isn't automatically displayed.
      * @returns {Object} The result of the API call
      *
      */
-    function getObjectDetails(container, objectName) {
-      return apiService.get(
+    function getObjectDetails(container, objectName, ignoreError) {
+      var promise = apiService.get(
         service.getObjectURL(container, objectName, 'metadata')
-      )
-        .error(function () {
-          toastService.add('error', gettext('Unable to get details of the object.'));
-        });
+      );
+      if (ignoreError) {
+        // provide a noop error handler so the error is ignored
+        return promise.error(angular.noop);
+      }
+      return promise.error(function () {
+        toastService.add('error', gettext('Unable to get details of the object.'));
+      });
     }
 
     /**

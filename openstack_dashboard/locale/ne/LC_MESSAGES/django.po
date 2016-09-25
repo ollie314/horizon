@@ -1,9 +1,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 9.0.1.dev276\n"
+"Project-Id-Version: horizon 10.0.0.0b3.dev253\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-05-15 05:33+0000\n"
+"POT-Creation-Date: 2016-08-21 00:16+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,99 +13,6 @@ msgstr ""
 "Language: ne\n"
 "X-Generator: Zanata 3.7.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-
-#, python-format
-msgid ""
-"\n"
-"            <a href=\"%(volume_url)s\">%(volume_label)s</a> on "
-"%(volume_device)s\n"
-"            "
-msgstr ""
-"\n"
-"           <a href=\"%(volume_url)s\">%(volume_label)s</a> on "
-"%(volume_device)s\n"
-"            "
-
-#, python-format
-msgid ""
-"\n"
-"        Other IPv6 modes: ipv6_ra_mode=%(ra_mode)s, ipv6_address_mode="
-"%(addr_mode)s\n"
-"        "
-msgstr ""
-"\n"
-"अन्य IPv6 modes: ipv6_ra_mode=%(ra_mode)s, ipv6_address_mode=%(addr_mode)s\n"
-"        "
-
-msgid ""
-"\n"
-"      Volume type is a type or label that can be selected at volume "
-"creation\n"
-"      time in OpenStack. It usually maps to a set of capabilities of the "
-"storage\n"
-"      back-end driver to be used for this volume. Examples: \"Performance"
-"\",\n"
-"      \"SSD\", \"Backup\", etc. This is equivalent to the\n"
-"      <tt>cinder type-create</tt> command. Once the volume type gets "
-"created,\n"
-"      click the \"View Extra Specs\" button to set up extra specs key-value\n"
-"      pair(s) for that volume type.\n"
-"     "
-msgstr ""
-"\n"
-"       भोल्युम प्रकार एउटा प्रकार वा स्तर हो जो भोल्युम बनाउने क्रममा चयन गरिन्छ\n"
-"ओपनस्टेकमा समय। यसलाई प्राय स्टोरेजको दक्षता म्याप गर्ने क्रममा प्रयोग गरिन्छ\n"
-"यो भोल्युमको लागि ब्याक-एन्ड ड्राइभरको प्रयोग गर्नुपर्छ। उदाहरण: \"Performance\",\n"
-"      \"SSD\", \"Backup\", इत्यादि। यो बराबर हुन्छ\n"
-"      <tt>cinder type-create</tt> command. एकपल्टा भोल्युम प्रकार बनाइएपछि\n"
-"अतिरिक्त स्पेक कि-मूल्य सेटअप गर्नका लागि \"View Extra Specs\"मा क्लिक गर्नुहोस्\n"
-" त्यो भोल्युम प्रकारको लागि\n"
-"     "
-
-msgid ""
-"\n"
-"    Each QoS Specs entity will have a \"Consumer\" value which indicates "
-"where the\n"
-"    administrator would like the QoS policy to be enforced. This value can "
-"be \"front-end\"\n"
-"    (Nova Compute), \"back-end\" (Cinder back-end), or \"both\".\n"
-"    "
-msgstr ""
-"\n"
-" प्रत्येक QoS स्पेकता एउटा \"उपभोक्ता \" मूल्य हुन्छ जसले संकेत गर्छ कि \n"
-" कहाँ एडमिनिस्टरले QoS सर्त लागु गर्नेछ। यो मूल्य हुनसक्छ \"front-end\"\n"
-"    (नोभा कम्पुट), \"बेक-एन्ड\" (Cinder back बेकसिन्डर  \"front-end\"\n"
-"    (Nova Compute), \"back-end\" (Cinder back-end), or \"both\""
-
-msgid ""
-"\n"
-"    The status of a volume is normally managed automatically.  In some "
-"circumstances an\n"
-"    administrator may need to explicitly update the status value.  This is "
-"equivalent to\n"
-"    the <tt>cinder reset-state</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-"  प्रायजसो भोल्युमको स्टाटस स्वत व्यवस्थापन गरिन्छ। केही परिस्थितिमा एउटा\n"
-" एडमिनिस्टरले आवश्यक रूपमा स्टाटस मूल्य अपडेटगर्नुपर्ने हुन्छ। सयो बराबर हुन्छ\n"
-"<tt>cinder reset-state</tt> command.\n"
-"    "
-
-msgid ""
-"\n"
-"    The status of a volume snapshot is normally managed automatically.  In "
-"some circumstances\n"
-"    an administrator may need to explicitly update the status value. This is "
-"equivalent to\n"
-"    the <tt>cinder snapshot-reset-state</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-" आकार स्‍नेपसुटको स्टाटस साधारण रूपमा स्वत व्यवस्थापित भयो। केही परिस्थितिहरूमा \n"
-" प्रशासकले स्टाटस मूल्य अनिवार्य रूपमा अपडेट गर्न पर्ने हुन्छ। यो \n"
-"  <tt>cinder snapshot-reset-state</tt>  command.को बराबर हुन्छ\n"
-"    "
 
 msgid " - End"
 msgstr "- समाप्त"
@@ -229,9 +136,6 @@ msgstr ""
 "कन्टेनरहरू बनाउन सक्नुहुन्छ। डाटा आवश्यक रूपमा कन्टेनरमा संरक्षण गर्नुपर्छ जसको लागि डाटा "
 "अपलोड गर्नभन्दा पहिला तपाईँको खातामा एउटा सन्टेनर परिभाषित गरिएको हुनुपर्छ। "
 
-msgid "A image or external image location must be specified."
-msgstr "एउटा चित्र वा बाह्य चित्र स्थान आवश्यक रूपमा निश्चित गरिनुपर्छ।"
-
 msgid "A local environment to upload."
 msgstr "अपलोड गर्नका लागि लोकल वातावरण"
 
@@ -240,14 +144,6 @@ msgstr "अपलोड गर्नका लागि स्थानीय �
 
 msgid "A local template to upload."
 msgstr "अपलोड गर्नका लागि एउटा स्थानीय टेम्प्लेट"
-
-msgid ""
-"A more specific rule affects a portion of this traffic so a rule cannot be "
-"automatically generated to control the behavior of the entire source/"
-"destination combination."
-msgstr ""
-"अधिक निश्चित नियमले यो ट्राफिकको एउटा अंशलाई प्रभावित गर्छ त्यसकारण सम्पूर्ण स्रोत/लक्ष्य "
-"मिश्रणलाई नियन्त्रण गर्नका लागि नियमहरू स्वचालित रूपमा बनाउन सकिन्न।"
 
 msgid "A new uploaded file will replace the content of the current object"
 msgstr "वर्तमान अब्जेक्टको कन्टेन्टलाई अपलोड गरिएको  फाइलले रिप्लेस गर्नेछ"
@@ -305,9 +201,6 @@ msgstr "कार्य लग"
 msgid "Action for the firewall rule"
 msgstr "फाइरवेस नियमका लागि कार्य"
 
-msgid "Action:"
-msgstr "कार्यः"
-
 msgctxt "Current status of a Firewall"
 msgid "Active"
 msgstr "सक्रीय"
@@ -321,14 +214,6 @@ msgid "Active"
 msgstr "सक्रीय"
 
 msgctxt "Current status of a Pool"
-msgid "Active"
-msgstr "सक्रीय"
-
-msgctxt "Current status of a VPN Service"
-msgid "Active"
-msgstr "सक्रीय"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Active"
 msgstr "सक्रीय"
 
@@ -424,9 +309,6 @@ msgstr "शर्त थप्नुहोस्"
 
 msgid "Add Pool"
 msgstr "पूल थप्नुहोस्"
-
-msgid "Add Router Rule"
-msgstr "रूटर नियम थप्नुहोस्"
 
 msgid "Add Rule"
 msgstr "नियम थप्नुहोस्"
@@ -815,9 +697,6 @@ msgstr "CIDR  आवश्यक रूपमा तोकिएको हुन
 msgid "CPU time used"
 msgstr "CPU को प्रयोग समय "
 
-msgid "Can not specify both image and external image location."
-msgstr "चित्र वा बाह्य दुवै चित्र स्थान निश्चित गर्न सकिएन।"
-
 msgid "Cancel"
 msgstr "रद्ध गर्नुहोस्"
 
@@ -889,14 +768,6 @@ msgstr ""
 "उपलब्ध नेटवर्कहरूबाट पुस बटन वा ड्रेक अनि ड्रपद्वारा चयनित नेटवर्कमा एउटा नेटवर्क चयन "
 "गर्नुहोस्, तपाई NIC क्रम ड्रेग अनि ड्रपबाट पनि परिवर्तन गर्न सक्नुहुन्छ।"
 
-msgid ""
-"Choose rule(s) from Available Rules to Selected Rule by push button or drag "
-"and drop,\n"
-"you may change their order by drag and drop as well. "
-msgstr ""
-"पुस बटन वा ड्रेग अनि ड्रपद्वारा उपलब्ध नियमहरूबाट नियम(हरू) चयन गर्नुहोस्\n"
-"तपाईँ तिनीहरूको क्रमलाई ड्रेग अनि ड्रपद्वारा पनि परिवर्तन गर्न सक्नुहुन्छ।"
-
 msgid "Choose the flavor to launch."
 msgstr "आरम्भ गर्नका लागि फ्लेभर चयन गर्नुहोस्"
 
@@ -957,9 +828,6 @@ msgstr "रिसाइज/ मर्ज निश्चित गर्नु�
 
 msgid "Confirm new password"
 msgstr "नयाँ पासवर्ड निश्चित गर्नुहोस्"
-
-msgid "Conflicting Rule"
-msgstr "वेमेल भएका  नियम"
 
 msgid "Connection Limit"
 msgstr "सम्पर्क सिमा"
@@ -1083,17 +951,6 @@ msgstr "समुह बनाउ"
 
 msgid "Create Host Aggregate"
 msgstr "होस्ट मेठ बनाउनुहोस्"
-
-msgid ""
-"Create IPSec Site Connection for current project.\n"
-"\n"
-"Assign a name and description for the IPSec Site Connection. All fields in "
-"this tab are required."
-msgstr ""
-"बर्तमान प्रोजेक्टका लागि IPSec साइट कनेक्सन बनाउनुहोस्\n"
-"\n"
-" IPSec साइट कनेक्सनका लागि एउटा नाम अनि विवरण निरूपण गर्नुहोस्। यस ट्याबमा सबै "
-"क्षेत्रहरू आवश्यक हुन्छ।"
 
 msgid "Create Image"
 msgstr "चित्र बनाउनुहोस्"
@@ -1258,10 +1115,6 @@ msgid "Created"
 msgstr "सृष्टि भयो"
 
 msgctxt "Current status of a Pool"
-msgid "Created"
-msgstr "सृष्टि भयो"
-
-msgctxt "Current status of a VPN Service"
 msgid "Created"
 msgstr "सृष्टि भयो"
 
@@ -1460,9 +1313,6 @@ msgctxt "Task status of an Instance"
 msgid "Deleting"
 msgstr "मेटाइँदै"
 
-msgid "Deny"
-msgstr "नामञ्जुर गर्नुहोस्"
-
 msgid "Description"
 msgstr "विबरण"
 
@@ -1501,9 +1351,6 @@ msgstr "लक्षित अब्जेक्ट नाम"
 
 msgid "Destination port (integer in [1, 65535] or range in a:b)"
 msgstr "लक्ष्य  पोर्ट( पूर्णाङ्क [1, 65535] मा वा a:b मा रेन्ज)"
-
-msgid "Destination:"
-msgstr "लक्ष्यः"
 
 msgid "Detached"
 msgstr "डिटेच गर्नुहोस्"
@@ -1671,14 +1518,6 @@ msgid "Down"
 msgstr "तल"
 
 msgctxt "Current status of a Pool"
-msgid "Down"
-msgstr "तल"
-
-msgctxt "Current status of a VPN Service"
-msgid "Down"
-msgstr "तल"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Down"
 msgstr "तल"
 
@@ -1878,9 +1717,6 @@ msgstr "रेन्ज (-1: 255)मा ICMP प्रकारको लाग�
 msgid "Enter a value for ICMP type in the range (-1: 255)"
 msgstr "रेन्ज (-1: 255)मा ICMP प्रकारको लागि एउटा मूल्य दर्ता गर्नुहोस्"
 
-msgid "Enter an integer value between 0 and 255 (or -1 which means wildcard)."
-msgstr "एउटा 0 अनि 255 बिचको पूर्णाङ्क दर्ता (वा -1 जसको अर्थ वाइल्डकार्ड हो) गर्नुहोस्"
-
 msgid "Enter an integer value between 1 and 65535."
 msgstr "1 अनि 65535 माझको एउटा पूर्णाङ्क मुल्य दर्ता गर्नुहोस्"
 
@@ -1935,19 +1771,11 @@ msgctxt "Current status of a Pool"
 msgid "Error"
 msgstr "त्रुटि"
 
-msgctxt "Current status of a VPN Service"
-msgid "Error"
-msgstr "त्रुटि"
-
 msgctxt "Current status of a Volume"
 msgid "Error"
 msgstr "त्रुटि"
 
 msgctxt "Current status of a Volume Backup"
-msgid "Error"
-msgstr "त्रुटि"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Error"
 msgstr "त्रुटि"
 
@@ -2053,10 +1881,6 @@ msgstr "प्रोजेक्ट दलहरू %s थप्न अनि �
 #, python-format
 msgid "Failed to add agent %(agent_name)s for network %(network)s."
 msgstr "नेटवर्क %(network)s का लागि एजेन्ट %(agent_name)s थप्न असफल"
-
-#, python-format
-msgid "Failed to add router rule %s"
-msgstr "रूटर नियम %s थप्न असफल"
 
 #, python-format
 msgid "Failed to add_interface: %s"
@@ -2449,13 +2273,6 @@ msgstr ""
 "दलहरू बहु उपभोक्तालाई एकैचोटि प्रवेश व्यवस्थापन गर्नका लागि प्रयोग गरिन्छ। दल बनाइएपछि, "
 "उपभोक्ताहरू थप्‍नका लागि दल सम्पादन गर्नुहोस्।"
 
-msgid ""
-"Groups are used to manage access and assign roles to multiple users at once. "
-"Edit the group to add users."
-msgstr ""
-"दलहरू बहु उपभोक्तालाई एकैचोटि प्रवेश व्यवस्थापन गर्नका लागि प्रयोग गरिन्छ। दल बनाइएपछि, "
-"उपभोक्ताहरू थप्‍नका लागि दल सम्पादन गर्नुहोस्।"
-
 #. Translators: High Availability mode of Neutron router
 msgid "HA mode"
 msgstr "HA मोड"
@@ -2774,9 +2591,6 @@ msgstr "इन्जेक्ट गरिएको फाइल पथ बा�
 msgid "Injected Files"
 msgstr "इन्जेक्ट गरिएका फाइलहरू"
 
-msgid "Input must be in CIDR format"
-msgstr "इनपुट CIDR ढाँचामा हुन आवश्यक छ"
-
 msgid "Insert Rule"
 msgstr "नियम हाल्नुहोस्"
 
@@ -2887,11 +2701,6 @@ msgstr "चाबी जोडाहरू त्यस्ता हुन्छ
 
 msgid "Key Size (bits)"
 msgstr "कि आकार(बिटस्)"
-
-msgid ""
-"Key pair name may only contain letters, numbers, underscores, spaces and "
-"hyphens."
-msgstr "चाबी जोडा नाममा अक्षर, संख्याहरू, अन्जरस्कोरहरू, स्पेस अनि हाइफन मात्र हुनसक्छन्।"
 
 msgid "Key pair to use for authentication."
 msgstr "प्रमाणीकरणका लागि चाबी जोटा"
@@ -3370,9 +3179,6 @@ msgstr "नयाँ आकार वर्तमान आकारभन्द
 msgid "Next"
 msgstr "अर्को"
 
-msgid "Next Hops"
-msgstr "अघिल्लो होप्स"
-
 msgid "No"
 msgstr "होइन"
 
@@ -3633,9 +3439,6 @@ msgstr "पोर्ट/पोर्ट रेन्ज खोल्नुहो
 msgid "Optional Parameters"
 msgstr "वैकल्पिक प्यारामिटरहरू"
 
-msgid "Optional: Next Hop Addresses (comma delimited)"
-msgstr "वैकल्पिकः अर्को होप ठेकानाहरू( कमा डेलिमिटेड)"
-
 msgid "Optionally, you may choose to create a new volume."
 msgstr "वैकल्पिक रूपमा, तपाई एउटा नयाँ भोल्युम बनाउनका लागि चयन गर्नसक्नुहुन्छ"
 
@@ -3715,9 +3518,6 @@ msgstr "काल"
 
 msgid "Period:"
 msgstr "कालः"
-
-msgid "Permit"
-msgstr "पर्मिट"
 
 msgid "Physical Network"
 msgstr "भौतिक नेटवर्क"
@@ -4041,9 +3841,6 @@ msgstr "ID अनुरोध गर्नुहोस्"
 msgid "Required for APP_COOKIE persistence; Ignored otherwise."
 msgstr "APP_COOKIE निर्बन्धका लागि आवश्यक; अन्यता नजरअन्दाज गर्नुहोस्।"
 
-msgid "Reset to Default"
-msgstr "डिफल्टमा रिसेट गर्नुहोस्"
-
 msgid "Resize"
 msgstr "रिसाइज गर्नुहोस्"
 
@@ -4150,30 +3947,11 @@ msgstr "रूटरID"
 msgid "Router Name"
 msgstr "रूटर नाम"
 
-msgid "Router Rule Grid"
-msgstr "रूटर नियम ग्रिड"
-
-msgid "Router Rules"
-msgstr "राउटर नियम हरु"
-
-msgid "Router Rules Grid"
-msgstr "रूटर नियम ग्रीड"
-
 msgid "Router Type"
 msgstr "रूटर प्रकार"
 
-msgid "Router rule added"
-msgstr "रूटर नियम थपिएको छ"
-
 msgid "Routers"
 msgstr "राउटर हरु"
-
-msgid ""
-"Routing rules to apply to router. Rules are matched by most specific source "
-"first and then by most specific destination."
-msgstr ""
-"रूटरमा प्रयोग गर्नका लागि रूटिङ नियमहरू। नियमहरूमा निश्चित स्रोत द्वारा पहिला दाँजिन्छ "
-"अनि त्यसपछि निश्चित लक्ष्यद्वारा।"
 
 msgid "Rule"
 msgstr "नियम"
@@ -4189,9 +3967,6 @@ msgstr "सर्त%(policy)s बाट नियम %(rule)s सफलता�
 #, python-format
 msgid "Rule %s was successfully updated."
 msgstr "नियम  %s सफलतापूर्वक अपडेट गरिएको थियो।"
-
-msgid "Rule Conflict"
-msgstr "नियम बेमेल"
 
 msgid "Rule:"
 msgstr "नियमः"
@@ -4457,9 +4232,6 @@ msgstr "शेयर गरिएको"
 msgid "Shared Storage"
 msgstr "शेयर गरिएको स्टोरेज"
 
-msgid "Shared with Me"
-msgstr "मसिट बाँडिएको"
-
 msgid "Sign Out"
 msgstr "साइन आउट"
 
@@ -4505,12 +4277,6 @@ msgstr "स्नेपसुट स्रोत आवश्यक रूपम
 msgid "Something went wrong!"
 msgstr "केही भुल भएको थियो!"
 
-msgid "Source"
-msgstr "स्रोत"
-
-msgid "Source CIDR"
-msgstr "स्रोत CIDR"
-
 msgid "Source IP"
 msgstr "स्रोत IP"
 
@@ -4531,9 +4297,6 @@ msgstr "स्रोत पोर्ट/पोर्ट रेन्ज"
 
 msgid "Source port (integer in [1, 65535] or range in a:b)"
 msgstr "स्रोत पोर्ट( पूर्णाङ्क [1, 65535] मा वा a:b मा रेन्ज)"
-
-msgid "Source:"
-msgstr "स्रोतः"
 
 msgid ""
 "Specifies how IPv6 addresses and additional information are configured. We "
@@ -4674,14 +4437,6 @@ msgstr "सबनेट नाम"
 
 msgid "Subnet list can not be retrieved."
 msgstr "सबनेट सूची प्राप्त गर्न सकिन्न"
-
-#, python-format
-msgid "Subnet: %(dest_subnetname)s"
-msgstr "सबनेट: %(dest_subnetname)s"
-
-#, python-format
-msgid "Subnet: %(row_source_subnetname)s"
-msgstr "सबनेट: %(row_source_subnetname)s"
 
 msgid "Subnets"
 msgstr "सब्नेटहरु "
@@ -4871,14 +4626,8 @@ msgstr ""
 msgid "The Aggregate was updated."
 msgstr "मोठ अपडेट गरियो"
 
-msgid "The ICMP code is invalid."
-msgstr "ICMP कोड अवैध छ।"
-
 msgid "The ICMP code not in range (-1, 255)"
 msgstr "ICMP प्रकार रेनजमा छैन(-1, 255)"
-
-msgid "The ICMP type is invalid."
-msgstr "ICMP प्रकार अवैध छ।"
 
 msgid "The ICMP type not in range (-1, 255)"
 msgstr "ICMP प्रकार रेनजमा छैन(-1, 255)"
@@ -4933,10 +4682,6 @@ msgstr ""
 "अनुरोध गरिएका चित्रभन्दा फ्लेभर '%(flavor)s' अति नै सानो छ \n"
 "न्युनतम आवश्यकताहरूः रूट डिस्कको %(min_ram)s MB of RAM अनि %(min_disk)s GB "
 
-#, python-format
-msgid "The instance is preparing the live migration to host \"%s\"."
-msgstr "इन्सटेन्सले होस्ट\"%s\" मा लाइभ माइग्रेसनोको तयारी गर्दैछ"
-
 msgid "The instance password encrypted with your public key."
 msgstr "तपाईँको पब्लिक चाबीद्वारा इन्क्रिप्ट गरिएको इन्सटेन्स पासवर्ड"
 
@@ -4966,11 +4711,6 @@ msgid ""
 "The name of the physical network over which the virtual network is "
 "implemented."
 msgstr "भौतिक नेटवर्कको नाम जसमाथि भर्चुअल नेटवर्क कार्यान्यण गरिन्छ"
-
-msgid ""
-"The next hop addresses can be used to override the router used by the client."
-msgstr ""
-"अर्को होप ठेकानालाई क्लाइन्टद्वारा प्रयोग गरिएको रूटर ओभरराइट गर्न प्रयोग गरिन्छ।"
 
 msgid "The page you were looking for doesn't exist"
 msgstr "तपाईँले खोजिरहनुभएको पृष्ठ छैन"
@@ -5056,9 +4796,6 @@ msgid ""
 "This is required for operations to be performed throughout the lifecycle of "
 "the stack"
 msgstr "यो स्टेकको सम्पूर्ण जीवनक्रममा कार्यान्वयन गर्ने अभियानका लागि आवस्यक पर्दछ।"
-
-msgid "This name is already taken."
-msgstr "यो नाम पहिले नै प्रयोग भैसकेको छ"
 
 msgid ""
 "This volume is currently attached to an instance. In some cases, creating a "
@@ -5347,9 +5084,6 @@ msgstr "पूल  %s मेटाउन असमर्थ"
 #, python-format
 msgid "Unable to delete router \"%s\""
 msgstr "रूटर \"%s\" मेटाउन असमर्थ"
-
-msgid "Unable to delete router rule."
-msgstr "रूटर नियम मेटाउन असमर्थ।"
 
 #, python-format
 msgid "Unable to delete rule. %s"
@@ -6384,14 +6118,6 @@ msgstr "मूल्य( एभिजी)"
 
 msgid "Value:"
 msgstr "मूल्यः"
-
-#, python-format
-msgid ""
-"Version: %(version_info)s\n"
-"      "
-msgstr ""
-"संस्करण: %(version_info)s\n"
-"      "
 
 msgid "View Container"
 msgstr "कन्टेनर हेर्नुहोस्"

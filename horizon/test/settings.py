@@ -19,9 +19,7 @@
 import os
 import socket
 
-from openstack_dashboard.static_settings import get_staticfiles_dirs  # noqa
-
-STATICFILES_DIRS = get_staticfiles_dirs()
+from openstack_dashboard.utils import settings as settings_utils
 
 socket.setdefaulttimeout(1)
 
@@ -33,7 +31,6 @@ ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.abspath(os.path.join(ROOT_PATH, '..', 'static'))
 
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 TESTSERVER = 'http://testserver'
 
 SECRET_KEY = 'elj1IWiLoWHgcyYxFVLj7cM5rGOOxWl0'
@@ -75,20 +72,28 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.request',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    'horizon.context_processors.horizon')
-
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'horizon.loaders.TemplateLoader'
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(ROOT_PATH, 'tests', 'templates')],
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.request',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.contrib.messages.context_processors.messages',
+                'horizon.context_processors.horizon',
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'horizon.loaders.TemplateLoader'
+            ],
+        },
+    },
+]
 
 STATIC_URL = '/static/'
 WEBROOT = '/'
@@ -96,7 +101,6 @@ WEBROOT = '/'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 ROOT_URLCONF = 'horizon.test.urls'
-TEMPLATE_DIRS = (os.path.join(ROOT_PATH, 'tests', 'templates'),)
 SITE_ID = 1
 SITE_BRANDING = 'Horizon'
 
@@ -127,6 +131,10 @@ HORIZON_CONFIG = {
     'help_url': "http://example.com",
 }
 
+STATICFILES_DIRS = settings_utils.get_xstatic_dirs(
+    settings_utils.BASE_XSTATIC_MODULES, HORIZON_CONFIG
+)
+
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = False
 COMPRESS_ROOT = "/tmp/"
@@ -134,7 +142,7 @@ COMPRESS_PARSER = 'compressor.parser.HtmlParser'
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'horizon.contrib.staticfiles.finders.HorizonStaticFinder',
     'compressor.finders.CompressorFinder',
 )
 

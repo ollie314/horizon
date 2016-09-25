@@ -28,7 +28,6 @@
     'horizon.app.core.openstack-service-api.serviceCatalog',
     'horizon.app.core.openstack-service-api.settings',
     'horizon.dashboard.project.workflow.launch-instance.boot-source-types',
-    'horizon.dashboard.project.workflow.launch-instance.non_bootable_image_types',
     'horizon.framework.widgets.toast.service',
     'horizon.app.core.openstack-service-api.policy',
     'horizon.dashboard.project.workflow.launch-instance.step-policy'
@@ -48,7 +47,10 @@
    * @param {Object} securityGroup
    * @param {Object} serviceCatalog
    * @param {Object} settings
+   * @param {Object} bootSourceTypes
    * @param {Object} toast
+   * @param {Object} policy
+   * @param {Object} stepPolicy
    * @description
    * This is the M part in MVC design pattern for launch instance
    * wizard workflow. It is responsible for providing data to the
@@ -70,7 +72,6 @@
     serviceCatalog,
     settings,
     bootSourceTypes,
-    nonBootableImageTypes,
     toast,
     policy,
     stepPolicy
@@ -138,6 +139,7 @@
       novaLimits: {},
       profiles: [],
       securityGroups: [],
+      serverGroups: [],
       volumeBootable: false,
       volumes: [],
       volumeSnapshots: [],
@@ -172,8 +174,10 @@
         networks: [],
         ports: [],
         profile: {},
+        scheduler_hints: {},
         // REQUIRED Server Key. May be empty.
         security_groups: [],
+        server_groups: [],
         // REQUIRED for JS logic (image | snapshot | volume | volume_snapshot)
         source_type: null,
         source: [],
@@ -215,16 +219,18 @@
 
         model.allowedBootSources.length = 0;
 
+        var launchInstanceDefaults = settings.getSetting('LAUNCH_INSTANCE_DEFAULTS');
+
         promise = $q.all([
-          getImages(),
           novaAPI.getAvailabilityZones().then(onGetAvailabilityZones, noop),
           novaAPI.getFlavors(true, true).then(onGetFlavors, noop),
           novaAPI.getKeypairs().then(onGetKeypairs, noop),
-          novaAPI.getLimits().then(onGetNovaLimits, noop),
+          novaAPI.getLimits(true).then(onGetNovaLimits, noop),
           securityGroup.query().then(onGetSecurityGroups, noop),
           serviceCatalog.ifTypeEnabled('network').then(getNetworks, noop),
-          serviceCatalog.ifTypeEnabled('volume').then(getVolumes, noop),
-          settings.getSetting('LAUNCH_INSTANCE_DEFAULTS').then(setDefaultValues, noop)
+          launchInstanceDefaults.then(addImageSourcesIfEnabled, noop),
+          launchInstanceDefaults.then(setDefaultValues, noop),
+          launchInstanceDefaults.then(addVolumeSourcesIfEnabled, noop)
         ]);
 
         promise.then(onInitSuccess, onInitFail);
@@ -239,6 +245,7 @@
       // This provides supplemental data non-critical to launching
       // an instance.  Therefore we load it only if the critical data
       // all loads successfully.
+      getServerGroups();
       getMetadataDefinitions();
     }
 
@@ -276,6 +283,7 @@
       setFinalSpecPorts(finalSpec);
       setFinalSpecKeyPairs(finalSpec);
       setFinalSpecSecurityGroups(finalSpec);
+      setFinalSpecServerGroup(finalSpec);
       setFinalSpecSchedulerHints(finalSpec);
       setFinalSpecMetadata(finalSpec);
 
@@ -326,7 +334,7 @@
     }
 
     function setFinalSpecFlavor(finalSpec) {
-      if ( finalSpec.flavor ) {
+      if (finalSpec.flavor) {
         finalSpec.flavor_id = finalSpec.flavor.id;
       } else {
         delete finalSpec.flavor_id;
@@ -341,9 +349,12 @@
       angular.extend(
         model.keypairs,
         data.data.items.map(function (e) {
-          e.keypair.id = e.keypair.name;
+          e.keypair.id = 'li_keypair:' + e.keypair.name;
           return e.keypair;
         }));
+      if (data.data.items.length === 1) {
+        model.newInstanceSpec.key_pair.push(data.data.items[0].keypair);
+      }
     }
 
     function setFinalSpecKeyPairs(finalSpec) {
@@ -361,6 +372,15 @@
 
     function onGetSecurityGroups(data) {
       model.securityGroups.length = 0;
+      angular.forEach(data.data.items, function addDefault(item) {
+        // 'default' is a special security group in neutron. It can not be
+        // deleted and is guaranteed to exist. It by default contains all
+        // of the rules needed for an instance to reach out to the network
+        // so the instance can provision itself.
+        if (item.name === 'default') {
+          model.newInstanceSpec.security_groups.push(item);
+        }
+      });
       push.apply(model.securityGroups, data.data.items);
     }
 
@@ -377,6 +397,26 @@
       finalSpec.security_groups = securityGroupIds;
     }
 
+    // Server Groups
+
+    function getServerGroups() {
+      if (policy.check(stepPolicy.serverGroups)) {
+        return novaAPI.getServerGroups().then(onGetServerGroups, noop);
+      }
+    }
+
+    function onGetServerGroups(data) {
+      model.serverGroups.length = 0;
+      push.apply(model.serverGroups, data.data.items);
+    }
+
+    function setFinalSpecServerGroup(finalSpec) {
+      if (finalSpec.server_groups.length > 0) {
+        finalSpec.scheduler_hints.group = finalSpec.server_groups[0].id;
+      }
+      delete finalSpec.server_groups;
+    }
+
     // Networks
 
     function getNetworks() {
@@ -386,7 +426,13 @@
     function onGetNetworks(data) {
       model.neutronEnabled = true;
       model.networks.length = 0;
-      push.apply(model.networks, data.data.items);
+      if (data.data.items.length === 1) {
+        model.newInstanceSpec.networks.push(data.data.items[0]);
+      }
+      push.apply(model.networks,
+        data.data.items.filter(function(net) {
+          return net.subnets.length > 0;
+        }));
       return data;
     }
 
@@ -453,15 +499,86 @@
 
     // Boot Source
 
-    function getImages() {
-      return glanceAPI.getImages({status:'active'}).then(onGetImages);
+    function addImageSourcesIfEnabled(config) {
+      // in case settings are deleted or not present
+      var allEnabled = !config;
+      // if the settings are missing or the specific setting is missing default to true
+      var enabledImage = allEnabled || !config.disable_image;
+      var enabledSnapshot = allEnabled || !config.disable_instance_snapshot;
+
+      if (enabledImage || enabledSnapshot) {
+        return glanceAPI.getImages({status: 'active'}).then(function getEnabledImages(data) {
+          if (enabledImage) {
+            onGetImages(data);
+          }
+          if (enabledSnapshot) {
+            onGetSnapshots(data);
+          }
+        });
+      }
+    }
+
+    function addVolumeSourcesIfEnabled(config) {
+      var volumeDeferred = $q.defer();
+      var volumeSnapshotDeferred = $q.defer();
+      serviceCatalog
+        .ifTypeEnabled('volume')
+        .then(onVolumeServiceEnabled, resolvePromises);
+      function onVolumeServiceEnabled() {
+        model.volumeBootable = true;
+        novaExtensions
+          .ifNameEnabled('BlockDeviceMappingV2Boot')
+          .then(onBootToVolumeSupported);
+        if (!config || !config.disable_volume) {
+          getVolumes().then(resolveVolumes, failVolumes);
+        } else {
+          resolveVolumes();
+        }
+        if (!config || !config.disable_volume_snapshot) {
+          getVolumeSnapshots().then(resolveVolumeSnapshots, failVolumeSnapshots);
+        } else {
+          resolveVolumeSnapshots();
+        }
+      }
+      function onBootToVolumeSupported() {
+        model.allowCreateVolumeFromImage = true;
+      }
+      function getVolumes() {
+        return cinderAPI.getVolumes({status: 'available', bootable: 1})
+          .then(onGetVolumes);
+      }
+      function getVolumeSnapshots() {
+        return cinderAPI.getVolumeSnapshots({status: 'available'})
+          .then(onGetVolumeSnapshots);
+      }
+      function resolvePromises() {
+        volumeDeferred.resolve();
+        volumeSnapshotDeferred.resolve();
+      }
+      function resolveVolumes() {
+        volumeDeferred.resolve();
+      }
+      function failVolumes() {
+        volumeDeferred.resolve();
+      }
+      function resolveVolumeSnapshots() {
+        volumeSnapshotDeferred.resolve();
+      }
+      function failVolumeSnapshots() {
+        volumeSnapshotDeferred.resolve();
+      }
+      return $q.all(
+        [
+          volumeDeferred.promise,
+          volumeSnapshotDeferred.promise
+        ]);
     }
 
     function isBootableImageType(image) {
       // This is a blacklist of images that can not be booted.
       // If the image container type is in the blacklist
       // The evaluation will result in a 0 or greater index.
-      return nonBootableImageTypes.indexOf(image.container_format) < 0;
+      return bootSourceTypes.NON_BOOTABLE_IMAGE_TYPES.indexOf(image.container_format) < 0;
     }
 
     function onGetImages(data) {
@@ -471,7 +588,9 @@
           (!image.properties || image.properties.image_type !== 'snapshot');
       }));
       addAllowedBootSource(model.images, bootSourceTypes.IMAGE, gettext('Image'));
+    }
 
+    function onGetSnapshots(data) {
       model.imageSnapshots.length = 0;
       push.apply(model.imageSnapshots, data.data.items.filter(function (image) {
         return isBootableImageType(image) &&
@@ -485,42 +604,24 @@
       );
     }
 
-    function getVolumes() {
-      var volumePromises = [];
-      // Need to check if Volume service is enabled before getting volumes
-      model.volumeBootable = true;
-      addAllowedBootSource(model.volumes, bootSourceTypes.VOLUME, gettext('Volume'));
-      addAllowedBootSource(
-        model.volumeSnapshots,
-        bootSourceTypes.VOLUME_SNAPSHOT,
-        gettext('Volume Snapshot')
-      );
-      volumePromises.push(cinderAPI.getVolumes({ status: 'available', bootable: true })
-                          .then(onGetVolumes));
-      volumePromises.push(cinderAPI.getVolumeSnapshots({ status: 'available' })
-                          .then(onGetVolumeSnapshots));
-
-      // Can only boot image to volume if the Nova extension is enabled.
-      novaExtensions.ifNameEnabled('BlockDeviceMappingV2Boot')
-        .then(function() {
-          model.allowCreateVolumeFromImage = true;
-        });
-
-      return $q.all(volumePromises);
-    }
-
     function onGetVolumes(data) {
       model.volumes.length = 0;
       push.apply(model.volumes, data.data.items);
+      addAllowedBootSource(model.volumes, bootSourceTypes.VOLUME, gettext('Volume'));
     }
 
     function onGetVolumeSnapshots(data) {
       model.volumeSnapshots.length = 0;
       push.apply(model.volumeSnapshots, data.data.items);
+      addAllowedBootSource(
+        model.volumeSnapshots,
+        bootSourceTypes.VOLUME_SNAPSHOT,
+        gettext('Volume Snapshot')
+      );
     }
 
     function addAllowedBootSource(rawTypes, type, label) {
-      if (rawTypes && rawTypes.length > 0) {
+      if (rawTypes) {
         model.allowedBootSources.push({
           type: type,
           label: label
@@ -606,9 +707,8 @@
         var hints = model.hintsTree.getExisting();
         if (!angular.equals({}, hints)) {
           angular.forEach(hints, function(value, key) {
-            hints[key] = value + '';
+            finalSpec.scheduler_hints[key] = value + '';
           });
-          finalSpec.scheduler_hints = hints;
         }
       }
     }

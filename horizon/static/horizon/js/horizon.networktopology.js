@@ -52,6 +52,16 @@ function Server(data) {
   this.ip_addresses = [];
 }
 
+function listContains(obj, list) {
+  // Function to help checking if an object is present on a list
+  for (var i = 0; i < list.length; i++) {
+    if (angular.equals(list[i], obj)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 horizon.network_topology = {
   fa_globe_glyph: '\uf0ac',
   fa_globe_glyph_width: 15,
@@ -276,7 +286,7 @@ horizon.network_topology = {
     var k = 0;
     var offset = 40;
 
-    while ( k < nodes.length) {
+    while (k < nodes.length) {
       var n = nodes[k];
       if (n.data !== undefined) {
         if (n.data instanceof Server) {
@@ -423,7 +433,7 @@ horizon.network_topology = {
       .style('stroke', 'black')
       .style('stroke-width', 3);
 
-    switch ( data.data.iconType ) {
+    switch (data.data.iconType) {
       case 'text':
         nodeEnter.append('text')
           .style('fill', 'black')
@@ -703,7 +713,9 @@ horizon.network_topology = {
             device.data.networks.push(_network.data);
             if (port.fixed_ips) {
               for(var ip in port.fixed_ips) {
-                device.data.ip_addresses.push(port.fixed_ips[ip]);
+                if (!listContains(port.fixed_ips[ip], device.data.ip_addresses)) {
+                  device.data.ip_addresses.push(port.fixed_ips[ip]);
+                }
               }
             }
             // Remove the recently added node if connected to a network which is

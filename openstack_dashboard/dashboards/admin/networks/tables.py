@@ -78,21 +78,22 @@ class EditNetwork(policy.PolicyTargetMixin, tables.LinkAction):
     policy_rules = (("network", "update_network"),)
 
 
-# def _get_subnets(network):
-#    cidrs = [subnet.get('cidr') for subnet in network.subnets]
-#    return ','.join(cidrs)
-
-
 DISPLAY_CHOICES = (
     ("up", pgettext_lazy("Admin state of a Network", u"UP")),
     ("down", pgettext_lazy("Admin state of a Network", u"DOWN")),
 )
 
 
+class AdminNetworksFilterAction(project_tables.ProjectNetworksFilterAction):
+    name = "filter_admin_networks"
+    filter_choices = (('project', _("Project ="), True),) +\
+        project_tables.ProjectNetworksFilterAction.filter_choices
+
+
 class NetworksTable(tables.DataTable):
     tenant = tables.Column("tenant_name", verbose_name=_("Project"))
-    name = tables.Column("name_or_id", verbose_name=_("Network Name"),
-                         link='horizon:admin:networks:detail')
+    name = tables.WrappingColumn("name_or_id", verbose_name=_("Network Name"),
+                                 link='horizon:admin:networks:detail')
     subnets = tables.Column(project_tables.get_subnets,
                             verbose_name=_("Subnets Associated"),)
     num_agents = tables.Column("num_agents",
@@ -113,7 +114,7 @@ class NetworksTable(tables.DataTable):
         name = "networks"
         verbose_name = _("Networks")
         table_actions = (CreateNetwork, DeleteNetwork,
-                         project_tables.NetworksFilterAction)
+                         AdminNetworksFilterAction)
         row_actions = (EditNetwork, DeleteNetwork)
 
     def __init__(self, request, data=None, needs_form_wrapper=None, **kwargs):
@@ -121,6 +122,12 @@ class NetworksTable(tables.DataTable):
             request, data=data,
             needs_form_wrapper=needs_form_wrapper,
             **kwargs)
-        if not api.neutron.is_extension_supported(request,
-                                                  'dhcp_agent_scheduler'):
+        try:
+            if not api.neutron.is_extension_supported(request,
+                                                      'dhcp_agent_scheduler'):
+                del self.columns['num_agents']
+        except Exception:
+            msg = _("Unable to check if DHCP agent scheduler "
+                    "extension is supported")
+            exceptions.handle(self.request, msg)
             del self.columns['num_agents']

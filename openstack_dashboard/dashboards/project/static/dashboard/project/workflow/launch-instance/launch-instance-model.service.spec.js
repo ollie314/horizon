@@ -19,10 +19,11 @@
   describe('Launch Instance Model', function() {
 
     describe('launchInstanceModel Factory', function() {
-      var model, scope, settings, $q, glance;
+      var model, scope, settings, $q, glance, IMAGE, VOLUME, VOLUME_SNAPSHOT, INSTANCE_SNAPSHOT;
       var cinderEnabled = false;
       var neutronEnabled = false;
       var novaExtensionsEnabled = false;
+
       var novaApi = {
         createServer: function(finalSpec) {
           return {
@@ -68,8 +69,110 @@
           deferred.resolve({ data: limits });
 
           return deferred.promise;
+        },
+        getServerGroups: function() {
+          var serverGroups = [ {'id': 'group-1'}, {'id': 'group-2'} ];
+
+          var deferred = $q.defer();
+          deferred.resolve({ data: { items: serverGroups } });
+
+          return deferred.promise;
         }
       };
+
+      var securityGroupApi = {
+        query: function() {
+          var secGroups = [
+            { name: 'security-group-1' },
+            { name: 'security-group-2' }
+          ];
+
+          var deferred = $q.defer();
+          deferred.resolve({ data: { items: secGroups } });
+          return deferred.promise;
+        }
+      };
+
+      var neutronApi = {
+        getNetworks: function() {
+          var networks = [
+            { id: 'net-1', subnets: [ { id: 'subnet1' } ] },
+            { id: 'net-2', subnets: [ { id: 'subnet2' } ] },
+            { id: 'net-3', subnets: []}
+          ];
+
+          var deferred = $q.defer();
+          deferred.resolve({ data: { items: networks } });
+
+          return deferred.promise;
+        },
+        getPorts: function(network) {
+          var ports = {
+            'net-1': [
+              { name: 'port-1', device_owner: '', fixed_ips: [], admin_state: 'UP' },
+              { name: 'port-2', device_owner: '', fixed_ips: [], admin_state: 'DOWN' }
+            ],
+            'net-2': [
+              { name: 'port-3', device_owner: 'owner', fixed_ips: [], admin_state: 'DOWN' },
+              { name: 'port-4', device_owner: '', fixed_ips: [], admin_state: 'DOWN' }
+            ],
+            'net-3': []
+          };
+
+          var deferred = $q.defer();
+          deferred.resolve({ data: { items: ports[network.network_id] } });
+
+          return deferred.promise;
+        }
+      };
+
+      beforeEach(module('horizon.dashboard.project.workflow.launch-instance'));
+
+      beforeEach(module(function($provide) {
+        $provide.value('horizon.app.core.openstack-service-api.glance', {
+          getImages: function () {
+            var images = [
+              {container_format: 'aki', properties: {}},
+              {container_format: 'ari', properties: {}},
+              {container_format: 'ami', properties: {}},
+              {container_format: 'raw', properties: {}},
+              {container_format: 'ami', properties: {image_type: 'snapshot'}},
+              {container_format: 'raw', properties: {image_type: 'snapshot'}}
+            ];
+
+            var deferred = $q.defer();
+            deferred.resolve({data: {items: images}});
+
+            return deferred.promise;
+          },
+          getNamespaces: function () {
+            var namespaces = ['ns-1', 'ns-2'];
+
+            var deferred = $q.defer();
+            deferred.resolve({data: {items: namespaces}});
+
+            return deferred.promise;
+          }
+        });
+
+        beforeEach(function () {
+          settings = {
+            LAUNCH_INSTANCE_DEFAULTS: {
+              config_drive: false,
+              disable_image: false,
+              disable_instance_snapshot: false,
+              disable_volume: false,
+              disable_volume_snapshot: false
+            }
+          };
+          IMAGE = {type: 'image', label: 'Image'};
+          VOLUME = {type: 'volume', label: 'Volume'};
+          VOLUME_SNAPSHOT = {type: 'volume_snapshot', label: 'Volume Snapshot'};
+          INSTANCE_SNAPSHOT = {type: 'snapshot', label: 'Instance Snapshot'};
+        });
+
+        $provide.value('horizon.app.core.openstack-service-api.nova', novaApi);
+      }));
 
       beforeEach(module('horizon.dashboard.project.workflow.launch-instance'));
 
@@ -110,47 +213,9 @@
 
         $provide.value('horizon.app.core.openstack-service-api.nova', novaApi);
 
-        $provide.value('horizon.app.core.openstack-service-api.security-group', {
-          query: function() {
-            var secGroups = [
-              { name: 'security-group-1' },
-              { name: 'security-group-2' }
-            ];
+        $provide.value('horizon.app.core.openstack-service-api.security-group', securityGroupApi);
 
-            var deferred = $q.defer();
-            deferred.resolve({ data: { items: secGroups } });
-
-            return deferred.promise;
-          }
-        });
-
-        $provide.value('horizon.app.core.openstack-service-api.neutron', {
-          getNetworks: function() {
-            var networks = [ { id: 'net-1' }, { id: 'net-2' } ];
-
-            var deferred = $q.defer();
-            deferred.resolve({ data: { items: networks } });
-
-            return deferred.promise;
-          },
-          getPorts: function(network) {
-            var ports = {
-              'net-1': [
-                { name: 'port-1', device_owner: '', fixed_ips: [], admin_state: 'UP' },
-                { name: 'port-2', device_owner: '', fixed_ips: [], admin_state: 'DOWN' }
-              ],
-              'net-2': [
-                { name: 'port-3', device_owner: 'owner', fixed_ips: [], admin_state: 'DOWN' },
-                { name: 'port-4', device_owner: '', fixed_ips: [], admin_state: 'DOWN' }
-              ]
-            };
-
-            var deferred = $q.defer();
-            deferred.resolve({ data: { items: ports[network.network_id] } });
-
-            return deferred.promise;
-          }
-        });
+        $provide.value('horizon.app.core.openstack-service-api.neutron', neutronApi);
 
         $provide.value('horizon.app.core.openstack-service-api.cinder', {
           getVolumes: function() {
@@ -189,6 +254,13 @@
 
         $provide.value('horizon.app.core.openstack-service-api.policy', {
           ifAllowed: function() {
+            var deferred = $q.defer();
+
+            deferred.resolve();
+
+            return deferred.promise;
+          },
+          check: function() {
             var deferred = $q.defer();
 
             deferred.resolve();
@@ -273,7 +345,8 @@
         it('has empty arrays for all data', function() {
           var datasets = ['availabilityZones', 'flavors', 'allowedBootSources',
             'images', 'imageSnapshots', 'keypairs', 'networks',
-            'profiles', 'securityGroups', 'volumes', 'volumeSnapshots'];
+            'profiles', 'securityGroups', 'serverGroups', 'volumes',
+            'volumeSnapshots'];
 
           datasets.forEach(function(name) {
             expect(model[name]).toEqual([]);
@@ -393,7 +466,7 @@
         });
 
         it('should default config_drive to false if setting not provided', function() {
-          delete settings.LAUNCH_INSTANCE_DEFAULTS;
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.config_drive;
           model.initialize(true);
           scope.$apply();
 
@@ -438,6 +511,229 @@
           scope.$apply();
           expect(glance.getNamespaces.calls.count()).toBe(4);
         });
+
+        it('should set a keypair by default if only one keypair is available', function () {
+          var keypair = { keypair: { name: 'key-1' } };
+          spyOn(novaApi, 'getKeypairs').and.callFake(function () {
+            var deferred = $q.defer();
+            deferred.resolve({ data: { items: [ keypair ] } });
+            return deferred.promise;
+          });
+          model.initialize(true);
+          scope.$apply();
+          expect(model.newInstanceSpec.key_pair.length).toBe(1);
+          expect(model.newInstanceSpec.key_pair).toEqual([ keypair.keypair ]);
+        });
+
+        it('should set a security group by default if one named "default" is available',
+          function () {
+            var secGroups = [ { name: 'default' } ];
+            spyOn(securityGroupApi, 'query').and.callFake(function () {
+              var deferred = $q.defer();
+              deferred.resolve({ data: { items: secGroups } });
+              return deferred.promise;
+            });
+            model.initialize(true);
+            scope.$apply();
+            expect(model.newInstanceSpec.security_groups.length).toBe(1);
+            expect(model.newInstanceSpec.security_groups).toEqual(secGroups);
+          }
+        );
+
+        it('should set a network by default if only one network is available', function () {
+          var networks = [ { id: 'net-1', subnets: [ { id: 'subnet1' } ] } ];
+          spyOn(neutronApi, 'getNetworks').and.callFake(function () {
+            var deferred = $q.defer();
+            deferred.resolve({ data: { items: networks } });
+            return deferred.promise;
+          });
+          model.initialize(true);
+          scope.$apply();
+          expect(model.newInstanceSpec.networks.length).toBe(1);
+          expect(model.newInstanceSpec.networks).toEqual(networks);
+        });
+
+        it('should have the proper entries in allowedBootSources', function() {
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(4);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+        });
+
+        it('should have proper allowedBootSources if settings are missing', function() {
+          delete settings.LAUNCH_INSTANCE_DEFAULTS;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(4);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have proper allowedBootSources if specific settings missing', function() {
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_image;
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_instance_snapshot;
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_volume;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(4);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have no images if disable_image is set to true', function() {
+          settings.LAUNCH_INSTANCE_DEFAULTS.disable_image = true;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.images.length).toBe(0);
+          expect(model.images).toEqual([]);
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(3);
+          expect(model.allowedBootSources).not.toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have images if disable_image is missing', function() {
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_image;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(4);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have no volumes if disable_volume is set to true', function() {
+          settings.LAUNCH_INSTANCE_DEFAULTS.disable_volume = true;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.volumes.length).toBe(0);
+          expect(model.volumes).toEqual([]);
+          expect(model.volumeSnapshots.length).toBe(2);
+          expect(model.volumeSnapshots).toEqual([{ id: 'snap-1' }, { id: 'snap-2' }]);
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(3);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).not.toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have volumes if disable_volume is missing', function() {
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_volume;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(4);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have volume snapshots if disable_volume_snapshot is missing', function() {
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_volume_snapshot;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(4);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should not have volume snapshots if disable_volume_snapshot is set to true',
+        function() {
+          settings.LAUNCH_INSTANCE_DEFAULTS.disable_volume_snapshot = true;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(3);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).not.toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have no snapshot if disable_instance_snapshot is set to true', function() {
+          settings.LAUNCH_INSTANCE_DEFAULTS.disable_instance_snapshot = true;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(3);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).not.toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have snapshot if disable_instance_snapshot is missing', function() {
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_instance_snapshot;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(4);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have no snapshot and no image if both are disabled', function() {
+          settings.LAUNCH_INSTANCE_DEFAULTS.disable_image = true;
+          settings.LAUNCH_INSTANCE_DEFAULTS.disable_instance_snapshot = true;
+
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(2);
+          expect(model.allowedBootSources).not.toContain(IMAGE);
+          expect(model.allowedBootSources).not.toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
+        it('should have snapshot and image if both are missing', function() {
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_image;
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_instance_snapshot;
+
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.allowedBootSources).toBeDefined();
+          expect(model.allowedBootSources.length).toBe(4);
+          expect(model.allowedBootSources).toContain(IMAGE);
+          expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
+          expect(model.allowedBootSources).toContain(VOLUME);
+          expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+        });
+
       });
 
       describe('Post Initialization Model - Initializing', function() {
@@ -450,7 +746,7 @@
         // This is here to ensure that as people add/change items, they
         // don't forget to implement tests for them.
         it('has the right number of properties', function() {
-          expect(Object.keys(model.newInstanceSpec).length).toBe(19);
+          expect(Object.keys(model.newInstanceSpec).length).toBe(21);
         });
 
         it('sets availability zone to null', function() {
@@ -505,6 +801,10 @@
           expect(model.newInstanceSpec.security_groups).toEqual([]);
         });
 
+        it('sets scheduler hints to an empty object', function() {
+          expect(model.newInstanceSpec.scheduler_hints).toEqual({});
+        });
+
         it('sets source type to null', function() {
           expect(model.newInstanceSpec.source_type).toBeNull();
         });
@@ -535,10 +835,12 @@
           model.newInstanceSpec.key_pair = [ { name: 'keypair1' } ];
           model.newInstanceSpec.security_groups = [ { id: 'adminId', name: 'admin' },
                                                     { id: 'demoId', name: 'demo' } ];
+          model.newInstanceSpec.scheduler_hints = {};
           model.newInstanceSpec.vol_create = true;
           model.newInstanceSpec.vol_delete_on_instance_delete = true;
           model.newInstanceSpec.vol_device_name = "volTestName";
           model.newInstanceSpec.vol_size = 10;
+          model.newInstanceSpec.server_groups = [];
 
           metadata = {'foo': 'bar'};
           model.metadataTree = {
@@ -547,7 +849,7 @@
             }
           };
 
-          hints = {'group': 'group1'};
+          hints = {'hint1': 'val1'};
           model.hintsTree = {
             getExisting: function() {
               return hints;
@@ -707,21 +1009,34 @@
           expect(finalSpec.meta).toBe(metadata);
         });
 
-        it('should not have scheduler_hints property if no scheduler hints specified', function() {
+        it('should have only group for scheduler_hints if no other hints specified', function() {
           hints = {};
+          model.newInstanceSpec.server_groups = [{'id': 'group1'}];
+          var finalHints = {'group': model.newInstanceSpec.server_groups[0].id};
 
           var finalSpec = model.createInstance();
-          expect(finalSpec.scheduler_hints).toBeUndefined();
+          expect(finalSpec.scheduler_hints).toEqual(finalHints);
 
           model.hintsTree = null;
 
           finalSpec = model.createInstance();
-          expect(finalSpec.scheduler_hints).toBeUndefined();
+          expect(finalSpec.scheduler_hints).toEqual(finalHints);
         });
 
         it('should have scheduler_hints property if scheduler hints specified', function() {
+          var finalHints = hints;
+          finalHints.group = 'group1';
+
           var finalSpec = model.createInstance();
-          expect(finalSpec.scheduler_hints).toBe(hints);
+          expect(finalSpec.scheduler_hints).toEqual(finalHints);
+        });
+
+        it('should have no scheduler_hints if no scheduler hints specified', function() {
+          hints = {};
+          model.newInstanceSpec.server_groups = [];
+
+          var finalSpec = model.createInstance();
+          expect(finalSpec.scheduler_hints).toEqual({});
         });
 
       });

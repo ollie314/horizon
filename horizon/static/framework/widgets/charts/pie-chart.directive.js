@@ -113,6 +113,8 @@
     return directive;
 
     function link(scope, element) {
+      var d3Elt, arc, pie;
+
       function updateChartVisibility() {
         var showChart = scope.chartData.maxLimit !== Infinity;
         scope.chartData.showChart = showChart;
@@ -142,13 +144,13 @@
       };
 
       if (showChart) {
-        var d3Elt = d3.select(element[0]);
+        d3Elt = d3.select(element[0]);
 
-        var arc = d3.svg.arc()
+        arc = d3.svg.arc()
           .outerRadius(settings.outerRadius)
           .innerRadius(settings.innerRadius);
 
-        var pie = d3.layout.pie()
+        pie = d3.layout.pie()
           .sort(null)
           .value(function (d) {
             return d.value;
@@ -174,12 +176,20 @@
           scope.model.totalLabel = gettext('No Limit');
         } else if (angular.isDefined(scope.chartData.maxLimit)) {
           scope.model.total = scope.chartData.maxLimit;
-          scope.model.totalLabel = gettext('Max');
+          scope.model.totalLabel = interpolate(
+              gettext('%(total)s Max'),
+              { total: scope.model.total },
+              true
+          );
         } else {
           scope.model.total = d3.sum(scope.chartData.data, function (d) {
             return d.value;
           });
-          scope.model.totalLabel = gettext('Total');
+          scope.model.totalLabel = interpolate(
+              gettext('%(total)s Total'),
+              { total: scope.model.total },
+              true
+          );
         }
         scope.model.tooltipData.enabled = false;
 

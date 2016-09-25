@@ -216,17 +216,16 @@ class TogglePause(tables.BatchAction):
         self.paused = instance.status == "PAUSED"
         if self.paused:
             self.current_present_action = UNPAUSE
-            policy = (("compute", "compute_extension:admin_actions:unpause"),)
+            policy_rules = (
+                ("compute", "compute_extension:admin_actions:unpause"),)
         else:
             self.current_present_action = PAUSE
-            policy = (("compute", "compute_extension:admin_actions:pause"),)
+            policy_rules = (
+                ("compute", "compute_extension:admin_actions:pause"),)
 
-        has_permission = True
-        policy_check = getattr(settings, "POLICY_CHECK_FUNCTION", None)
-        if policy_check:
-            has_permission = policy_check(
-                policy, request,
-                target={'project_id': getattr(instance, 'tenant_id', None)})
+        has_permission = policy.check(
+            policy_rules, request,
+            target={'project_id': getattr(instance, 'tenant_id', None)})
 
         return (has_permission
                 and (instance.status in ACTIVE_STATES or self.paused)
@@ -284,17 +283,16 @@ class ToggleSuspend(tables.BatchAction):
         self.suspended = instance.status == "SUSPENDED"
         if self.suspended:
             self.current_present_action = RESUME
-            policy = (("compute", "compute_extension:admin_actions:resume"),)
+            policy_rules = (
+                ("compute", "compute_extension:admin_actions:resume"),)
         else:
             self.current_present_action = SUSPEND
-            policy = (("compute", "compute_extension:admin_actions:suspend"),)
+            policy_rules = (
+                ("compute", "compute_extension:admin_actions:suspend"),)
 
-        has_permission = True
-        policy_check = getattr(settings, "POLICY_CHECK_FUNCTION", None)
-        if policy_check:
-            has_permission = policy_check(
-                policy, request,
-                target={'project_id': getattr(instance, 'tenant_id', None)})
+        has_permission = policy.check(
+            policy_rules, request,
+            target={'project_id': getattr(instance, 'tenant_id', None)})
 
         return (has_permission
                 and (instance.status in ACTIVE_STATES or self.suspended)
@@ -351,17 +349,14 @@ class ToggleShelve(tables.BatchAction):
         self.shelved = instance.status == "SHELVED_OFFLOADED"
         if self.shelved:
             self.current_present_action = UNSHELVE
-            policy = (("compute", "compute_extension:unshelve"),)
+            policy_rules = (("compute", "compute_extension:unshelve"),)
         else:
             self.current_present_action = SHELVE
-            policy = (("compute", "compute_extension:shelve"),)
+            policy_rules = (("compute", "compute_extension:shelve"),)
 
-        has_permission = True
-        policy_check = getattr(settings, "POLICY_CHECK_FUNCTION", None)
-        if policy_check:
-            has_permission = policy_check(
-                policy, request,
-                target={'project_id': getattr(instance, 'tenant_id', None)})
+        has_permission = policy.check(
+            policy_rules, request,
+            target={'project_id': getattr(instance, 'tenant_id', None)})
 
         return (has_permission
                 and (instance.status in ACTIVE_STATES or self.shelved)
@@ -878,9 +873,11 @@ class LockInstance(policy.PolicyTargetMixin, tables.BatchAction):
             count
         )
 
-    # TODO(akrivoka): When the lock status is added to nova, revisit this
     # to only allow unlocked instances to be locked
     def allowed(self, request, instance):
+        # if not locked, lock should be available
+        if getattr(instance, 'locked', False):
+            return False
         if not api.nova.extension_supported('AdminActions', request):
             return False
         return True
@@ -909,15 +906,43 @@ class UnlockInstance(policy.PolicyTargetMixin, tables.BatchAction):
             count
         )
 
-    # TODO(akrivoka): When the lock status is added to nova, revisit this
     # to only allow locked instances to be unlocked
     def allowed(self, request, instance):
+        if not getattr(instance, 'locked', True):
+            return False
         if not api.nova.extension_supported('AdminActions', request):
             return False
         return True
 
     def action(self, request, obj_id):
         api.nova.server_unlock(request, obj_id)
+
+
+class AttachVolume(tables.LinkAction):
+    name = "attach_volume"
+    verbose_name = _("Attach Volume")
+    url = "horizon:project:instances:attach_volume"
+    classes = ("ajax-modal",)
+    policy_rules = (("compute", "compute:attach_volume"),)
+
+    # This action should be disabled if the instance
+    # is not active, or the instance is being deleted
+    def allowed(self, request, instance=None):
+        return instance.status in ("ACTIVE") \
+            and not is_deleting(instance)
+
+
+class DetachVolume(AttachVolume):
+    name = "detach_volume"
+    verbose_name = _("Detach Volume")
+    url = "horizon:project:instances:detach_volume"
+    policy_rules = (("compute", "compute:detach_volume"),)
+
+    # This action should be disabled if the instance
+    # is not active, or the instance is being deleted
+    def allowed(self, request, instance=None):
+        return instance.status in ("ACTIVE") \
+            and not is_deleting(instance)
 
 
 class AttachInterface(policy.PolicyTargetMixin, tables.LinkAction):
@@ -1170,9 +1195,9 @@ class InstancesTable(tables.DataTable):
         ("shelved", True),
         ("shelved_offloaded", True),
     )
-    name = tables.Column("name",
-                         link="horizon:project:instances:detail",
-                         verbose_name=_("Instance Name"))
+    name = tables.WrappingColumn("name",
+                                 link="horizon:project:instances:detail",
+                                 verbose_name=_("Instance Name"))
     image_name = tables.Column("image_name",
                                verbose_name=_("Image Name"))
     ip = tables.Column(get_ips,
@@ -1220,9 +1245,10 @@ class InstancesTable(tables.DataTable):
         row_actions = (StartInstance, ConfirmResize, RevertResize,
                        CreateSnapshot, SimpleAssociateIP, AssociateIP,
                        SimpleDisassociateIP, AttachInterface,
-                       DetachInterface, EditInstance, UpdateMetadata,
-                       DecryptInstancePassword, EditInstanceSecurityGroups,
-                       ConsoleLink, LogLink, TogglePause, ToggleSuspend,
-                       ToggleShelve, ResizeLink, LockInstance, UnlockInstance,
+                       DetachInterface, EditInstance, AttachVolume,
+                       DetachVolume, UpdateMetadata, DecryptInstancePassword,
+                       EditInstanceSecurityGroups, ConsoleLink, LogLink,
+                       TogglePause, ToggleSuspend, ToggleShelve,
+                       ResizeLink, LockInstance, UnlockInstance,
                        SoftRebootInstance, RebootInstance,
                        StopInstance, RebuildInstance, DeleteInstance)

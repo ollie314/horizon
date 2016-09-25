@@ -3,9 +3,9 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 9.0.1.dev255\n"
+"Project-Id-Version: horizon 10.0.0.0b4.dev124\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-05-12 04:37+0000\n"
+"POT-Creation-Date: 2016-09-11 20:17+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,10 +18,6 @@ msgstr ""
 
 msgid "#"
 msgstr "#"
-
-#, python-format
-msgid "%(name)s deleted."
-msgstr "%(name)s deleted."
 
 #, python-format
 msgid "%s instance launched."
@@ -52,47 +48,6 @@ msgstr "6"
 
 msgid "7"
 msgstr "7"
-
-msgid ""
-"<li><b>Image (with Create New Volume checked)</b>: This options uses an "
-"image to boot the instance, and creates a new volume to persist instance "
-"data. You can specify volume size and whether to delete the volume on "
-"deletion of the instance.</li>"
-msgstr ""
-"<li><b>Image (with Create New Volume checked)</b>: This options uses an "
-"image to boot the instance, and creates a new volume to persist instance "
-"data. You can specify volume size and whether to delete the volume on "
-"deletion of the instance.</li>"
-
-msgid "<li><b>Image</b>: This option uses an image to boot the instance.</li>"
-msgstr "<li><b>Image</b>: This option uses an image to boot the instance.</li>"
-
-msgid ""
-"<li><b>Instance Snapshot</b>: This option uses an instance snapshot to boot "
-"the instance.</li>"
-msgstr ""
-"<li><b>Instance Snapshot</b>: This option uses an instance snapshot to boot "
-"the instance.</li>"
-
-msgid ""
-"<li><b>Volume Snapshot</b>: This option uses a volume snapshot to boot the "
-"instance, and creates a new volume to persist instance data. You can choose "
-"to delete the volume on deletion of the instance.</li>"
-msgstr ""
-"<li><b>Volume Snapshot</b>: This option uses a volume snapshot to boot the "
-"instance, and creates a new volume to persist instance data. You can choose "
-"to delete the volume on deletion of the instance.</li>"
-
-msgid ""
-"<li><b>Volume</b>: This option uses a volume that already exists. It does "
-"not create a new volume. You can choose to delete the volume on deletion of "
-"the instance. <em>Note: when selecting Volume, you can only launch one "
-"instance.</em></li>"
-msgstr ""
-"<li><b>Volume</b>: This option uses a volume that already exists. It does "
-"not create a new volume. You can choose to delete the volume on deletion of "
-"the instance. <em>Note: when selecting Volume, you can only launch one "
-"instance.</em></li>"
 
 msgid "<small>This line of text is meant to be treated as fine print.</small>"
 msgstr "<small>This line of text is meant to be treated as fine print.</small>"
@@ -228,14 +183,6 @@ msgstr "Another action"
 
 msgid "Architecture"
 msgstr "Architecture"
-
-#, python-format
-msgid "Are you sure you want to delete %(name)s?"
-msgstr "Are you sure you want to delete %(name)s?"
-
-#, python-format
-msgid "Are you sure you want to delete %(numSelected)s files?"
-msgstr "Are you sure you want to delete %(numSelected)s files?"
 
 #, python-format
 msgid "Are you sure you want to delete container %(name)s?"
@@ -466,9 +413,6 @@ msgstr[1] "Delete Images"
 msgid "Delete Images"
 msgstr "Delete Images"
 
-msgid "Delete Selection"
-msgstr "Delete Selection"
-
 msgid "Delete Volume on Instance Delete"
 msgstr "Delete Volume on Instance Delete"
 
@@ -481,17 +425,11 @@ msgid_plural "Deleted Images: %s."
 msgstr[0] "Deleted Image: %s."
 msgstr[1] "Deleted Images: %s."
 
-msgid "Deleted."
-msgstr "Deleted."
-
 msgid "Deleting"
 msgstr "Deleting"
 
 msgid "Description"
 msgstr "Description"
-
-msgid "Description:"
-msgstr "Description:"
 
 msgid "Details"
 msgstr "Details"
@@ -577,9 +515,6 @@ msgstr "Extension is not enabled: %(extension)s."
 
 msgid "External Network"
 msgstr "External Network"
-
-msgid "Failed to delete."
-msgstr "Failed to delete."
 
 msgid "File"
 msgstr "File"
@@ -682,13 +617,6 @@ msgid "ISO"
 msgstr "ISO"
 
 msgid ""
-"If \"No volume type\" is selected, the volume will be created without a "
-"volume type."
-msgstr ""
-"If \"No volume type\" is selected, the volume will be created without a "
-"volume type."
-
-msgid ""
 "If a network is shared, then all users in the project can access the network."
 msgstr ""
 "If a network is shared, then all users in the project can access the network."
@@ -701,9 +629,6 @@ msgstr ""
 "If a security group is not associated with an instance before it is "
 "launched, then you will have very limited access to the instance after it is "
 "deployed. You will only be able to access the instance from a VNC console."
-
-msgid "If not, you can manually dowload this keypair at the following link:"
-msgstr "If not, you can manually dowload this keypair at the following link:"
 
 msgid ""
 "If you select an availability zone and plan to use the 'boot from volume' "
@@ -921,9 +846,6 @@ msgstr "Min. RAM"
 
 msgid "Mini button"
 msgstr "Mini button"
-
-msgid "Modal title"
-msgstr "Modal title"
 
 msgid "Modals"
 msgstr "Modals"
@@ -1227,14 +1149,8 @@ msgstr "Ramdisk ID"
 msgid "Re-order items using drag and drop"
 msgstr "Re-order items using drag and drop"
 
-msgid "Record Properties"
-msgstr "Record Properties"
-
 msgid "Remote"
 msgstr "Remote"
-
-msgid "Required"
-msgstr "Required"
 
 msgid "Right"
 msgstr "Right"
@@ -1265,26 +1181,8 @@ msgid ""
 msgstr ""
 "Security groups are project-specific and cannot be shared across projects."
 
-msgid ""
-"Security groups define a set of IP filter rules that determine how network "
-"traffic flows to and from an instance. Users can add additional rules to an "
-"existing security group to further define the access options for an "
-"instance. To create additional rules, go to the <b>Compute | Access & "
-"Security</b> view, then find the security group and click <b>Manage Rules</"
-"b>."
-msgstr ""
-"Security groups define a set of IP filter rules that determine how network "
-"traffic flows to and from an instance. Users can add additional rules to an "
-"existing security group to further define the access options for an "
-"instance. To create additional rules, go to the <b>Compute | Access & "
-"Security</b> view, then find the security group and click <b>Manage Rules</"
-"b>."
-
 msgid "Segmentation ID"
 msgstr "Segmentation ID"
-
-msgid "Select All"
-msgstr "Select All"
 
 msgid "Select Boot Source"
 msgstr "Select Boot Source"
@@ -1297,9 +1195,6 @@ msgstr "Select a key pair from the available key pairs below."
 
 msgid "Select a source from those listed below."
 msgstr "Select a source from those listed below."
-
-msgid "Select a zone"
-msgstr "Select a zone"
 
 msgid "Select an item from Available items below"
 msgstr "Select an item from Available items below"
@@ -1341,9 +1236,6 @@ msgstr "Setting is not enabled: %(setting)s"
 
 msgid "Shared"
 msgstr "Shared"
-
-msgid "Shared with Me"
-msgstr "Shared with Me"
 
 msgid "Size"
 msgstr "Size"

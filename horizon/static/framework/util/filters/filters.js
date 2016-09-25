@@ -19,6 +19,7 @@
   angular
     .module('horizon.framework.util.filters')
     .filter('yesno', yesNoFilter)
+    .filter('simpleDate', simpleDateFilter)
     .filter('gb', gbFilter)
     .filter('mb', mbFilter)
     .filter('title', titleFilter)
@@ -42,6 +43,19 @@
   function yesNoFilter(gettext) {
     return function (input) {
       return input ? gettext("Yes") : gettext("No");
+    };
+  }
+
+  /**
+   * @ngdoc filter
+   * @name simpleDate
+   * @description
+   * Evaluates given for display as a short date, returning '-' if empty.
+   */
+  simpleDateFilter.$inject = ['$filter'];
+  function simpleDateFilter($filter) {
+    return function (input) {
+      return $filter('noValue')($filter('date')(input, 'short'));
     };
   }
 
@@ -133,7 +147,7 @@
   function noValueFilter() {
     return function (input, def) {
       if (input === null || angular.isUndefined(input) ||
-        (angular.isString(input) && '' === input.trim())) {
+        angular.isString(input) && '' === input.trim()) {
         return def || gettext('-');
       } else {
         return input;
@@ -208,9 +222,9 @@
   function itemCountFilter() {
 
     function ensureNonNegative(input) {
-      var isNumeric = (input !== null && isFinite(input));
+      var isNumeric = input !== null && isFinite(input);
       var number = isNumeric ? Math.round(input) : 0;
-      return (number > 0) ? number : 0;
+      return number > 0 ? number : 0;
     }
 
     return function (input, totalInput) {

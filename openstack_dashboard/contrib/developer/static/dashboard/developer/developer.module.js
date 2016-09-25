@@ -25,7 +25,8 @@
    */
   angular
     .module('horizon.dashboard.developer', [
-      'horizon.dashboard.developer.theme-preview'
+      'horizon.dashboard.developer.theme-preview',
+      'horizon.dashboard.developer.resource-browser'
     ])
     .config(config);
 
@@ -39,7 +40,7 @@
    * @description Base path for the developer dashboard
    */
   function config($provide, $windowProvider) {
-      var path = $windowProvider.$get().STATIC_URL + 'dashboard/developer/';
-      $provide.constant('horizon.dashboard.developer.basePath', path);
+    var path = $windowProvider.$get().STATIC_URL + 'dashboard/developer/';
+    $provide.constant('horizon.dashboard.developer.basePath', path);
   }
 })();

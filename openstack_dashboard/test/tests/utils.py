@@ -14,12 +14,10 @@
 #    under the License.
 
 import datetime
-from django.test.utils import override_settings
 import uuid
 
 from openstack_dashboard.test import helpers as test
 from openstack_dashboard.utils import filters
-from openstack_dashboard.utils import identity
 from openstack_dashboard.utils import metering
 
 
@@ -51,25 +49,17 @@ class UtilsMeteringTests(test.TestCase):
             "2012-04-11", "2012-04-12", "other")
         self.assertTrue(type(date_from) is datetime.datetime)
         self.assertTrue(type(date_to) is datetime.datetime)
-        self.assertEqual(str(date_from.tzinfo), "UTC")
-        self.assertEqual(str(date_to.tzinfo), "UTC")
+        self.assertEqual("UTC", str(date_from.tzinfo))
+        self.assertEqual("UTC", str(date_to.tzinfo))
 
     def test_calc_date_args_datetime_dates(self):
         date_from, date_to = metering.calc_date_args(
             datetime.date(2012, 4, 11), datetime.date(2012, 4, 12), "other")
         self.assertTrue(type(date_from) is datetime.datetime)
         self.assertTrue(type(date_to) is datetime.datetime)
-        self.assertEqual(str(date_from.tzinfo), "UTC")
-        self.assertEqual(str(date_to.tzinfo), "UTC")
+        self.assertEqual("UTC", str(date_from.tzinfo))
+        self.assertEqual("UTC", str(date_to.tzinfo))
 
     def test_calc_date_args_invalid(self):
         self.assertRaises(
             ValueError, metering.calc_date_args, object, object, "other")
-
-
-class IdentityTests(test.BaseAdminViewTests):
-    @override_settings(OPENSTACK_KEYSTONE_ADMIN_ROLES=['foO', 'BAR', 'admin'])
-    def test_get_admin_roles(self):
-        mix_in = identity.IdentityMixIn()
-        admin_roles = mix_in.get_admin_roles()
-        self.assertEqual(['foo', 'bar', 'admin'], admin_roles)

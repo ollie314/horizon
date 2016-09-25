@@ -1,9 +1,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 9.0.1.dev276\n"
+"Project-Id-Version: horizon 10.0.0.0b3.dev253\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-05-15 05:33+0000\n"
+"POT-Creation-Date: 2016-08-21 00:16+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,101 +13,6 @@ msgstr ""
 "Language: bn-IN\n"
 "X-Generator: Zanata 3.7.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-
-#, python-format
-msgid ""
-"\n"
-"            <a href=\"%(volume_url)s\">%(volume_label)s</a> on "
-"%(volume_device)s\n"
-"            "
-msgstr ""
-"\n"
-"            %(volume_device)s তে <a href=\"%(volume_url)s\">"
-"%(volume_label)s</a>\n"
-"            "
-
-#, python-format
-msgid ""
-"\n"
-"        Other IPv6 modes: ipv6_ra_mode=%(ra_mode)s, ipv6_address_mode="
-"%(addr_mode)s\n"
-"        "
-msgstr ""
-"\n"
-"        অন্যান্য IPv6 প্রণালী: ipv6_ra_mode=%(ra_mode)s, ipv6_address_mode="
-"%(addr_mode)s\n"
-"        "
-
-msgid ""
-"\n"
-"      Volume type is a type or label that can be selected at volume "
-"creation\n"
-"      time in OpenStack. It usually maps to a set of capabilities of the "
-"storage\n"
-"      back-end driver to be used for this volume. Examples: \"Performance"
-"\",\n"
-"      \"SSD\", \"Backup\", etc. This is equivalent to the\n"
-"      <tt>cinder type-create</tt> command. Once the volume type gets "
-"created,\n"
-"      click the \"View Extra Specs\" button to set up extra specs key-value\n"
-"      pair(s) for that volume type.\n"
-"     "
-msgstr ""
-"\n"
-"      ভলিয়্যুম প্রকার হল এক প্রকার বা লেবেল যা OpenStackএ ভলিয়্যুম সৃষ্টির সময়\n"
-"      নির্বাচিত করা যেতে পারে. এটি সাধারণতঃ এই ভলিয়্যুমের জন্য ব্যবহৃত ব্যাক-এন্ড\n"
-"      ড্রাইভারের ভাণ্ডারের ক্ষমতার সেট ম্যাপ করে. উদাহরণ: \"Performance\",\n"
-"      \"SSD\", \"Backup\", ইত্যাদি. এটি \n"
-"      <tt>cinder type-create</tt> আদেশের সমান. একবার ভলিয়্যুম প্রকার তৈরি হলে,\n"
-"      ঐ ভলিয়্যুম প্রকারের জন্য অতিরিক্ত স্পেক কী-মান জোড়া সেট আপ করতে \"View Extra "
-"Specs\" \n"
-"      বোতামে ক্লিক করুন.\n"
-"     "
-
-msgid ""
-"\n"
-"    Each QoS Specs entity will have a \"Consumer\" value which indicates "
-"where the\n"
-"    administrator would like the QoS policy to be enforced. This value can "
-"be \"front-end\"\n"
-"    (Nova Compute), \"back-end\" (Cinder back-end), or \"both\".\n"
-"    "
-msgstr ""
-"\n"
-"    প্রতিটি QoS স্পেক স্বত্ত্বায় একটি  \"Consumer\" মান থাকবে যা ইঙ্গিত করে কোথায়\n"
-"    অ্যাডমিনিষ্ট্রেটর QoS নীতি চালু করতে পছন্দ করবে. এই মান \"front-end\"\n"
-"    (Nova Compute), \"back-end\" (Cinder back-end), বা \"both\" হতে পারে.\n"
-"    "
-
-msgid ""
-"\n"
-"    The status of a volume is normally managed automatically.  In some "
-"circumstances an\n"
-"    administrator may need to explicitly update the status value.  This is "
-"equivalent to\n"
-"    the <tt>cinder reset-state</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-"    ভলিয়্যুমের স্থিতি সাধারণত স্বতঃশ্চলভাবে পরিচালিতা হয়.  কিছু ক্ষেত্রে\n"
-"    স্পষ্টভাবে স্থিতি মান আপডেট করতে অ্যাডমিনিষ্ট্রেটর প্রয়োজন হতে পারে.  এটি\n"
-"    <tt>cinder reset-state</tt> আদেশের সমান.\n"
-"    "
-
-msgid ""
-"\n"
-"    The status of a volume snapshot is normally managed automatically.  In "
-"some circumstances\n"
-"    an administrator may need to explicitly update the status value. This is "
-"equivalent to\n"
-"    the <tt>cinder snapshot-reset-state</tt> command.\n"
-"    "
-msgstr ""
-"\n"
-"    ভলিয়্যুম স্ন্যাপশটের স্থিতি সাধারণত স্বতোশ্চলভাবে পরিচালিত হয়.  কিছু ক্ষেত্রে\n"
-"    অ্যাডমিনিষ্ট্রেটরের স্থিতি মান স্পষ্টভাবে আপডেট হওয়া চাই. এটি\n"
-"    <tt>cinder snapshot-reset-state</tt> আদেশের সমরূপ.\n"
-"    "
 
 msgid " - End"
 msgstr " - শেষ"
@@ -231,9 +136,6 @@ msgstr ""
 "ডেটাতে আপনার অ্যাকাউন্টে নির্ধারিত কমপক্ষে একটি কন্টেনার থাকা উচিত যাতে ডেটা একটি "
 "কন্টেনারে সঞ্চিত থাকা চাই."
 
-msgid "A image or external image location must be specified."
-msgstr "একটি ইমেজ বা বাহ্যিক ইমেজের অবস্থান নির্দিষ্ট হওয়া চাই."
-
 msgid "A local environment to upload."
 msgstr "আপলোড করতে একটি স্থানীয় পরিবেশ."
 
@@ -242,14 +144,6 @@ msgstr "আপলোড করতে এক স্থানীয় ইমেজ."
 
 msgid "A local template to upload."
 msgstr "আপলোড করতে এক স্থানীয় টেমপ্লেট."
-
-msgid ""
-"A more specific rule affects a portion of this traffic so a rule cannot be "
-"automatically generated to control the behavior of the entire source/"
-"destination combination."
-msgstr ""
-"একটি অধিক নির্দিষ্ট নিয়ম এই ট্রাফিকের একটি অংশ প্রভাবিত করে যাতে সমগ্র উত্স/গন্তব্য "
-"সমন্বয়ের ব্যবহার নিয়ন্ত্রণ করতে একটি নিয়ম স্বতোশ্চলভাবে উত্পন্ন করা যেতে পারে না."
 
 msgid "A new uploaded file will replace the content of the current object"
 msgstr "একটি নতুন আপলোড করা ফাইল বর্তমান বস্তুর বিষয় প্রতিস্থাপন করবে"
@@ -308,9 +202,6 @@ msgstr "ক্রিয়া লগ"
 msgid "Action for the firewall rule"
 msgstr "ফায়ারওয়াল নিয়মের জন্য ক্রিয়া"
 
-msgid "Action:"
-msgstr "ক্রিয়া:"
-
 msgctxt "Current status of a Firewall"
 msgid "Active"
 msgstr "সক্রিয়"
@@ -324,14 +215,6 @@ msgid "Active"
 msgstr "সক্রিয়"
 
 msgctxt "Current status of a Pool"
-msgid "Active"
-msgstr "সক্রিয়"
-
-msgctxt "Current status of a VPN Service"
-msgid "Active"
-msgstr "সক্রিয়"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Active"
 msgstr "সক্রিয়"
 
@@ -427,9 +310,6 @@ msgstr "নীতি যোগ করুন"
 
 msgid "Add Pool"
 msgstr "পুল যোগ করুন"
-
-msgid "Add Router Rule"
-msgstr "রাউটার নিয়ম যোগ করুন"
 
 msgid "Add Rule"
 msgstr "নিয়ম যোগ করুন"
@@ -820,9 +700,6 @@ msgstr "CIDR নির্দিষ্ট হওয়া চাই."
 msgid "CPU time used"
 msgstr "ব্যবহৃত CPU সময়"
 
-msgid "Can not specify both image and external image location."
-msgstr "ইমেজ ও বাহ্যিক ইমেজ অবস্থান উভয়ই নির্দিষ্ট করতে পারে না."
-
 msgid "Cancel"
 msgstr "বাতিল করুন"
 
@@ -894,14 +771,6 @@ msgstr ""
 "লভ্য নেটওয়ার্ক থেকে পুশ বোতাম বা ড্র্যাগ ও ড্রপ বোতাম দ্বারা নির্বাচিত নেটওয়ার্কে "
 "নেটওয়ার্ক বাছুন, আপনি সাথে সাথে ড্র্যাগ ও ড্রপ দ্বারা NIC ক্রম বদল করতে পারেন. "
 
-msgid ""
-"Choose rule(s) from Available Rules to Selected Rule by push button or drag "
-"and drop,\n"
-"you may change their order by drag and drop as well. "
-msgstr ""
-"পুশ বোতাম বা টানা ও ফেলা দ্বারা নির্বাচিত নিয়মে লভ্য নিয়মগুলি থেকে নিয়ম বাছুন,\n"
-"আপনি টানা ও ফেলা দ্বারা তাদের ক্রম বদল করতেও পারেন. "
-
 msgid "Choose the flavor to launch."
 msgstr "শুরু করতে ফ্লেভার বাছুন."
 
@@ -966,9 +835,6 @@ msgstr "নতুন পাসওয়ার্ড নিশ্চিত করু
 msgctxt "Current status of an Instance"
 msgid "Confirm or Revert Resize/Migrate"
 msgstr "পুনঃআয়তন/মাইগ্রেট প্রত্যাবর্তন করুন বা নিশ্চিত করুন"
-
-msgid "Conflicting Rule"
-msgstr "বিরোধী নিয়ম"
 
 msgid "Connection Limit"
 msgstr "সংযোগ সীমা"
@@ -1092,17 +958,6 @@ msgstr "শ্রেণি তৈরি করুন"
 
 msgid "Create Host Aggregate"
 msgstr "হোস্ট সমূহ তৈরি করুন"
-
-msgid ""
-"Create IPSec Site Connection for current project.\n"
-"\n"
-"Assign a name and description for the IPSec Site Connection. All fields in "
-"this tab are required."
-msgstr ""
-"বর্তমান প্রোজেক্টের জন্য IPSec সাইট সংযোগ তৈরি করুন.\n"
-"\n"
-"IPSec সাইট সংযোগের জন্য একটি নাম ও বিবরণ নিয়োগ করুন. এই ট্যাব সবকটি ক্ষেত্রে "
-"প্রয়োজনীয়."
 
 msgid "Create Image"
 msgstr "ইমেজ তৈরি করুন"
@@ -1267,10 +1122,6 @@ msgid "Created"
 msgstr "তৈরি"
 
 msgctxt "Current status of a Pool"
-msgid "Created"
-msgstr "তৈরি"
-
-msgctxt "Current status of a VPN Service"
 msgid "Created"
 msgstr "তৈরি"
 
@@ -1469,9 +1320,6 @@ msgctxt "Task status of an Instance"
 msgid "Deleting"
 msgstr "মুছে ফেলছে"
 
-msgid "Deny"
-msgstr "অস্বীকার"
-
 msgid "Description"
 msgstr "বিবরণ"
 
@@ -1510,9 +1358,6 @@ msgstr "গন্তব্য বস্তু নাম"
 
 msgid "Destination port (integer in [1, 65535] or range in a:b)"
 msgstr "গন্তব্য পোর্ট  ([1, 65535]তে পূর্ণসংখ্যা বা a:b তে ব্যপ্তি)"
-
-msgid "Destination:"
-msgstr "গন্তব্য:"
 
 msgid "Detached"
 msgstr "বিচ্ছিন্ন"
@@ -1679,14 +1524,6 @@ msgid "Down"
 msgstr "নিচে"
 
 msgctxt "Current status of a Pool"
-msgid "Down"
-msgstr "নিচে"
-
-msgctxt "Current status of a VPN Service"
-msgid "Down"
-msgstr "নিচে"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Down"
 msgstr "নিচে"
 
@@ -1887,9 +1724,6 @@ msgstr "ICMP কোডের জন্য মান ভরুন ব্যপ্
 msgid "Enter a value for ICMP type in the range (-1: 255)"
 msgstr "ICMP প্রকারের জন্য মান ভরুন ব্যপ্তি (-1: 255)"
 
-msgid "Enter an integer value between 0 and 255 (or -1 which means wildcard)."
-msgstr "0 এবং 255 এর মধ্যে একটি পূর্ণ মান ভরুন(বা -1 যার মানে ওয়াইল্ডকার্ড)."
-
 msgid "Enter an integer value between 1 and 65535."
 msgstr "1 এবং 65535 এর মধ্যে একটি পূর্ণ মান ভরুন."
 
@@ -1944,19 +1778,11 @@ msgctxt "Current status of a Pool"
 msgid "Error"
 msgstr "ভুল"
 
-msgctxt "Current status of a VPN Service"
-msgid "Error"
-msgstr "ভুল"
-
 msgctxt "Current status of a Volume"
 msgid "Error"
 msgstr "ভুল"
 
 msgctxt "Current status of a Volume Backup"
-msgid "Error"
-msgstr "ভুল"
-
-msgctxt "Current status of an IPSec Site Connection"
 msgid "Error"
 msgstr "ভুল"
 
@@ -2063,10 +1889,6 @@ msgstr "%s প্রোজেক্ট শ্রেণি এবং প্রো
 #, python-format
 msgid "Failed to add agent %(agent_name)s for network %(network)s."
 msgstr "%(network)s নেটওয়ার্কের জন্য %(agent_name)s এজেন্ট যোগ করতে ব্যর্থ."
-
-#, python-format
-msgid "Failed to add router rule %s"
-msgstr "রাউটার নিয়ম %s যোগ করতে ব্যর্থ"
 
 #, python-format
 msgid "Failed to add_interface: %s"
@@ -2458,13 +2280,6 @@ msgstr ""
 "অ্যাক্সেস পরিচালনা করতে এবং একবারে একাধিক ব্যবহর্তাতে ভূমিকা নিয়োগ করতে ব্যবহৃত "
 "শ্রেণি. শ্রেণি তৈরি করার পরে, ব্যবহর্তা যোগ করতে শ্রেণি সম্পাদনা করুন."
 
-msgid ""
-"Groups are used to manage access and assign roles to multiple users at once. "
-"Edit the group to add users."
-msgstr ""
-"অ্যাক্সেস পরিচালনা করতে এবং একবারে একাধিক ব্যবহর্তাতে ভূমিকা নিয়োগ করতে ব্যবহৃত "
-"শ্রেণি. ব্যবহর্তা যোগ করতে শ্রেণি সম্পাদনা করুন."
-
 #. Translators: High Availability mode of Neutron router
 msgid "HA mode"
 msgstr "HA প্রণালী"
@@ -2782,9 +2597,6 @@ msgstr "ইঞ্জেক্ট করা ফাইল পথ বাইট"
 msgid "Injected Files"
 msgstr "ইঞ্জেক্ট করা ফাইলগুলি"
 
-msgid "Input must be in CIDR format"
-msgstr "ইনপুট CIDR ফরম্যাটে থাকা চাই"
-
 msgid "Insert Rule"
 msgstr "নিয়ম সন্নিহিত করুন"
 
@@ -2896,13 +2708,6 @@ msgstr "কী জোড়া আপনি কীভাবে উদাহর�
 
 msgid "Key Size (bits)"
 msgstr "কী আয়তন (bits)"
-
-msgid ""
-"Key pair name may only contain letters, numbers, underscores, spaces and "
-"hyphens."
-msgstr ""
-"কী জোড়া নামে কেবলমাত্র অক্ষর, সংখ্যা, আন্ডারস্কোর, স্পেস এবং হাইফেন অন্তর্ভুক্ত হতে "
-"পারে."
 
 msgid "Key pair to use for authentication."
 msgstr "প্রত্যয়নের জন্য ব্যবহার করতে কী জোড়া."
@@ -3381,9 +3186,6 @@ msgstr "নতুন আয়তন বর্তমান আয়তনের চ�
 msgid "Next"
 msgstr "পরে"
 
-msgid "Next Hops"
-msgstr "পরের হপ"
-
 msgid "No"
 msgstr "না"
 
@@ -3643,9 +3445,6 @@ msgstr "পোর্ট/পোর্ট ব্যপ্তি খুলুন:"
 msgid "Optional Parameters"
 msgstr "বৈকল্পিক পরিশর্ত"
 
-msgid "Optional: Next Hop Addresses (comma delimited)"
-msgstr "বৈকল্পিক: পরের হপ ঠিকানা (কমা দ্বারা বিভাজিত)"
-
 msgid "Optionally, you may choose to create a new volume."
 msgstr "বৈকল্পিকভাবে, একটি নতুন ভলিয়্যুম তৈরি করতে বাছতেও পারেন."
 
@@ -3725,9 +3524,6 @@ msgstr "সময়কাল"
 
 msgid "Period:"
 msgstr "সময়কাল:"
-
-msgid "Permit"
-msgstr "অনুমতি"
 
 msgid "Physical Network"
 msgstr "ভৌতিক নেটওয়ার্ক"
@@ -4051,9 +3847,6 @@ msgstr "অনুরোধ ID"
 msgid "Required for APP_COOKIE persistence; Ignored otherwise."
 msgstr "APP_COOKIE অটলের প্রয়োজনীয়; অন্যথা অগ্রাহ্য করুন."
 
-msgid "Reset to Default"
-msgstr "স্থিতকে পুনরায় সেট করুন"
-
 msgid "Resize"
 msgstr "পুনঃআয়তন"
 
@@ -4160,30 +3953,11 @@ msgstr "রাউটার ID"
 msgid "Router Name"
 msgstr "রাউটার নাম"
 
-msgid "Router Rule Grid"
-msgstr "রাউটার নিয়ম গ্রিড"
-
-msgid "Router Rules"
-msgstr "রাউটার নিয়ম"
-
-msgid "Router Rules Grid"
-msgstr "রাউটার নিয়ম গ্রিড"
-
 msgid "Router Type"
 msgstr "রাউটার প্রকার"
 
-msgid "Router rule added"
-msgstr "রাউটার নিয়ম যুক্ত"
-
 msgid "Routers"
 msgstr "রাউটার"
-
-msgid ""
-"Routing rules to apply to router. Rules are matched by most specific source "
-"first and then by most specific destination."
-msgstr ""
-"রাউটারে প্রয়োগ করতে রাউটিং নিয়ম. নিয়মগুলি প্রথমে সবচেয়ে নির্দিষ্ট উৎস দ্বারা ও পরে "
-"সবচেয়ে নির্দিষ্ট গন্তব্য দ্বারা মিল করা হয়."
 
 msgid "Rule"
 msgstr "নিয়ম"
@@ -4199,9 +3973,6 @@ msgstr "%(policy)s নীতিতে %(rule)s নিয়ম সফলভাব�
 #, python-format
 msgid "Rule %s was successfully updated."
 msgstr "নিয়ম %s সফলভাবে আপডেট হয়েছিল."
-
-msgid "Rule Conflict"
-msgstr "নিয়ম বিবাদ"
 
 msgid "Rule:"
 msgstr "নিয়ম:"
@@ -4467,9 +4238,6 @@ msgstr "অংশীদারী"
 msgid "Shared Storage"
 msgstr "অংশীদারী ভাণ্ডার"
 
-msgid "Shared with Me"
-msgstr "আমার সঙ্গে ভাগ করুন"
-
 msgid "Sign Out"
 msgstr "সাইন আউট"
 
@@ -4515,12 +4283,6 @@ msgstr "স্ন্যাপশট উত্স নির্দিষ্ট হ
 msgid "Something went wrong!"
 msgstr "কিছু ভুল হয়েছে!"
 
-msgid "Source"
-msgstr "উত্স"
-
-msgid "Source CIDR"
-msgstr "উত্স CIDR"
-
 msgid "Source IP"
 msgstr "উত্স IP"
 
@@ -4541,9 +4303,6 @@ msgstr "উত্স পোর্ট/পোর্ট ব্যপ্তি"
 
 msgid "Source port (integer in [1, 65535] or range in a:b)"
 msgstr "উত্স পোর্ট ([1, 65535] তে পূর্ণসংখ্যা বা a:b তে ব্যপ্তি)"
-
-msgid "Source:"
-msgstr "উত্স:"
 
 msgid ""
 "Specifies how IPv6 addresses and additional information are configured. We "
@@ -4685,14 +4444,6 @@ msgstr "সাবনেট নাম"
 
 msgid "Subnet list can not be retrieved."
 msgstr "সাবনেট তালিকা পুনরুদ্ধার করা যেতে পারে না."
-
-#, python-format
-msgid "Subnet: %(dest_subnetname)s"
-msgstr "সাবনেট: %(dest_subnetname)s"
-
-#, python-format
-msgid "Subnet: %(row_source_subnetname)s"
-msgstr "সাবনেট: %(row_source_subnetname)s"
 
 msgid "Subnets"
 msgstr "সাবনেট"
@@ -4884,14 +4635,8 @@ msgstr ""
 msgid "The Aggregate was updated."
 msgstr "সমূহ সদ্যতন ছিল."
 
-msgid "The ICMP code is invalid."
-msgstr "ICMP কোড অবৈধ."
-
 msgid "The ICMP code not in range (-1, 255)"
 msgstr "ICMP কোড ব্যপ্তিতে নেই (-1, 255)"
-
-msgid "The ICMP type is invalid."
-msgstr "ICMP প্রকারটি অবৈধ."
 
 msgid "The ICMP type not in range (-1, 255)"
 msgstr "ICMP প্রকার (-1, 255) ব্যপ্তিতে নেই"
@@ -4944,10 +4689,6 @@ msgstr ""
 "অনুরোধ করা ইমেজের জন্য ফ্লেভার '%(flavor)s' খুবই ছোটো.\n"
 "ন্যূনতম প্রয়োজন: RAM  এর %(min_ram)s MB এবং রুট ডিস্কের %(min_disk)s GB."
 
-#, python-format
-msgid "The instance is preparing the live migration to host \"%s\"."
-msgstr "\"%s\" হোস্টে উদাহরণ লাইভ মাইগ্রেশন প্রস্তুতি করছে."
-
 msgid "The instance password encrypted with your public key."
 msgstr "আপনার পাবলিক কী সহ এনক্রিপ্ট করা উদাহরণ পাসওয়ার্ড."
 
@@ -4977,11 +4718,6 @@ msgid ""
 "The name of the physical network over which the virtual network is "
 "implemented."
 msgstr "ভৌতিক নেটওয়ার্কের নাম যাতে কার্যকর নেটওয়ার্ক বাস্তবায়িত."
-
-msgid ""
-"The next hop addresses can be used to override the router used by the client."
-msgstr ""
-"পরের হপ ঠিকানা ক্লায়েন্ট দ্বারা ব্যবহৃত রাউটার অগ্রাহ্য করতে ব্যবহার করা যেতে পারে."
 
 msgid "The page you were looking for doesn't exist"
 msgstr "আপনি যে পাতাটি চাইছেন সেটি নেই"
@@ -5067,9 +4803,6 @@ msgid ""
 "This is required for operations to be performed throughout the lifecycle of "
 "the stack"
 msgstr "স্ট্যাক-এর জীবনচক্রের মাধ্যমে সম্পাদনা করতে সংসাধনের জন্য এটি প্রয়োজনীয়"
-
-msgid "This name is already taken."
-msgstr "এই নাম ইতিমধ্যেই নেওয়া হয়েছে."
 
 msgid ""
 "This volume is currently attached to an instance. In some cases, creating a "
@@ -5359,9 +5092,6 @@ msgstr "পুল মুছে ফেলতে অসমর্থ. %s"
 #, python-format
 msgid "Unable to delete router \"%s\""
 msgstr "রাউটার \"%s\" মুছে ফেলতে অসমর্থ"
-
-msgid "Unable to delete router rule."
-msgstr "রাউটার নিয়ম মুছে ফেলতে অসমর্থ."
 
 #, python-format
 msgid "Unable to delete rule. %s"
@@ -6396,14 +6126,6 @@ msgstr "মান (গড়)"
 
 msgid "Value:"
 msgstr "মান:"
-
-#, python-format
-msgid ""
-"Version: %(version_info)s\n"
-"      "
-msgstr ""
-"সংস্করণ: %(version_info)s\n"
-"      "
 
 msgid "View Container"
 msgstr "কন্টেনার দেখুন"

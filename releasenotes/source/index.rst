@@ -5,6 +5,14 @@
 .. toctree::
    :maxdepth: 1
 
+   unreleased
+   newton
    mitaka
    liberty
-   unreleased
+   kilo
+   juno
+   icehouse
+   havana
+   grizzly
+   folsom
+   essex

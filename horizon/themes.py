@@ -40,7 +40,10 @@ _local = threading.local()
 
 # Get the themes from settings
 def get_themes():
-    return getattr(settings, 'AVAILABLE_THEMES', [])
+    return getattr(settings, 'AVAILABLE_THEMES',
+                   [(get_default_theme(),
+                     get_default_theme(),
+                     os.path.join(get_theme_dir(), get_default_theme()))])
 
 
 # Get the themes dir from settings
@@ -149,6 +152,9 @@ class ThemeTemplateLoader(tLoaderCls):
             elif template_name.find(template_path) != -1:
                 yield template_name
 
+        except SuspiciousFileOperation:
+            # In case we are loading a theme outside of Django, pass along
+            pass
         except UnicodeDecodeError:
             # The template dir name wasn't valid UTF-8.
             raise

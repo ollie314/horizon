@@ -18,7 +18,7 @@
   "use strict";
 
   describe('MagicSearchController', function () {
-    var ctrl, scope, searchInput, $timeout, service;
+    var ctrl, scope, searchInput, $timeout, service, magicSearchEvents;
 
     function expectResetState() {
       expect(ctrl.facetSelected).toBeUndefined();
@@ -42,7 +42,9 @@
       scope = $rootScope.$new();
       scope.strings = { prompt: "Hello World!" };
       scope.facets_param = [];
+      spyOn(scope, '$on').and.callThrough();
       service = $injector.get('horizon.framework.widgets.magic-search.service');
+      magicSearchEvents = $injector.get('horizon.framework.widgets.magic-search.events');
 
       searchInput = {
         on: angular.noop, val: function() {
@@ -135,8 +137,8 @@
         ctrl.currentSearch = ['a', 'b', 'c'];
         scope.filter_keys = [1,2,3];
         ctrl.clearSearch();
-        expect(scope.$emit).toHaveBeenCalledWith('searchUpdated', '');
-        expect(scope.$emit).toHaveBeenCalledWith('textSearch', '', [1,2,3]);
+        expect(scope.$emit).toHaveBeenCalledWith(magicSearchEvents.SEARCH_UPDATED, '');
+        expect(scope.$emit).toHaveBeenCalledWith(magicSearchEvents.TEXT_SEARCH, '', [1,2,3]);
       });
 
     });
@@ -212,7 +214,7 @@
           scope.filter_keys = 'abc';
           spyOn(scope, '$emit');
           keyUpHandler(evt);
-          expect(scope.$emit).toHaveBeenCalledWith('textSearch', 'waldo', 'abc');
+          expect(scope.$emit).toHaveBeenCalledWith(magicSearchEvents.TEXT_SEARCH, 'waldo', 'abc');
         });
 
         it("emits a textSearch event even if ctrl.textSearch undefined", function() {
@@ -220,7 +222,7 @@
           scope.filter_keys = 'abc';
           spyOn(scope, '$emit');
           keyUpHandler(evt);
-          expect(scope.$emit).toHaveBeenCalledWith('textSearch', '', 'abc');
+          expect(scope.$emit).toHaveBeenCalledWith(magicSearchEvents.TEXT_SEARCH, '', 'abc');
         });
       });
 
@@ -315,7 +317,8 @@
           spyOn(scope, '$emit');
           scope.filter_keys = ['a', 'b', 'c'];
           keyUpHandler(evt);
-          expect(scope.$emit).toHaveBeenCalledWith('textSearch', '', ['a', 'b', 'c']);
+          expect(scope.$emit).toHaveBeenCalledWith(
+            magicSearchEvents.TEXT_SEARCH, '', ['a', 'b', 'c']);
         });
 
         it("resets state if facetSelected and no options", function() {
@@ -331,7 +334,8 @@
           spyOn(scope, '$emit');
           scope.filter_keys = [1,2,3];
           keyUpHandler(evt);
-          expect(scope.$emit).toHaveBeenCalledWith('textSearch', 'searchterm', [1,2,3]);
+          expect(scope.$emit).toHaveBeenCalledWith(
+            magicSearchEvents.TEXT_SEARCH, 'searchterm', [1,2,3]);
         });
       });
     });
@@ -354,7 +358,8 @@
         spyOn(scope, '$emit');
         scope.filter_keys = [1,2,3];
         keyPressHandler(evt);
-        expect(scope.$emit).toHaveBeenCalledWith('textSearch', 'mane', [1,2,3]);
+        expect(scope.$emit).toHaveBeenCalledWith(
+          magicSearchEvents.TEXT_SEARCH, 'mane', [1,2,3]);
       });
 
       it("opens menu when searchVal is a space", function() {
@@ -363,7 +368,8 @@
         spyOn(scope, '$emit');
         scope.filter_keys = [1,2,3];
         keyPressHandler(evt);
-        expect(scope.$emit).toHaveBeenCalledWith('textSearch', '  ', [1,2,3]);
+        expect(scope.$emit).toHaveBeenCalledWith(
+          magicSearchEvents.TEXT_SEARCH, '  ', [1,2,3]);
       });
 
       it("opens menu when searchVal is an empty string", function() {
@@ -372,7 +378,8 @@
         evt.which = 13; // not alter search
         scope.filter_keys = [1,2,3];
         keyPressHandler(evt);
-        expect(scope.$emit).toHaveBeenCalledWith('textSearch', '', [1,2,3]);
+        expect(scope.$emit).toHaveBeenCalledWith(
+          magicSearchEvents.TEXT_SEARCH, '', [1,2,3]);
       });
 
       it("resets state when ctrl.facetSelected exists but has no options", function() {
@@ -384,7 +391,8 @@
         ctrl.facetOptions = {};
         ctrl.filteredOptions = {};
         keyPressHandler(evt);
-        expect(scope.$emit).toHaveBeenCalledWith('textSearch', '', [1,2,3]);
+        expect(scope.$emit).toHaveBeenCalledWith(
+          magicSearchEvents.TEXT_SEARCH, '', [1,2,3]);
         expectResetState();
       });
 
@@ -394,7 +402,8 @@
         evt.which = 13; // not alter search
         scope.filter_keys = [1,2,3];
         keyPressHandler(evt);
-        expect(scope.$emit).toHaveBeenCalledWith('textSearch', 'searchterm', [1,2,3]);
+        expect(scope.$emit).toHaveBeenCalledWith(
+          magicSearchEvents.TEXT_SEARCH, 'searchterm', [1,2,3]);
       });
 
       it("does not filter when key is backspace/delete", function() {
@@ -533,6 +542,51 @@
         expect(ctrl.isMenuOpen).toBe(true);
       });
     });
+
+    describe("initSearch event", function() {
+
+      beforeEach(function() {
+        spyOn(searchInput, 'val').and.callThrough();
+      });
+
+      it("registers a listener", function() {
+        var initSearchHandler = getHandler(
+          scope.$on.calls.allArgs(),
+          magicSearchEvents.INIT_SEARCH);
+        expect(initSearchHandler).toBeDefined();
+      });
+
+      it("initializes text search", function() {
+        var data = {
+          textSearch: "Snarf"
+        };
+        scope.$broadcast('initSearch', data);
+        expect(ctrl.textSearch).toEqual("Snarf");
+      });
+
+      it("clears prior text search", function() {
+        ctrl.textSearch = "Snarf";
+        searchInput.val.calls.reset();
+        var data = {
+          textSearch: undefined
+        };
+        scope.$broadcast('initSearch', data);
+        expect(ctrl.textSearch).toBeUndefined();
+        expect(searchInput.val.calls.count()).toEqual(1);
+        expect(searchInput.val.calls.argsFor(0)).toEqual(['']);
+      });
+
+      it("calls initSearch with the magicSearchQuery", function() {
+        ctrl.facetChoices = "Old";
+        var data = {
+          magicSearchQuery: ["New"]
+        };
+        scope.$broadcast('initSearch', data);
+        // facetChoices is initialized on initSeach. Look for that init
+        // as proof the method was called
+        expect(ctrl.facetChoices).toEqual([]);
+      });
+    });
   });
 
   // NOTE: The javascript file being tested here isn't the magic-search code
@@ -640,7 +694,7 @@
     });
 
     it('initSearch should be called when facetsChanged broadcasted', function () {
-      $scope.$broadcast('facetsChanged');
+      $scope.$broadcast(magicSearchEvents.FACETS_CHANGED);
       $timeout.flush();
 
       expect($magicScope.currentSearch).toEqual([]);
@@ -722,7 +776,7 @@
       it('should call checkFacets when initFacets called', function () {
         $magicScope.initFacets([]);
 
-        expect($magicScope.$emit).toHaveBeenCalledWith('checkFacets', []);
+        expect($magicScope.$emit).toHaveBeenCalledWith(magicSearchEvents.CHECK_FACETS, []);
       });
     });
 
@@ -742,7 +796,7 @@
         expect($magicScope.currentSearch).toEqual([]);
         expect($magicScope.emitQuery).toHaveBeenCalledWith('name=myname');
         expect($magicScope.initFacets).toHaveBeenCalledWith([]);
-        expect($magicScope.$emit).toHaveBeenCalledWith('checkFacets', []);
+        expect($magicScope.$emit).toHaveBeenCalledWith(magicSearchEvents.CHECK_FACETS, []);
         expect($magicScope.strings.prompt).toBe('Prompt');
       });
 
@@ -771,7 +825,7 @@
         expect($magicScope.currentSearch).toEqual([]);
         expect($magicScope.resetState).toHaveBeenCalled();
         expect($magicScope.initFacets).toHaveBeenCalledWith([]);
-        expect($magicScope.$emit).toHaveBeenCalledWith('checkFacets', []);
+        expect($magicScope.$emit).toHaveBeenCalledWith(magicSearchEvents.CHECK_FACETS, []);
       });
 
       it('should emit checkFacets and remember state on removeFacet if facetSelected', function () {
@@ -794,7 +848,7 @@
         expect($magicScope.currentSearch).toEqual([search2]);
         expect($magicScope.resetState).toHaveBeenCalled();
         expect($magicScope.initFacets).toHaveBeenCalledWith([search2]);
-        expect($magicScope.$emit).toHaveBeenCalledWith('checkFacets', [search2]);
+        expect($magicScope.$emit).toHaveBeenCalledWith(magicSearchEvents.CHECK_FACETS, [search2]);
       });
 
     });

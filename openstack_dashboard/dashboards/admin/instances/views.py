@@ -18,6 +18,8 @@
 #    under the License.
 
 from collections import OrderedDict
+
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
@@ -70,11 +72,28 @@ class AdminIndexView(tables.DataTableView):
     def has_more_data(self, table):
         return self._more
 
+    def needs_filter_first(self, table):
+        return self._needs_filter_first
+
     def get_data(self):
         instances = []
         marker = self.request.GET.get(
             project_tables.AdminInstancesTable._meta.pagination_param, None)
-        search_opts = self.get_filters({'marker': marker, 'paginate': True})
+        default_search_opts = {'marker': marker, 'paginate': True}
+
+        search_opts = self.get_filters(default_search_opts.copy())
+
+        # If filter_first is set and if there are not other filters
+        # selected, then search criteria must be provided and return an empty
+        # list
+        filter_first = getattr(settings, 'FILTER_DATA_FIRST', {})
+        if filter_first.get('admin.instances', False) and \
+                len(search_opts) == len(default_search_opts):
+            self._needs_filter_first = True
+            self._more = False
+            return instances
+
+        self._needs_filter_first = False
         # Gather our tenants to correlate against IDs
         try:
             tenants, has_more = api.keystone.tenant_list(self.request)
@@ -138,15 +157,6 @@ class AdminIndexView(tables.DataTableView):
                 tenant = tenant_dict.get(inst.tenant_id, None)
                 inst.tenant_name = getattr(tenant, "name", None)
         return instances
-
-    def get_filters(self, filters):
-        filter_field = self.table.get_filter_field()
-        filter_action = self.table._meta._filter_action
-        if filter_action.is_api_filter(filter_field):
-            filter_string = self.table.get_filter_string().strip()
-            if filter_field and filter_string:
-                filters[filter_field] = filter_string
-        return filters
 
 
 class LiveMigrateView(forms.ModalFormView):

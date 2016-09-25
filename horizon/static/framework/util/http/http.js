@@ -19,20 +19,27 @@ limitations under the License.
 
   /* eslint-disable angular/no-service-method */
   angular
-    .module('horizon.framework.util.http', [])
+    .module('horizon.framework.util.http', ['ngFileUpload'])
     .service('horizon.framework.util.http.service', ApiService);
   /* eslint-enable angular/no-service-method */
 
-  ApiService.$inject = ['$http', '$window'];
+  ApiService.$inject = ['$http', '$window', 'Upload'];
 
-  function ApiService($http, $window) {
+  function ApiService($http, $window, uploadService) {
 
     var httpCall = function (method, url, data, config) {
-      /* eslint-disable angular/window-service */
-      url = $window.WEBROOT + url;
-      /* eslint-enable angular/window-service */
+      var backend = $http;
+      // An external call goes directly to some OpenStack service, say Glance
+      // API, not to the Horizon API wrapper layer. Thus it doesn't need a
+      // WEBROOT prefix
+      var external = pop(config, 'external');
+      if (!external) {
+        /* eslint-disable angular/window-service */
+        url = $window.WEBROOT + url;
+        /* eslint-enable angular/window-service */
 
-      url = url.replace(/\/+/g, '/');
+        url = url.replace(/\/+/g, '/');
+      }
 
       if (angular.isUndefined(config)) {
         config = {};
@@ -44,7 +51,20 @@ limitations under the License.
         config.data = data;
       }
 
-      return $http(config);
+      if (uploadService.isFile(config.data)) {
+        backend = uploadService.http;
+      } else if (angular.isObject(config.data)) {
+        for (var key in config.data) {
+          if (config.data.hasOwnProperty(key) && uploadService.isFile(config.data[key])) {
+            backend = uploadService.upload;
+            // NOTE(tsufiev): keeping the original JSON to not lose value types
+            // after sending them all as strings via multipart/form-data
+            config.data.$$originalJSON = JSON.stringify(config.data);
+            break;
+          }
+        }
+      }
+      return backend(config);
     };
 
     this.get = function(url, config) {
@@ -68,4 +88,14 @@ limitations under the License.
       return httpCall('DELETE', url, data, config);
     };
   }
+
+  function pop(obj, key) {
+    if (!angular.isObject(obj)) {
+      return undefined;
+    }
+    var value = obj[key];
+    delete obj[key];
+    return value;
+  }
+
 }());

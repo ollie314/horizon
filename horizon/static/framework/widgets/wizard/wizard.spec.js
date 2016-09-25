@@ -61,7 +61,7 @@
       $scope.workflow = {};
       $scope.workflow.title = "doesn't matter";
       $scope.$apply();
-      expect(element[0].querySelectorAll('#help-panel').length).toBe(1);
+      expect(element[0].querySelectorAll('.help-panel').length).toBe(1);
     });
 
     it('should toggle help icon button', function () {
@@ -69,7 +69,7 @@
         steps: [ {}, {}, {} ]
       };
       $scope.$apply();
-      expect(angular.element(element).find('.help-toggle').hasClass('ng-hide')).toBe(false);
+      expect(angular.element(element).find('.help-toggle').hasClass('ng-hide')).toBe(true);
 
       $scope.workflow.steps[1] = {};
       $scope.switchTo(1);
@@ -203,11 +203,11 @@
     });
 
     it('should show error message after calling method showError', function () {
-      var errorMessage = 'some error message';
+      var errorMessage = {data: 'some error message'};
       $scope.$apply();
       $scope.showError(errorMessage);
       $scope.$apply();
-      expect(element[0].querySelector('.error-message').textContent).toBe(errorMessage);
+      expect(element[0].querySelector('.error-message').textContent).toBe('some error message');
     });
 
     it("checks steps' readiness", function() {
@@ -251,7 +251,7 @@
       launchContext = { my: 'data' };
       ctrl = $controller('ModalContainerController',
                          { $scope: scope, $modalInstance: modalInstance,
-                           launchContext: launchContext } );
+                           launchContext: launchContext });
     }));
 
     it('is defined', function() {

@@ -402,6 +402,8 @@ files to be added.  There are some example files available within this folder, w
 customization as much as possible, and support for this is given preference over more
 exotic methods such as monkey patching and overrides files.
 
+.. _horizon-customization-module:
+
 Horizon customization module (overrides)
 ========================================
 
@@ -420,9 +422,7 @@ To specify the python module containing your modifications, add the key
 ``local_settings.py``. The value should be a string containing the path to your
 module in dotted python path notation. Example::
 
-    HORIZON_CONFIG = {
-        "customization_module": "my_project.overrides"
-    }
+    HORIZON_CONFIG["customization_module"] = "my_project.overrides"
 
 You can do essentially anything you like in the customization module. For
 example, you could change the name of a panel::
@@ -440,12 +440,6 @@ Or get the instances panel::
 
     projects_dashboard = horizon.get_dashboard("project")
     instances_panel = projects_dashboard.get_panel("instances")
-
-And limit access to users with the Keystone Admin role::
-
-    permissions = list(getattr(instances_panel, 'permissions', []))
-    permissions.append('openstack.roles.admin')
-    instances_panel.permissions = tuple(permissions)
 
 Or just remove it entirely::
 
@@ -519,6 +513,35 @@ similar way, add the new column definition and then use the ``Meta``
     you'd make it look like the following::
 
         WSGIDaemonProcess [... existing options ...] python-path=/opt/python
+
+
+Customize the project and user table columns
+============================================
+
+
+Keystone V3 has a place to store extra information regarding project and user.
+Using the override mechanism described in :ref:`horizon-customization-module`,
+Horizon is able to show these extra information as a custom column.
+For example, if a user in Keystone has an attribute ``phone_num``, you could
+define new column::
+
+    from django.utils.translation import ugettext_lazy as _
+
+    from horizon import forms
+    from horizon import tables
+
+    from openstack_dashboard.dashboards.identity.users import tables as user_tables
+    from openstack_dashboard.dashboards.identity.users import views
+
+    class MyUsersTable(user_tables.UsersTable):
+        phone_num = tables.Column('phone_num',
+                                  verbose_name=_('Phone Number'),
+                                  form_field=forms.CharField(),)
+
+        class Meta(user_tables.UsersTable.Meta):
+            columns = ('name', 'description', 'phone_num')
+
+    views.IndexView.table_class = MyUsersTable
 
 
 Icons

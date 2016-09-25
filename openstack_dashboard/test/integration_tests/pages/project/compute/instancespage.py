@@ -9,6 +9,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import netaddr
+
 from openstack_dashboard.test.integration_tests.pages import basepage
 from openstack_dashboard.test.integration_tests.regions import forms
 from openstack_dashboard.test.integration_tests.regions import tables
@@ -68,6 +70,10 @@ class InstancesPage(basepage.BaseNavigationPage):
         return self.instances_table.get_row(self.INSTANCES_TABLE_NAME_COLUMN,
                                             name)
 
+    def _get_rows_with_instances_names(self, names):
+        return [self.instances_table.get_row(
+            self.INSTANCES_TABLE_IMAGE_NAME_COLUMN, n) for n in names]
+
     @property
     def instances_table(self):
         return InstancesTable(self.driver, self.conf)
@@ -110,9 +116,19 @@ class InstancesPage(basepage.BaseNavigationPage):
         confirm_delete_instances_form = self.instances_table.delete_instance()
         confirm_delete_instances_form.submit()
 
+    def delete_instances(self, instances_names):
+        for instance_name in instances_names:
+            self._get_row_with_instance_name(instance_name).mark()
+        confirm_delete_instances_form = self.instances_table.delete_instance()
+        confirm_delete_instances_form.submit()
+
     def is_instance_deleted(self, name):
         return self.instances_table.is_row_deleted(
             lambda: self._get_row_with_instance_name(name))
+
+    def are_instances_deleted(self, instances_names):
+        return self.instances_table.are_rows_deleted(
+            lambda: self._get_rows_with_instances_names(instances_names))
 
     def is_instance_active(self, name):
         def cell_getter():
@@ -142,4 +158,6 @@ class InstancesPage(basepage.BaseNavigationPage):
     def get_fixed_ipv4(self, name):
         row = self._get_row_with_instance_name(name)
         ips = row.cells[self.INSTANCES_TABLE_IP_COLUMN].text
-        return ips.split()[0]
+        for ip in ips.split():
+            if netaddr.valid_ipv4(ip):
+                return ip

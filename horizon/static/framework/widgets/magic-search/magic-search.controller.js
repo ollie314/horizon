@@ -25,10 +25,20 @@
   angular.module('horizon.framework.widgets.magic-search')
     .controller('MagicSearchController', magicSearchController);
 
-  magicSearchController.$inject = ['$scope', '$element', '$timeout', '$window',
-    'horizon.framework.widgets.magic-search.service'];
+  magicSearchController.$inject = [
+    '$scope', '$element', '$timeout', '$window',
+    'horizon.framework.widgets.magic-search.service',
+    'horizon.framework.widgets.magic-search.events'
+  ];
 
-  function magicSearchController($scope, $element, $timeout, $window, service) {
+  function magicSearchController(
+    $scope,
+    $element,
+    $timeout,
+    $window,
+    service,
+    magicSearchEvents
+  ) {
     var ctrl = this;
     var searchInput = $element.find('.search-input');
     ctrl.mainPromptString = $scope.strings.prompt;
@@ -72,6 +82,20 @@
 
     initSearch(service.getSearchTermsFromQueryString($window.location.search));
     emitQuery();
+
+    $scope.$on(magicSearchEvents.INIT_SEARCH, function(event, data) {
+      if ( data ) {
+        if ( data.textSearch ) {
+          // the requested text search will show up as a 'search in results' facet
+          ctrl.textSearch = data.textSearch;
+        } else {
+          // no requested text search, clear any prior text search
+          ctrl.textSearch = undefined;
+          searchInput.val('');
+        }
+        initSearch(data.magicSearchQuery || []);
+      }
+    });
 
     function initSearch(initialSearchTerms) {
       // Initializes both the unused choices and the full list of facets
@@ -266,7 +290,7 @@
     }
 
     function emitTextSearch(val) {
-      $scope.$emit('textSearch', val, $scope.filter_keys);
+      $scope.$emit(magicSearchEvents.TEXT_SEARCH, val, $scope.filter_keys);
     }
 
     function emitQuery(removed) {
@@ -275,7 +299,7 @@
         emitTextSearch('');
         delete ctrl.textSearch;
       } else {
-        $scope.$emit('searchUpdated', query);
+        $scope.$emit(magicSearchEvents.SEARCH_UPDATED, query);
         if (ctrl.currentSearch.length > 0) {
           // prune facets as needed from menus
           var newFacet = ctrl.currentSearch[ctrl.currentSearch.length - 1].name;
@@ -290,7 +314,7 @@
         ctrl.currentSearch = [];
         ctrl.unusedFacetChoices = ctrl.facetChoices.map(service.getFacetChoice);
         resetState();
-        $scope.$emit('searchUpdated', '');
+        $scope.$emit(magicSearchEvents.SEARCH_UPDATED, '');
         emitTextSearch('');
       }
     }
@@ -329,7 +353,7 @@
      * Broadcast event when facet options are returned via AJAX.
      * Should magic_search.js absorb this?
      */
-    var facetsChangedWatcher = $scope.$on('facetsChanged', function (event, data) {
+    var facetsChangedWatcher = $scope.$on(magicSearchEvents.FACETS_CHANGED, function (event, data) {
       $timeout(function () {
         if (data && data.magicSearchQuery) {
           initSearch(data.magicSearchQuery.split('&'));
@@ -354,11 +378,11 @@
         service.getUnusedFacetChoices(tmpFacetChoices, searchTerms);
 
       // emit to check facets for server-side
-      $scope.$emit('checkFacets', ctrl.currentSearch);
+      $scope.$emit(magicSearchEvents.CHECK_FACETS, ctrl.currentSearch);
     }
 
     /**
-     * Override magic_search.js 'removeFacet' to emit('checkFacets')
+     * Override magic_search.js 'removeFacet' to emit(magicSearchEvents.CHECK_FACETS)
      * to flag facets as 'isServer' after removing facet and
      * either update filter or search
      * @param {number} index - the index of the facet to remove. Required.

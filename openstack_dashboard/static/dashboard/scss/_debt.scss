@@ -6,7 +6,6 @@
 }
 
 ul {
-  list-style: none;
   margin: 0;
 }
 
@@ -198,4 +197,11 @@ display to inline-block so that existing formatting is unaffected.
 */
 div.tooltip-hack {
   display: inline-block;
+}
+
+/*
+Rickshaw graphs don't grow their detail box appropriately
+*/
+.rickshaw_graph .detail .item {
+  width: auto;
 }

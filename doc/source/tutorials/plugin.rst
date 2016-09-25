@@ -92,8 +92,6 @@ Below is a skeleton of what your plugin should look like.::
   │   |                   └── mypanel.scss
   │   │
   │   └── locale
-  │       ├── django.pot
-  │       ├── djangojs.pot
   │       └── <lang>
   │            └── LC_MESSAGES
   │                ├── django.po
@@ -149,7 +147,7 @@ _31000_myplugin.py::
     ADD_JS_FILES = []
 
     # A list of scss files to be included in the compressed set of files
-    ADD_SCSS_FILES = ['dashboard/identity/myplugin/myplugin.scss']
+    ADD_SCSS_FILES = ['dashboard/identity/myplugin/mypanel/mypanel.scss']
 
 ..  Note ::
 
@@ -289,13 +287,12 @@ setup.cfg
 
     [metadata]
     name = myplugin
-    version = 0.0.1
     summary = A panel plugin for OpenStack Dashboard
     description-file =
         README.rst
     author = myname
     author_email = myemail
-    home-page = http://www.openstack.org/
+    home-page = http://docs.openstack.org/developer/horizon/
     classifiers = [
         Environment :: OpenStack
         Framework :: Django
@@ -459,8 +456,8 @@ This comes from the combination of the following two reasons.
 myplugin/locale
 ---------------
 
-Translation catalog template (POT) files and translated message catalog files
-(PO files) are placed under this directory.
+Translated message catalog files (PO files) are placed under this
+directory.
 
 babel-django.cfg, babel-djangojs.cfg
 ------------------------------------

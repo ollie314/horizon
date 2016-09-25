@@ -15,6 +15,7 @@
 """
 Views for managing Neutron Networks.
 """
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
@@ -22,6 +23,7 @@ from django.utils.translation import ugettext_lazy as _
 from horizon import exceptions
 from horizon import forms
 from horizon import tables
+from horizon import tabs
 from horizon.utils import memoized
 from horizon import workflows
 
@@ -30,12 +32,10 @@ from openstack_dashboard.utils import filters
 
 from openstack_dashboard.dashboards.project.networks \
     import forms as project_forms
-from openstack_dashboard.dashboards.project.networks.ports \
-    import tables as port_tables
-from openstack_dashboard.dashboards.project.networks.subnets \
-    import tables as subnet_tables
 from openstack_dashboard.dashboards.project.networks \
     import tables as project_tables
+from openstack_dashboard.dashboards.project.networks import tabs \
+    as network_tabs
 from openstack_dashboard.dashboards.project.networks \
     import workflows as project_workflows
 
@@ -44,12 +44,16 @@ class IndexView(tables.DataTableView):
     table_class = project_tables.NetworksTable
     template_name = 'project/networks/index.html'
     page_title = _("Networks")
+    FILTERS_MAPPING = {'shared': {_("yes"): True, _("no"): False},
+                       'router:external': {_("yes"): True, _("no"): False},
+                       'admin_state_up': {_("up"): True, _("down"): False}}
 
     def get_data(self):
         try:
             tenant_id = self.request.user.tenant_id
+            search_opts = self.get_filters(filters_map=self.FILTERS_MAPPING)
             networks = api.neutron.network_list_for_tenant(
-                self.request, tenant_id, include_external=True)
+                self.request, tenant_id, include_external=True, **search_opts)
         except Exception:
             networks = []
             msg = _('Network list can not be retrieved.')
@@ -57,8 +61,22 @@ class IndexView(tables.DataTableView):
         return networks
 
 
-class CreateView(workflows.WorkflowView):
+class DefaultSubnetWorkflowMixin(object):
+
+    def get_default_dns_servers(self):
+        # this returns the default dns servers to be used for new subnets
+        dns_default = "\n".join(getattr(settings, 'OPENSTACK_NEUTRON_NETWORK',
+                                        {}).get('default_dns_nameservers', ''))
+        return dns_default
+
+
+class CreateView(DefaultSubnetWorkflowMixin, workflows.WorkflowView):
     workflow_class = project_workflows.CreateNetwork
+
+    def get_initial(self):
+        results = super(CreateView, self).get_initial()
+        results['dns_nameservers'] = self.get_default_dns_servers()
+        return results
 
 
 class UpdateView(forms.ModalFormView):
@@ -83,7 +101,10 @@ class UpdateView(forms.ModalFormView):
     def _get_object(self, *args, **kwargs):
         network_id = self.kwargs['network_id']
         try:
-            return api.neutron.network_get(self.request, network_id)
+            # no subnet values are read or editable in this view, so
+            # save the subnet expansion overhead
+            return api.neutron.network_get(self.request, network_id,
+                                           expand_subnet=False)
         except Exception:
             redirect = self.success_url
             msg = _('Unable to retrieve network details.')
@@ -98,31 +119,14 @@ class UpdateView(forms.ModalFormView):
                 'shared': network['shared']}
 
 
-class DetailView(tables.MultiTableView):
-    table_classes = (subnet_tables.SubnetsTable, port_tables.PortsTable)
-    template_name = 'project/networks/detail.html'
+class DetailView(tabs.TabbedTableView):
+    tab_group_class = network_tabs.NetworkDetailsTabs
+    template_name = 'horizon/common/_detail.html'
     page_title = '{{ network.name | default:network.id }}'
 
-    def get_subnets_data(self):
-        try:
-            network = self._get_data()
-            subnets = api.neutron.subnet_list(self.request,
-                                              network_id=network.id)
-        except Exception:
-            subnets = []
-            msg = _('Subnet list can not be retrieved.')
-            exceptions.handle(self.request, msg)
-        return subnets
-
-    def get_ports_data(self):
-        try:
-            network_id = self.kwargs['network_id']
-            ports = api.neutron.port_list(self.request, network_id=network_id)
-        except Exception:
-            ports = []
-            msg = _('Port list can not be retrieved.')
-            exceptions.handle(self.request, msg)
-        return ports
+    @staticmethod
+    def get_redirect_url():
+        return reverse('horizon:project:networks:index')
 
     @memoized.memoized_method
     def _get_data(self):
@@ -151,7 +155,3 @@ class DetailView(tables.MultiTableView):
         network.admin_state_label = (
             filters.get_display_label(choices, network.admin_state))
         return context
-
-    @staticmethod
-    def get_redirect_url():
-        return reverse_lazy('horizon:project:networks:index')

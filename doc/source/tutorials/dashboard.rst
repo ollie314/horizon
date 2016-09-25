@@ -20,7 +20,7 @@ data pulled by the Nova instances API.
     with the :doc:`Horizon quickstart guide </quickstart>` or the
     `Django tutorial`_.
 
-    .. _Django tutorial: https://docs.djangoproject.com/en/1.6/intro/tutorial01/
+    .. _Django tutorial: https://docs.djangoproject.com/en/dev/intro/tutorial01/
 
 
 Creating a dashboard
@@ -287,7 +287,7 @@ There are also additional actions which are extensions of the basic Action class
 
 - :class:`~horizon.tables.BatchAction`
 - :class:`~horizon.tables.DeleteAction`
-- :class:`~horizon.tables.UpdateAction`
+- :class:`~horizon.tables.UpdateAction` **DEPRECATED**
 - :class:`~horizon.tables.FixedFilterAction`
 
 
@@ -534,7 +534,7 @@ our OpenStack Dashboard site.
     For more information about Django views, URLs and templates, please refer
     to the `Django documentation`_.
 
-    .. _Django documentation: https://docs.djangoproject.com/en/1.6/
+    .. _Django documentation: https://docs.djangoproject.com/en/dev/
 
 
 Enable and show the dashboard

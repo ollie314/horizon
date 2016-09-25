@@ -23,8 +23,9 @@
 
   MetadataModalController.$inject = [
     '$modalInstance',
-    'horizon.framework.widgets.metadata.tree.service',
     'horizon.app.core.metadata.service',
+    'horizon.framework.widgets.metadata.tree.service',
+    'horizon.framework.widgets.toast.service',
     // Dependencies injected with resolve by $modal.open
     'available',
     'existing',
@@ -38,8 +39,8 @@
    * Controller used by `ModalService`
    */
   function MetadataModalController(
-    $modalInstance, metadataTreeService, metadataService,
-    available, existing, params
+    $modalInstance, metadataService, metadataTreeService,
+    toastService, available, existing, params
   ) {
     var ctrl = this;
 
@@ -53,6 +54,19 @@
       ctrl.saving = true;
       var updated = ctrl.tree.getExisting();
       var removed = angular.copy(existing.data);
+
+      // Glance v1 changes metadata property casing in the get request
+      // but to remove you still need to send back in using the proper original case.
+      // See https://bugs.launchpad.net/horizon/+bug/1606988
+      angular.forEach(removed, function bug1606988(value, removedKey) {
+        angular.forEach(ctrl.tree.flatTree, function compareToDefinitions(item) {
+          if (item.leaf && removedKey.toLocaleLowerCase() === item.leaf.name.toLocaleLowerCase()) {
+            delete removed[removedKey];
+            removed[item.leaf.name] = value;
+          }
+        });
+      });
+
       angular.forEach(updated, function(value, key) {
         delete removed[key];
       });
@@ -67,10 +81,12 @@
     }
 
     function onEditSuccess() {
+      toastService.add('success', gettext('Metadata was successfully updated.'));
       $modalInstance.close();
     }
 
     function onEditFailure() {
+      toastService.add('error', gettext('Unable to update metadata.'));
       ctrl.saving = false;
     }
   }

@@ -20,7 +20,10 @@
     .module('horizon.framework.widgets.magic-search')
     .directive('hzMagicSearchContext', hzMagicSearchContext);
 
-  hzMagicSearchContext.$inject = ['$parse'];
+  hzMagicSearchContext.$inject = [
+    '$parse',
+    'horizon.framework.widgets.magic-search.events'
+  ];
 
   /**
    * @ngdoc directive
@@ -38,7 +41,9 @@
    *
    * @param {object} filterFacets Facets allowed for searching
    * @param {object=} filterStrings Help content shown in search bar
-   * @param {object=} clientFullTextSearch if full text search is to be done on the client
+   * @param {boolean=} clientFullTextSearch if true, performs full text search
+   *   exclusively on the client
+   *
    * Facets:
    * ```
    * var nameFacet = {
@@ -69,16 +74,15 @@
    * @example
    * ```
    * <hz-magic-search-context
-   *   template="/static/framework/widgets/magic-search/magic-search.html"
-   *   strings="filterStrings"
-   *   facets="{{ filterFacets }}">
+   *   filter-strings="filterStrings"
+   *   filter-facets="filterFacets">
    *   <magic-search></magic-search>
    *   <table st-magic-search st-table="controller.data">
    *   </table>
    * </hz-magic-search-context>
    * ```
    */
-  function hzMagicSearchContext($parse) {
+  function hzMagicSearchContext($parse, magicSearchEvents) {
     var directive = {
       link: link,
       restrict: 'E',
@@ -88,10 +92,8 @@
 
     function link(scope, element, attrs) {
       var filterStrings = $parse(attrs.filterStrings)(scope);
-      var filterFacets = $parse(attrs.filterFacets)(scope);
       var clientFullTextSearch = $parse(attrs.clientFullTextSearch)(scope);
       var searchSettingsCallback = $parse(attrs.searchSettingsCallback)(scope);
-      scope.filterFacets = filterFacets;
       scope.searchSettingsCallback = searchSettingsCallback;
 
       scope.clientFullTextSearch = angular.isDefined(clientFullTextSearch)
@@ -102,9 +104,9 @@
         cancel: gettext('Cancel'),
         prompt: gettext('Click here for filters.'),
         remove: gettext('Remove'),
-        text: (scope.clientFullTextSearch
+        text: scope.clientFullTextSearch
           ? gettext('Search in current results')
-          : gettext('Full Text Search'))
+          : gettext('Full Text Search')
       };
       scope.filterStrings = filterStrings || defaultFilterStrings;
 
@@ -114,11 +116,26 @@
         scope.showSettings = false;
       }
 
-      scope.$on('searchUpdated', resend);
-      scope.$on('textSearch', resend);
-      scope.$on('checkFacets', resend);
-      scope.$on('facetsChanged', resend);
-      scope.$on('serverSearchUpdated', resend);
+      scope.$on(magicSearchEvents.SEARCH_UPDATED, resend);
+      scope.$on(magicSearchEvents.TEXT_SEARCH, resend);
+      scope.$on(magicSearchEvents.CHECK_FACETS, resend);
+      scope.$on(magicSearchEvents.FACETS_CHANGED, resend);
+      scope.$on(magicSearchEvents.SERVER_SEARCH_UPDATED, resend);
+
+      // This directive doesn't use an isolate scope because it is used to wrap magic-search which
+      // doesn't take all data as attributes (yet). Until it does, in order to make changes
+      // to the 'filter-facets' of this directive visible to a child magic-search, we
+      // explicitly watch whatever value the parent set as the 'filter-facets' attribute on this
+      // directive, and set that to 'scope.filterFacets' for any children to use.
+      //
+      // For example, if the parent sets filter-facets='ctrl.myFilters', then this watch
+      // is equivalent to:
+      // scope.filterFacets = scope.ctrl.myFilters
+      if (angular.isUndefined(scope.filterFacets)) {
+        scope.$watch(attrs.filterFacets, function (newValue) {
+          scope.filterFacets = newValue;
+        });
+      }
 
       function resend(event, data) {
         scope.$broadcast(event.name + '-ms-context', data);

@@ -13,6 +13,7 @@
 #    under the License.
 import copy
 
+import django
 from django.core.urlresolvers import reverse
 from django import http
 
@@ -21,8 +22,6 @@ from mox3.mox import IsA  # noqa
 import six
 
 from openstack_dashboard import api
-from openstack_dashboard.dashboards.project.routers.extensions.routerrules\
-    import rulemanager
 from openstack_dashboard.test import helpers as test
 from openstack_dashboard.usage import quotas
 
@@ -30,9 +29,10 @@ from openstack_dashboard.usage import quotas
 class RouterMixin(object):
     @test.create_stubs({
         api.neutron: ('router_get', 'port_list',
-                      'network_get', 'is_extension_supported'),
+                      'network_get', 'is_extension_supported',
+                      'list_l3_agent_hosting_router'),
     })
-    def _get_detail(self, router, extraroute=True):
+    def _get_detail(self, router, extraroute=True, lookup_l3=False):
         api.neutron.is_extension_supported(IsA(http.HttpRequest), 'extraroute')\
             .MultipleTimes().AndReturn(extraroute)
         api.neutron.router_get(IsA(http.HttpRequest), router.id)\
@@ -41,6 +41,10 @@ class RouterMixin(object):
                               device_id=router.id)\
             .AndReturn([self.ports.first()])
         self._mock_external_network_get(router)
+        if lookup_l3:
+            agent = self.agents.list()[1]
+            api.neutron.list_l3_agent_hosting_router(IsA(http.HttpRequest), router.id)\
+                .AndReturn([agent])
         self.mox.ReplayAll()
 
         res = self.client.get(reverse('horizon:%s'
@@ -85,8 +89,7 @@ class RouterTests(RouterMixin, test.TestCase):
         quota_data = self.neutron_quota_usages.first()
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         quotas.tenant_quota_usages(
             IsA(http.HttpRequest)) \
             .MultipleTimes().AndReturn(quota_data)
@@ -105,8 +108,8 @@ class RouterTests(RouterMixin, test.TestCase):
         quota_data = self.neutron_quota_usages.first()
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).MultipleTimes().AndRaise(self.exceptions.neutron)
+            tenant_id=self.tenant.id).MultipleTimes().AndRaise(
+            self.exceptions.neutron)
         quotas.tenant_quota_usages(
             IsA(http.HttpRequest)) \
             .MultipleTimes().AndReturn(quota_data)
@@ -126,8 +129,7 @@ class RouterTests(RouterMixin, test.TestCase):
         quota_data = self.neutron_quota_usages.first()
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).MultipleTimes().AndReturn([router])
+            tenant_id=self.tenant.id).MultipleTimes().AndReturn([router])
         quotas.tenant_quota_usages(
             IsA(http.HttpRequest)) \
             .MultipleTimes().AndReturn(quota_data)
@@ -171,21 +173,18 @@ class RouterTests(RouterMixin, test.TestCase):
         quota_data = self.neutron_quota_usages.first()
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         quotas.tenant_quota_usages(
             IsA(http.HttpRequest)) \
             .MultipleTimes().AndReturn(quota_data)
         self._mock_external_network_list()
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         self._mock_external_network_list()
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         self._mock_external_network_list()
         api.neutron.port_list(IsA(http.HttpRequest),
                               device_id=router.id, device_owner=IgnoreArg())\
@@ -212,21 +211,18 @@ class RouterTests(RouterMixin, test.TestCase):
         quota_data = self.neutron_quota_usages.first()
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         quotas.tenant_quota_usages(
             IsA(http.HttpRequest)) \
             .MultipleTimes().AndReturn(quota_data)
         self._mock_external_network_list()
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         self._mock_external_network_list()
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         self._mock_external_network_list()
         api.neutron.port_list(IsA(http.HttpRequest),
                               device_id=router.id, device_owner=IgnoreArg())\
@@ -446,11 +442,15 @@ class RouterActionTests(RouterMixin, test.TestCase):
 
         self.assertTemplateUsed(res, 'project/routers/update.html')
         self.assertContains(res, 'Router Type')
-        self.assertContains(
-            res,
-            '<input class="form-control" id="id_mode" name="mode" '
-            'readonly="readonly" type="text" value="distributed" />',
-            html=True)
+        if django.VERSION >= (1, 10):
+            pattern = ('<input class="form-control" id="id_mode" name="mode" '
+                       'readonly="readonly" type="text" value="distributed" '
+                       'required/>')
+        else:
+            pattern = ('<input class="form-control" id="id_mode" name="mode" '
+                       'readonly="readonly" type="text" '
+                       'value="distributed" />')
+        self.assertContains(res, pattern, html=True)
         self.assertNotContains(res, 'centralized')
 
     @test.create_stubs({api.neutron: ('router_get',
@@ -696,150 +696,6 @@ class RouterActionTests(RouterMixin, test.TestCase):
         self.assertRedirectsNoFollow(res, detail_url)
 
 
-class RouterRuleTests(RouterMixin, test.TestCase):
-    DASHBOARD = 'project'
-    INDEX_URL = reverse('horizon:%s:routers:index' % DASHBOARD)
-    DETAIL_PATH = 'horizon:%s:routers:detail' % DASHBOARD
-
-    def test_extension_hides_without_rules(self):
-        router = self.routers.first()
-        res = self._get_detail(router)
-
-        self.assertTemplateUsed(res, 'horizon/common/_detail.html')
-        self.assertTemplateNotUsed(
-            res,
-            '%s/routers/extensions/routerrules/grid.html' % self.DASHBOARD)
-
-    @test.create_stubs({api.neutron: ('network_list',)})
-    def test_routerrule_detail(self):
-        router = self.routers_with_rules.first()
-        if self.DASHBOARD == 'project':
-            api.neutron.network_list(
-                IsA(http.HttpRequest),
-                shared=False,
-                tenant_id=router['tenant_id']).AndReturn(self.networks.list())
-            api.neutron.network_list(
-                IsA(http.HttpRequest),
-                shared=True).AndReturn([])
-        res = self._get_detail(router)
-
-        self.assertTemplateUsed(res, 'horizon/common/_detail.html')
-        if self.DASHBOARD == 'project':
-            self.assertTemplateUsed(
-                res,
-                '%s/routers/extensions/routerrules/grid.html' % self.DASHBOARD)
-        rules = res.context['routerrules_table'].data
-        self.assertItemsEqual(rules, router['router_rules'])
-
-    def _test_router_addrouterrule(self, raise_error=False):
-        pre_router = self.routers_with_rules.first()
-        post_router = copy.deepcopy(pre_router)
-        rule = {'source': '1.2.3.4/32', 'destination': '4.3.2.1/32', 'id': 99,
-                'action': 'permit', 'nexthops': ['1.1.1.1', '2.2.2.2']}
-        post_router['router_rules'].insert(0, rule)
-        api.neutron.router_get(IsA(http.HttpRequest),
-                               pre_router.id).AndReturn(pre_router)
-        params = {}
-        params['router_rules'] = rulemanager.format_for_api(
-            post_router['router_rules'])
-        router_update = api.neutron.router_update(IsA(http.HttpRequest),
-                                                  pre_router.id, **params)
-        if raise_error:
-            router_update.AndRaise(self.exceptions.neutron)
-        else:
-            router_update.AndReturn({'router': post_router})
-        self.mox.ReplayAll()
-
-        form_data = {'router_id': pre_router.id,
-                     'source': rule['source'],
-                     'destination': rule['destination'],
-                     'action': rule['action'],
-                     'nexthops': ','.join(rule['nexthops'])}
-
-        url = reverse('horizon:%s:routers:addrouterrule' % self.DASHBOARD,
-                      args=[pre_router.id])
-        res = self.client.post(url, form_data)
-        self.assertNoFormErrors(res)
-        detail_url = reverse(self.DETAIL_PATH, args=[pre_router.id])
-        self.assertRedirectsNoFollow(res, detail_url)
-
-    @test.create_stubs({api.neutron: ('router_get',
-                                      'router_update')})
-    def test_router_addrouterrule(self):
-        self._test_router_addrouterrule()
-
-    @test.create_stubs({api.neutron: ('router_get',
-                                      'router_update')})
-    def test_router_addrouterrule_exception(self):
-        self._test_router_addrouterrule(raise_error=True)
-
-    @test.create_stubs({api.neutron: ('router_get', 'router_update',
-                                      'port_list', 'network_get',
-                                      'is_extension_supported')})
-    def test_router_removerouterrule(self):
-        pre_router = self.routers_with_rules.first()
-        post_router = copy.deepcopy(pre_router)
-        rule = post_router['router_rules'].pop()
-        api.neutron.is_extension_supported(IsA(http.HttpRequest), 'extraroute')\
-            .AndReturn(False)
-        api.neutron.router_get(IsA(http.HttpRequest),
-                               pre_router.id).AndReturn(pre_router)
-        params = {}
-        params['router_rules'] = rulemanager.format_for_api(
-            post_router['router_rules'])
-        router_update = api.neutron.router_update(IsA(http.HttpRequest),
-                                                  pre_router.id, **params)
-        router_update.AndReturn({'router': post_router})
-        api.neutron.router_get(IsA(http.HttpRequest),
-                               pre_router.id).AndReturn(pre_router)
-        api.neutron.port_list(IsA(http.HttpRequest),
-                              device_id=pre_router.id)\
-            .AndReturn([self.ports.first()])
-        self._mock_external_network_get(pre_router)
-        self.mox.ReplayAll()
-        form_rule_id = rule['source'] + rule['destination']
-        form_data = {'router_id': pre_router.id,
-                     'action': 'routerrules__delete__%s' % form_rule_id}
-        url = reverse(self.DETAIL_PATH, args=[pre_router.id])
-        res = self.client.post(url, form_data)
-        self.assertNoFormErrors(res)
-
-    @test.create_stubs({api.neutron: ('router_get', 'router_update',
-                                      'network_list', 'port_list',
-                                      'network_get',
-                                      'is_extension_supported')})
-    def test_router_resetrouterrules(self):
-        pre_router = self.routers_with_rules.first()
-        post_router = copy.deepcopy(pre_router)
-        default_rules = [{'source': 'any', 'destination': 'any',
-                          'action': 'permit', 'nexthops': [], 'id': '2'}]
-        del post_router['router_rules'][:]
-        post_router['router_rules'].extend(default_rules)
-        api.neutron.is_extension_supported(IsA(http.HttpRequest), 'extraroute')\
-            .AndReturn(False)
-        api.neutron.router_get(IsA(http.HttpRequest),
-                               pre_router.id).AndReturn(post_router)
-        params = {}
-        params['router_rules'] = rulemanager.format_for_api(
-            post_router['router_rules'])
-        router_update = api.neutron.router_update(IsA(http.HttpRequest),
-                                                  pre_router.id, **params)
-        router_update.AndReturn({'router': post_router})
-        api.neutron.port_list(IsA(http.HttpRequest),
-                              device_id=pre_router.id)\
-            .AndReturn([self.ports.first()])
-        self._mock_external_network_get(pre_router)
-        self._mock_network_list(pre_router['tenant_id'])
-        api.neutron.router_get(IsA(http.HttpRequest),
-                               pre_router.id).AndReturn(post_router)
-        self.mox.ReplayAll()
-        form_data = {'router_id': pre_router.id,
-                     'action': 'routerrules__resetrules'}
-        url = reverse(self.DETAIL_PATH, args=[pre_router.id])
-        res = self.client.post(url, form_data)
-        self.assertNoFormErrors(res)
-
-
 class RouterRouteTests(RouterMixin, test.TestCase):
     DASHBOARD = 'project'
     INDEX_URL = reverse('horizon:%s:routers:index' % DASHBOARD)
@@ -941,8 +797,7 @@ class RouterViewTests(RouterMixin, test.TestCase):
         quota_data['routers']['available'] = 0
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         quotas.tenant_quota_usages(
             IsA(http.HttpRequest)) \
             .MultipleTimes().AndReturn(quota_data)
@@ -957,8 +812,8 @@ class RouterViewTests(RouterMixin, test.TestCase):
         self.assertItemsEqual(routers, self.routers.list())
 
         create_action = self.getAndAssertTableAction(res, 'routers', 'create')
-        self.assertTrue('disabled' in create_action.classes,
-                        'Create button is not disabled')
+        self.assertIn('disabled', create_action.classes,
+                      'Create button is not disabled')
         self.assertEqual('Create Router (Quota exceeded)',
                          create_action.verbose_name)
 
@@ -969,8 +824,7 @@ class RouterViewTests(RouterMixin, test.TestCase):
         quota_data['routers'].pop('available')
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         quotas.tenant_quota_usages(
             IsA(http.HttpRequest)) \
             .MultipleTimes().AndReturn(quota_data)
@@ -997,8 +851,7 @@ class RouterViewTests(RouterMixin, test.TestCase):
         quota_data['routers']['available'] = 10
         api.neutron.router_list(
             IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            search_opts=None).AndReturn(self.routers.list())
+            tenant_id=self.tenant.id).AndReturn(self.routers.list())
         quotas.tenant_quota_usages(
             IsA(http.HttpRequest)) \
             .MultipleTimes().AndReturn(quota_data)

@@ -19,6 +19,7 @@ import logging
 from operator import attrgetter
 import sys
 
+from django.conf import settings
 from django.core import exceptions as core_exceptions
 from django.core import urlresolvers
 from django import forms
@@ -322,9 +323,10 @@ class Column(html.HTMLElement):
         self.display_choices = display_choices
 
         if summation is not None and summation not in self.summation_methods:
-            raise ValueError("Summation method %s must be one of %s."
-                             % (summation,
-                                ", ".join(self.summation_methods.keys())))
+            raise ValueError(
+                "Summation method %(summation)s must be one of %(keys)s.",
+                {'summation': summation,
+                 'keys': ", ".join(self.summation_methods.keys())})
         self.summation = summation
 
         self.creation_counter = Column.creation_counter
@@ -433,10 +435,11 @@ class Column(html.HTMLElement):
         except urlresolvers.NoReverseMatch:
             return self.link
 
-    def get_default_attrs(self):
-        attrs = super(Column, self).get_default_attrs()
-        attrs.update({'data-selenium': self.name})
-        return attrs
+    if getattr(settings, 'INTEGRATION_TESTS_SUPPORT', False):
+        def get_default_attrs(self):
+            attrs = super(Column, self).get_default_attrs()
+            attrs.update({'data-selenium': self.name})
+            return attrs
 
     def get_summation(self):
         """Returns the summary value for the data in this column if a
@@ -458,6 +461,14 @@ class Column(html.HTMLElement):
             except TypeError:
                 pass
         return None
+
+
+class WrappingColumn(Column):
+    """A column that wraps its contents. Useful for data like UUIDs or names"""
+
+    def __init__(self, *args, **kwargs):
+        super(WrappingColumn, self).__init__(*args, **kwargs)
+        self.classes.append('word-break')
 
 
 class Row(html.HTMLElement):
@@ -665,7 +676,8 @@ class Cell(html.HTMLElement):
             if len(data) > column.truncate:
                 self.attrs['data-toggle'] = 'tooltip'
                 self.attrs['title'] = data
-                self.attrs['data-selenium'] = data
+                if getattr(settings, 'INTEGRATION_TESTS_SUPPORT', False):
+                    self.attrs['data-selenium'] = data
         self.data = self.get_data(datum, column, row)
 
     def get_data(self, datum, column, row):
@@ -707,7 +719,7 @@ class Cell(html.HTMLElement):
                                      form_field_attributes)
             table._data_cache[column][table.get_object_id(datum)] = data
         elif column.auto == "actions":
-            data = table.render_row_actions(datum, pull_right=False)
+            data = table.render_row_actions(datum)
             table._data_cache[column][table.get_object_id(datum)] = data
         else:
             data = column.get_data(datum)
@@ -793,7 +805,7 @@ class Cell(html.HTMLElement):
         elif status is False:
             return "status_down"
         else:
-            return "status_unknown"
+            return "warning"
 
     def get_default_classes(self):
         """Returns a flattened string of the cell's CSS classes."""
@@ -893,6 +905,24 @@ class DataTableOptions(object):
 
         String containing the template which should be used to render the
         table. Defaults to ``"horizon/common/_data_table.html"``.
+
+    .. attribute:: row_actions_dropdown_template
+
+        String containing the template which should be used to render the
+        row actions dropdown. Defaults to
+        ``"horizon/common/_data_table_row_actions_dropdown.html"``.
+
+    .. attribute:: row_actions_row_template
+
+        String containing the template which should be used to render the
+        row actions. Defaults to
+        ``"horizon/common/_data_table_row_actions_row.html"``.
+
+    .. attribute:: table_actions_template
+
+        String containing the template which should be used to render the
+        table actions. Defaults to
+        ``"horizon/common/_data_table_table_actions.html"``.
 
     .. attribute:: context_var_name
 
@@ -1019,12 +1049,18 @@ class DataTableOptions(object):
         self.template = getattr(options,
                                 'template',
                                 'horizon/common/_data_table.html')
-        self.row_actions_dropdown_template = ('horizon/common/_data_table_'
-                                              'row_actions_dropdown.html')
-        self.row_actions_row_template = ('horizon/common/_data_table_'
-                                         'row_actions_row.html')
+        self.row_actions_dropdown_template = \
+            getattr(options,
+                    'row_actions_dropdown_template',
+                    'horizon/common/_data_table_row_actions_dropdown.html')
+        self.row_actions_row_template = \
+            getattr(options,
+                    'row_actions_row_template',
+                    'horizon/common/_data_table_row_actions_row.html')
         self.table_actions_template = \
-            'horizon/common/_data_table_table_actions.html'
+            getattr(options,
+                    'table_actions_template',
+                    'horizon/common/_data_table_table_actions.html')
         self.context_var_name = six.text_type(getattr(options,
                                                       'context_var_name',
                                                       'table'))
@@ -1048,7 +1084,7 @@ class DataTableOptions(object):
         if len(self.data_types) > 1:
             self.mixed_data_type = True
 
-        # However, if the mixed_data_type is set to True manually and the
+        # However, if the mixed_data_type is set to True manually and
         # the data_types is empty, raise an error.
         if self.mixed_data_type and len(self.data_types) <= 1:
             raise ValueError("If mixed_data_type is set to True in class %s, "
@@ -1058,6 +1094,11 @@ class DataTableOptions(object):
         self.data_type_name = getattr(options,
                                       'data_type_name',
                                       "_table_data_type")
+
+        self.filter_first_message = \
+            getattr(options,
+                    'filter_first_message',
+                    _('Please specify a search criteria first.'))
 
 
 class DataTableMetaclass(type):
@@ -1173,6 +1214,8 @@ class DataTable(object):
         self.breadcrumb = None
         self.current_item_id = None
         self.permissions = self._meta.permissions
+        self.needs_filter_first = False
+        self._filter_first_message = self._meta.filter_first_message
 
         # Create a new set
         columns = []
@@ -1320,6 +1363,12 @@ class DataTable(object):
         """Returns the message to be displayed when there is no data."""
         return self._no_data_message
 
+    def get_filter_first_message(self):
+        """Return the message to be displayed when the user needs to provide
+        first a search criteria before loading any data.
+        """
+        return self._filter_first_message
+
     def get_object_by_id(self, lookup):
         """Returns the data object from the table's dataset which matches
         the ``lookup`` parameter specified. An error will be raised if
@@ -1437,7 +1486,7 @@ class DataTable(object):
         self.set_multiselect_column_visibility(len(bound_actions) > 0)
         return table_actions_template.render(context)
 
-    def render_row_actions(self, datum, pull_right=True, row=False):
+    def render_row_actions(self, datum, row=False):
         """Renders the actions specified in ``Meta.row_actions`` using the
         current row data. If `row` is True, the actions are rendered in a row
         of buttons. Otherwise they are rendered in a dropdown box.
@@ -1450,8 +1499,7 @@ class DataTable(object):
         row_actions_template = template.loader.get_template(template_path)
         bound_actions = self.get_row_actions(datum)
         extra_context = {"row_actions": bound_actions,
-                         "row_id": self.get_object_id(datum),
-                         "pull_right": pull_right}
+                         "row_id": self.get_object_id(datum)}
         context = template.RequestContext(self.request, extra_context)
         return row_actions_template.render(context)
 
@@ -1774,7 +1822,7 @@ class DataTable(object):
         elif status is False:
             return "status_down"
         else:
-            return "status_unknown"
+            return "warning"
 
     def get_columns(self):
         """Returns this table's columns including auto-generated ones."""

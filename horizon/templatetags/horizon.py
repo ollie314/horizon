@@ -38,7 +38,7 @@ class MinifiedNode(Node):
     def render(self, context):
         return ' '.join(
             force_text(self.nodelist.render(context).strip()).split()
-        )
+        ).replace(' > ', '>').replace(' <', '<')
 
 
 @register.filter
@@ -209,6 +209,11 @@ def datepicker_locale():
     locale_mapping = getattr(settings, 'DATEPICKER_LOCALES',
                              bootstrap_datepicker.LOCALE_MAPPING)
     return locale_mapping.get(translation.get_language(), 'en')
+
+
+@register.assignment_tag
+def template_cache_age():
+    return getattr(settings, 'NG_TEMPLATE_CACHE_AGE', 0)
 
 
 @register.tag

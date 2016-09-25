@@ -93,7 +93,7 @@ class CreateNetwork(forms.SelfHandlingForm):
     name = forms.CharField(max_length=255,
                            label=_("Name"),
                            required=False)
-    tenant_id = forms.ChoiceField(label=_("Project"))
+    tenant_id = forms.ThemableChoiceField(label=_("Project"))
     if api.neutron.is_port_profiles_supported():
         widget = None
     else:
@@ -105,7 +105,7 @@ class CreateNetwork(forms.SelfHandlingForm):
         label=_("Provider Network Type"),
         help_text=_("The physical mechanism by which the virtual "
                     "network is implemented."),
-        widget=forms.Select(attrs={
+        widget=forms.ThemableSelectWidget(attrs={
             'class': 'switchable',
             'data-slug': 'network_type'
         }))
@@ -125,9 +125,10 @@ class CreateNetwork(forms.SelfHandlingForm):
             'class': 'switched',
             'data-switch-on': 'network_type',
         }))
-    admin_state = forms.ChoiceField(choices=[(True, _('UP')),
-                                             (False, _('DOWN'))],
-                                    label=_("Admin State"))
+    admin_state = forms.ThemableChoiceField(
+        choices=[(True, _('UP')),
+                 (False, _('DOWN'))],
+        label=_("Admin State"))
     shared = forms.BooleanField(label=_("Shared"),
                                 initial=False, required=False)
     external = forms.BooleanField(label=_("External Network"),
@@ -149,8 +150,16 @@ class CreateNetwork(forms.SelfHandlingForm):
         if api.neutron.is_port_profiles_supported():
             self.fields['net_profile_id'].choices = (
                 self.get_network_profile_choices(request))
+        try:
+            is_extension_supported = \
+                api.neutron.is_extension_supported(request, 'provider')
+        except Exception:
+            msg = _("Unable to verify Neutron service providers")
+            exceptions.handle(self.request, msg)
+            self._hide_provider_network_type()
+            is_extension_supported = False
 
-        if api.neutron.is_extension_supported(request, 'provider'):
+        if is_extension_supported:
             neutron_settings = getattr(settings,
                                        'OPENSTACK_NEUTRON_NETWORK', {})
             self.seg_id_range = SEGMENTATION_ID_RANGE.copy()
@@ -209,8 +218,6 @@ class CreateNetwork(forms.SelfHandlingForm):
                 self._hide_provider_network_type()
             else:
                 self.fields['network_type'].choices = network_type_choices
-        else:
-            self._hide_provider_network_type()
 
     def get_network_profile_choices(self, request):
         profile_choices = [('', _("Select a profile"))]
@@ -304,9 +311,9 @@ class UpdateNetwork(forms.SelfHandlingForm):
     network_id = forms.CharField(label=_("ID"),
                                  widget=forms.TextInput(
                                      attrs={'readonly': 'readonly'}))
-    admin_state = forms.ChoiceField(choices=[(True, _('UP')),
-                                             (False, _('DOWN'))],
-                                    label=_("Admin State"))
+    admin_state = forms.ThemableChoiceField(choices=[(True, _('UP')),
+                                                     (False, _('DOWN'))],
+                                            label=_("Admin State"))
     shared = forms.BooleanField(label=_("Shared"), required=False)
     external = forms.BooleanField(label=_("External Network"), required=False)
     failure_url = 'horizon:admin:networks:index'

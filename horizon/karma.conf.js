@@ -46,7 +46,7 @@ module.exports = function (config) {
       // NOTE: the templates must also be listed in the files section below.
       './**/*.html': ['ng-html2js'],
       // Used to indicate files requiring coverage reports.
-      './**/!(*.spec).js': ['coverage']
+      './**/!(*.spec|*.borrowed-from-underscore).js': ['coverage']
     },
 
     // Sets up module to process templates.
@@ -79,8 +79,12 @@ module.exports = function (config) {
       xstaticPath + 'rickshaw/data/rickshaw.js',
       xstaticPath + 'angular_smart_table/data/smart-table.js',
       xstaticPath + 'angular_lrdragndrop/data/lrdragndrop.js',
+      xstaticPath + 'angular_fileupload/data/ng-file-upload-all.js',
       xstaticPath + 'spin/data/spin.js',
       xstaticPath + 'spin/data/spin.jquery.js',
+      xstaticPath + 'tv4/data/tv4.js',
+      xstaticPath + 'objectpath/data/ObjectPath.js',
+      xstaticPath + 'angular_schema_form/data/schema-form.js',
 
       // from jasmine_tests.py; only those that are deps for others
       'horizon/js/horizon.js',
@@ -138,7 +142,7 @@ module.exports = function (config) {
 
     coverageReporter: {
       type: 'html',
-      dir: '../coverage-karma/'
+      dir: '../../cover/horizon'
     },
 
     // Coverage threshold values.

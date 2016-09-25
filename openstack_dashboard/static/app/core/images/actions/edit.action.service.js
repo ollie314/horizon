@@ -23,8 +23,8 @@
 
   editService.$inject = [
     '$q',
-    'horizon.app.core.images.resourceType',
     'horizon.app.core.images.events',
+    'horizon.app.core.images.resourceType',
     'horizon.app.core.images.actions.editWorkflow',
     'horizon.app.core.metadata.service',
     'horizon.app.core.openstack-service-api.glance',
@@ -43,8 +43,8 @@
    */
   function editService(
     $q,
-    imageResourceType,
     events,
+    imageResourceType,
     editWorkflow,
     metadataService,
     glance,
@@ -56,10 +56,9 @@
     toast
   ) {
     var message = {
-      success: gettext('Image %s was successfully updated.'),
-      successMetadata: gettext('Image metadata %s was successfully updated.')
+      success: gettext('Image %s was successfully updated.')
     };
-    var modifyImagePolicyCheck, scope, saveDeferred;
+    var modifyImagePolicyCheck, scope;
 
     var model = {
       image: {},
@@ -78,6 +77,7 @@
 
     function initScope($scope) {
       scope = $scope;
+      $scope.$on(events.IMAGE_METADATA_CHANGED, onMetadataChange);
       modifyImagePolicyCheck = policy.ifAllowed({rules: [['image', 'modify_image']]});
     }
 
@@ -99,64 +99,56 @@
         model.image = localImage;
       }
 
-      wizardModalService.modal({
+      return wizardModalService.modal({
         scope: scope,
         workflow: editWorkflow,
         submit: submit
-      }).result.catch(cancel);
-
-      saveDeferred = $q.defer();
-      return saveDeferred.promise;
+      }).result;
     }
 
-    function cancel() {
-      saveDeferred.reject();
+    function onMetadataChange(e, metadata) {
+      model.metadata = metadata;
+      e.stopPropagation();
     }
 
     function submit() {
-      return saveMetadata().then(onSaveMetadata, onFailMetadata);
+      return updateMetadata().then(updateImage, onUpdateImageFail);
     }
 
-    function onFailMetadata() {
-      glance.updateImage(model.image).then(onUpdateImageSuccess, onUpdateImageFail);
-    }
-
-    function onSaveMetadata() {
-      toast.add('success', interpolate(message.successMetadata, [model.image.name]));
-      glance.updateImage(model.image).then(onUpdateImageSuccess, onUpdateImageFail);
+    function updateImage() {
+      var finalModel = model.image;
+      return glance.updateImage(finalModel).then(onUpdateImageSuccess, onUpdateImageFail);
     }
 
     function onUpdateImageSuccess() {
       toast.add('success', interpolate(message.success, [model.image.name]));
-      saveDeferred.resolve(actionResultService.getActionResult()
+      return actionResultService.getActionResult()
         .updated(imageResourceType, model.image.id)
-        .result);
+        .result;
     }
 
     function onUpdateImageFail() {
-      saveDeferred.reject(actionResultService.getActionResult()
+      return actionResultService.getActionResult()
         .failed(imageResourceType, model.image.id)
-        .result);
+        .result;
     }
 
-    function saveMetadata() {
-      var imageId = model.image.id;
-      var deferred = $q.defer();
+    function updateMetadata() {
 
-      metadataService.getMetadata('image', imageId).then(onMetadataGet);
+      return metadataService
+        .getMetadata('image', model.image.id)
+        .then(onMetadataGet);
 
       function onMetadataGet(response) {
+        var updated = model.metadata;
         var removed = angular.copy(response.data);
-        angular.forEach(model.metadata, function(value, key) {
+        angular.forEach(updated, function(value, key) {
           delete removed[key];
         });
 
-        deferred.resolve(
-          metadataService.editMetadata('image', imageId, model.metadata, Object.keys(removed))
-        );
+        return metadataService
+          .editMetadata('image', model.image.id, updated, Object.keys(removed));
       }
-
-      return deferred.promise;
     }
 
     function isActive(image) {

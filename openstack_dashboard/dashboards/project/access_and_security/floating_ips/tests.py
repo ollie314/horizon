@@ -374,6 +374,8 @@ class FloatingIpNeutronViewTests(FloatingIpViewTests):
             .AndReturn(False)
         api.base.is_service_enabled(IsA(http.HttpRequest), 'network') \
             .MultipleTimes().AndReturn(True)
+        api.base.is_service_enabled(IsA(http.HttpRequest), 'compute') \
+            .MultipleTimes().AndReturn(True)
         api.nova.tenant_quota_get(IsA(http.HttpRequest), '1') \
             .AndReturn(self.quotas.first())
         api.nova.flavor_list(IsA(http.HttpRequest)) \
@@ -390,8 +392,10 @@ class FloatingIpNeutronViewTests(FloatingIpViewTests):
             .AndReturn(self.neutron_quotas.first())
         api.neutron.router_list(IsA(http.HttpRequest)) \
             .AndReturn(self.routers.list())
-        api.neutron.subnet_list(IsA(http.HttpRequest)) \
+        api.neutron.subnet_list(IsA(http.HttpRequest), shared=False) \
             .AndReturn(self.subnets.list())
+        api.neutron.subnet_list(IsA(http.HttpRequest), shared=True) \
+            .AndReturn(list())
         api.neutron.network_list(IsA(http.HttpRequest), shared=False) \
             .AndReturn(self.networks.list())
         api.neutron.network_list(IsA(http.HttpRequest), shared=True) \
@@ -433,6 +437,8 @@ class FloatingIpNeutronViewTests(FloatingIpViewTests):
             .AndReturn(False)
         api.base.is_service_enabled(IsA(http.HttpRequest), 'network') \
             .MultipleTimes().AndReturn(True)
+        api.base.is_service_enabled(IsA(http.HttpRequest), 'compute') \
+            .MultipleTimes().AndReturn(True)
         api.nova.tenant_quota_get(IsA(http.HttpRequest), '1') \
             .AndReturn(self.quotas.first())
         api.nova.flavor_list(IsA(http.HttpRequest)) \
@@ -449,7 +455,9 @@ class FloatingIpNeutronViewTests(FloatingIpViewTests):
             .AndReturn(self.neutron_quotas.first())
         api.neutron.router_list(IsA(http.HttpRequest)) \
             .AndReturn(self.routers.list())
-        api.neutron.subnet_list(IsA(http.HttpRequest)) \
+        api.neutron.subnet_list(IsA(http.HttpRequest), shared=False) \
+            .AndReturn(list())
+        api.neutron.subnet_list(IsA(http.HttpRequest), shared=True) \
             .AndReturn(self.subnets.list())
         api.neutron.network_list(IsA(http.HttpRequest), shared=False) \
             .AndReturn(list())

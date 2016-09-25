@@ -93,10 +93,22 @@ class BaseUserForm(forms.SelfHandlingForm):
             LOG.debug("User: %s has no projects" % user_id)
 
 
+class AddExtraColumnMixIn(object):
+    def add_extra_fields(self, ordering=None):
+        if api.keystone.VERSIONS.active >= 3:
+            # add extra column defined by setting
+            EXTRA_INFO = getattr(settings, 'USER_TABLE_EXTRA_INFO', {})
+            for key, value in EXTRA_INFO.items():
+                self.fields[key] = forms.CharField(label=value,
+                                                   required=False)
+                if ordering:
+                    ordering.append(key)
+
+
 ADD_PROJECT_URL = "horizon:identity:projects:create"
 
 
-class CreateUserForm(PasswordMixin, BaseUserForm):
+class CreateUserForm(PasswordMixin, BaseUserForm, AddExtraColumnMixIn):
     # Hide the domain_id and domain_name by default
     domain_id = forms.CharField(label=_("Domain ID"),
                                 required=False,
@@ -112,11 +124,11 @@ class CreateUserForm(PasswordMixin, BaseUserForm):
     email = forms.EmailField(
         label=_("Email"),
         required=False)
-    project = forms.DynamicChoiceField(label=_("Primary Project"),
-                                       required=PROJECT_REQUIRED,
-                                       add_item_link=ADD_PROJECT_URL)
-    role_id = forms.ChoiceField(label=_("Role"),
-                                required=PROJECT_REQUIRED)
+    project = forms.ThemableDynamicChoiceField(label=_("Primary Project"),
+                                               required=PROJECT_REQUIRED,
+                                               add_item_link=ADD_PROJECT_URL)
+    role_id = forms.ThemableChoiceField(label=_("Role"),
+                                        required=PROJECT_REQUIRED)
     enabled = forms.BooleanField(label=_("Enabled"),
                                  required=False,
                                  initial=True)
@@ -129,6 +141,7 @@ class CreateUserForm(PasswordMixin, BaseUserForm):
                     "description", "email", "password",
                     "confirm_password", "project", "role_id",
                     "enabled"]
+        self.add_extra_fields(ordering)
         self.fields = collections.OrderedDict(
             (key, self.fields[key]) for key in ordering)
         role_choices = [(role.id, role.name) for role in roles]
@@ -153,6 +166,14 @@ class CreateUserForm(PasswordMixin, BaseUserForm):
             desc = data["description"]
             if "email" in data:
                 data['email'] = data['email'] or None
+
+            # add extra information
+            if api.keystone.VERSIONS.active >= 3:
+                EXTRA_INFO = getattr(settings, 'USER_TABLE_EXTRA_INFO', {})
+                kwargs = dict((key, data.get(key)) for key in EXTRA_INFO)
+            else:
+                kwargs = {}
+
             new_user = \
                 api.keystone.user_create(request,
                                          name=data['name'],
@@ -161,7 +182,8 @@ class CreateUserForm(PasswordMixin, BaseUserForm):
                                          password=data['password'],
                                          project=data['project'] or None,
                                          enabled=data['enabled'],
-                                         domain=domain.id)
+                                         domain=domain.id,
+                                         **kwargs)
             messages.success(request,
                              _('User "%s" was successfully created.')
                              % data['name'])
@@ -189,7 +211,7 @@ class CreateUserForm(PasswordMixin, BaseUserForm):
             exceptions.handle(request, _('Unable to create user.'))
 
 
-class UpdateUserForm(BaseUserForm):
+class UpdateUserForm(BaseUserForm, AddExtraColumnMixIn):
     # Hide the domain_id and domain_name by default
     domain_id = forms.CharField(label=_("Domain ID"),
                                 required=False,
@@ -206,12 +228,12 @@ class UpdateUserForm(BaseUserForm):
     email = forms.EmailField(
         label=_("Email"),
         required=False)
-    project = forms.ChoiceField(label=_("Primary Project"),
-                                required=PROJECT_REQUIRED)
+    project = forms.ThemableChoiceField(label=_("Primary Project"),
+                                        required=PROJECT_REQUIRED)
 
     def __init__(self, request, *args, **kwargs):
         super(UpdateUserForm, self).__init__(request, *args, **kwargs)
-
+        self.add_extra_fields()
         if api.keystone.keystone_can_edit_user() is False:
             for field in ('name', 'email'):
                 self.fields.pop(field)

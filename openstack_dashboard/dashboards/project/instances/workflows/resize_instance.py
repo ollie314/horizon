@@ -35,8 +35,9 @@ class SetFlavorChoiceAction(workflows.Action):
         widget=forms.TextInput(attrs={'readonly': 'readonly'}),
         required=False,
     )
-    flavor = forms.ChoiceField(label=_("New Flavor"),
-                               help_text=_("Choose the flavor to launch."))
+    flavor = forms.ThemableChoiceField(
+        label=_("New Flavor"),
+        help_text=_("Choose the flavor to launch."))
 
     class Meta(object):
         name = _("Flavor Choice")
@@ -61,7 +62,8 @@ class SetFlavorChoiceAction(workflows.Action):
     def get_help_text(self, extra_context=None):
         extra = {} if extra_context is None else dict(extra_context)
         try:
-            extra['usages'] = api.nova.tenant_absolute_limits(self.request)
+            extra['usages'] = api.nova.tenant_absolute_limits(self.request,
+                                                              reserved=True)
             extra['usages_json'] = json.dumps(extra['usages'])
             flavors = json.dumps([f._info for f in
                                   instance_utils.flavor_list(self.request)])
