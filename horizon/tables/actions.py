@@ -599,7 +599,8 @@ class BatchAction(Action):
 
     .. attribute:: name
 
-       An internal name for this action.
+       A short name or "slug" representing this action.
+       Should be one word such as "delete", "add", "disable", etc.
 
     .. method:: action_present
 
@@ -983,7 +984,7 @@ class Deprecated(type):
 
 @six.add_metaclass(Deprecated)
 class UpdateAction(object):
-    """A table action for cell updates by inline editing."""
+    """**DEPRECATED**: A table action for cell updates by inline editing."""
 
     name = "update"
 
