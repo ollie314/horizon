@@ -1,22 +1,19 @@
 # Akihiro Motoki <amotoki@gmail.com>, 2015. #zanata
-# Shu Muto <shu-mutou@rf.jp.nec.com>, 2015. #zanata
 # Yuko Katabami <yukokatabami@gmail.com>, 2015. #zanata
 # Akihiro Motoki <amotoki@gmail.com>, 2016. #zanata
-# Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 # Mie Yamamoto <myamamot@redhat.com>, 2016. #zanata
 # Shu Muto <shu-mutou@rf.jp.nec.com>, 2016. #zanata
-# Yoshiki Eguchi <yoshiki.eguchi@gmail.com>, 2016. #zanata
 # Yuko Katabami <yukokatabami@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 10.0.0.0rc2.dev86\n"
+"Project-Id-Version: horizon 10.0.0.0rc2.dev147\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-09-30 21:11+0000\n"
+"POT-Creation-Date: 2016-10-19 06:59+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-09-20 01:01+0000\n"
-"Last-Translator: Akihiro Motoki <amotoki@gmail.com>\n"
+"PO-Revision-Date: 2016-10-19 06:43+0000\n"
+"Last-Translator: Shu Muto <shu-mutou@rf.jp.nec.com>\n"
 "Language-Team: Japanese\n"
 "Language: ja\n"
 "X-Generator: Zanata 3.7.3\n"
@@ -66,10 +63,10 @@ msgid ""
 "can specify volume size and whether to delete the volume on deletion of the "
 "instance."
 msgstr ""
-"<b>イメージ (「新規ボリュームの作成」をチェックした場合)</b>: イメージを使っ"
-"てインスタンスを起動します。新しいボリュームが作成され、そのボリュームにイン"
-"スタンスのデータが保持されます。ボリュームサイズと、インスタンスの削除時にそ"
-"のボリュームを削除するかどうかを指定できます。"
+"<b>イメージ (「新規ボリュームの作成」を「はい」にした場合)</b>: イメージを使"
+"用してインスタンスを起動し、その際に新しいボリュームが作成されてそのボリュー"
+"ムにインスタンスのデータが保持されます。ボリュームサイズと、インスタンスの削"
+"除時にそのボリュームを削除するかどうかを指定できます。"
 
 msgid "<b>Image</b>: This option uses an image to boot the instance."
 msgstr "<b>イメージ</b>: イメージを使ってインスタンスを起動します。"
@@ -86,10 +83,9 @@ msgid ""
 "instance, and creates a new volume to persist instance data. You can choose "
 "to delete the volume on deletion of the instance."
 msgstr ""
-"<b>ボリュームスナップショット</b>: ボリュームスナップショットを使ってインスタ"
-"ンスを起動します。新しいボリュームが作成され、そのボリュームにインスタンスの"
-"データが保持されます。インスタンスの削除時にそのボリュームを削除するかを指定"
-"できます。"
+"<b>ボリュームスナップショット</b>: ボリュームスナップショットを使用してインス"
+"タンスを起動し、インスタンスのデータを保持するための新しいボリュームを作成し"
+"ます。インスタンスの削除時にそのボリュームを削除するかを指定できます。"
 
 msgid ""
 "<b>Volume</b>: This option uses a volume that already exists. It does not "
@@ -99,8 +95,8 @@ msgid ""
 msgstr ""
 "<b>ボリューム</b>: 既存のボリュームを使用します。新しいボリュームは作成されま"
 "せん。インスタンスの削除時にそのボリュームを削除するかどうかを指定できます。"
-"<em>注意: ボリュームを使用する場合、そのボリュームから起動できるインスタンス"
-"は 1 つだけです。</em>"
+"<em>注意: ボリュームを選択した場合には、起動できるインスタンスは 1 つのみで"
+"す。</em>"
 
 msgid ""
 "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
@@ -161,9 +157,9 @@ msgstr ""
 "データを整理する手段を提供します。\n"
 "コンテナーは、Windows® のフォルダーや UNIX® のディレクトリーのように考えるこ"
 "とができます。\n"
-"コンテナーとこれらのファイルシステムの概念の主な違いは、コンテナーは入れ子に"
-"できないことです。\n"
-"ただし、アカウント内に無制限のコンテナーを作成することが可能です。\n"
+"コンテナーとこれらのファイルシステムの概念の相違点は主に、コンテナーは入れ子"
+"にできないことです。\n"
+"ただし、アカウント内にコンテナーを無制限に作成することが可能です。\n"
 "データはコンテナーに保存する必要があります。\n"
 "そのため、データをアップロードする前に、少なくとも 1 つのコンテナーを\n"
 "アカウントに定義する必要があります。"
@@ -211,11 +207,14 @@ msgstr ""
 "'{$ctrl.createdKeypair.name$}' の名前のキーペアを正常に作成できました。この"
 "キーペアは自動的にダウンロードされます。"
 
+msgid "A local file should be selected."
+msgstr "ローカルファイルを選択してください。"
+
 msgid ""
 "A longer block of help text that breaks onto a new line and may extend "
 "beyond one line."
 msgstr ""
-"ヘルプテキストの長いブロックは、新しい行に分割され、1行を超えることがありま"
+"ヘルプテキストが長い場合には、新しい行に分割されて 1 行を超えることがありま"
 "す。"
 
 msgid "A name is required for your container."
@@ -225,7 +224,9 @@ msgid "A name is required for your instance."
 msgstr "インスタンス名は必須です。"
 
 msgid "A port represents a virtual switch port on a logical network switch."
-msgstr "ポート、論理ネットワークスイッチ上にある仮想スイッチポートを表します。"
+msgstr ""
+"ポートとは、論理ネットワークスイッチ上にある仮想スイッチポートのことを表しま"
+"す。"
 
 msgid "AKI"
 msgstr "AKI"
@@ -279,10 +280,10 @@ msgid "Alerts"
 msgstr "アラート"
 
 msgid "Amount of RAM in MB that is required to boot the image."
-msgstr "イメージの起動に必要な RAM の量 (単位は MB)。"
+msgstr "イメージの起動に必要な RAM の量 (MB)。"
 
 msgid "Amount of disk space in GB that is required to boot the image."
-msgstr "イメージの起動に必要なディスク容量 (単位は GB)。"
+msgstr "イメージの起動に必要なディスク容量 (GB)。"
 
 msgid ""
 "An <b>External</b> network is set up by an administrator.\n"
@@ -323,21 +324,24 @@ msgid "An external (HTTP) URL to load the image from"
 msgstr "イメージを読み込む外部 (HTTP) URL。"
 
 msgid "An image description less than 256 characters is required."
-msgstr "256 文字以下の説明が必要です。"
+msgstr "イメージの説明は、256 文字未満にする必要があります。"
 
 msgid ""
 "An image description less than {$ctrl.validationRules.fieldMaxLength + 1$} "
 "characters is required."
-msgstr "{$ctrl.validationRules.fieldMaxLength + 1$} 文字以下の説明が必要です。"
+msgstr ""
+"イメージの説明は、{$ctrl.validationRules.fieldMaxLength + 1$} 文字未満でなけ"
+"ればなりません。"
 
 msgid "An image name less than 256 characters is required."
-msgstr "256 文字以下のイメージ名が必要です。"
+msgstr "イメージ名は、256 文字未満にする必要があります。"
 
 msgid ""
 "An image name less than {$ctrl.validationRules.fieldMaxLength + 1$} "
 "characters is required."
 msgstr ""
-"{$ctrl.validationRules.fieldMaxLength + 1$} 文字以下のイメージ名が必要です。"
+"イメージ名は、{$ctrl.validationRules.fieldMaxLength + 1$} 文字未満でなければ"
+"なりません。"
 
 msgid ""
 "An instance name is required and used to help you uniquely identify your "
@@ -399,7 +403,10 @@ msgid "Brand"
 msgstr "ブランドマーク"
 
 msgid "Breadcrumbs"
-msgstr "パンくず"
+msgstr "パンくずリスト"
+
+msgid "Browse..."
+msgstr "参照..."
 
 msgid "Button"
 msgstr "ボタン"
@@ -447,7 +454,7 @@ msgid "Close"
 msgstr "閉じる"
 
 msgid "Collecting information for deletion:"
-msgstr "削除するための情報を収集しています。"
+msgstr "削除する情報を収集しています。"
 
 msgid "Color"
 msgstr "色"
@@ -511,7 +518,7 @@ msgid "Copy Data"
 msgstr "データのコピー"
 
 msgid "Count"
-msgstr "数"
+msgstr "インスタンス数"
 
 msgid "Create"
 msgstr "作成"
@@ -545,6 +552,10 @@ msgstr "作成時刻"
 
 msgid "Created At"
 msgstr "作成時刻"
+
+#, python-format
+msgid "Created keypair: %s"
+msgstr "キーペア %s を作成しました"
 
 msgid "Creating"
 msgstr "作成中"
@@ -582,7 +593,7 @@ msgid "Danger Anchor"
 msgstr "危険のアンカー"
 
 msgid "Danger Button"
-msgstr "危険のボタン"
+msgstr "危険ボタン"
 
 msgid "Data"
 msgstr "データ"
@@ -654,7 +665,7 @@ msgid "Description"
 msgstr "説明"
 
 msgid "Description lists"
-msgstr "定義リスト"
+msgstr "説明リスト"
 
 msgid "Details"
 msgstr "詳細"
@@ -690,7 +701,7 @@ msgid "Disk Partition"
 msgstr "ディスクパーティション"
 
 msgid "Distribution Charts"
-msgstr "ディストリビューションチャート"
+msgstr "分布チャート"
 
 msgid "Docker"
 msgstr "Docker"
@@ -738,7 +749,7 @@ msgid "Enabled"
 msgstr "有効"
 
 msgid "Encountered {$ ctrl.model.deleted.failures $} failures."
-msgstr "{$ ctrl.model.deleted.failures $} 個の失敗がありました。"
+msgstr "{$ ctrl.model.deleted.failures $} 個のエラーが発生しました。"
 
 msgid "Encrypted"
 msgstr "暗号化"
@@ -750,6 +761,9 @@ msgid "Enter an Image name"
 msgstr "イメージの名前を入力します。"
 
 msgid "Ephemeral Disk"
+msgstr "一時ディスク"
+
+msgid "Ephmeral Disk"
 msgstr "一時ディスク"
 
 msgid "Error"
@@ -857,22 +871,22 @@ msgid "Hash"
 msgstr "ハッシュ"
 
 msgid "Heading 1"
-msgstr "見出し１"
+msgstr "見出し 1"
 
 msgid "Heading 2"
-msgstr "見出し２"
+msgstr "見出し 2"
 
 msgid "Heading 3"
-msgstr "見出し３"
+msgstr "見出し 3"
 
 msgid "Heading 4"
-msgstr "見出し４"
+msgstr "見出し 4"
 
 msgid "Heading 5"
-msgstr "見出し５"
+msgstr "見出し 5"
 
 msgid "Heading 6"
-msgstr "見出し６"
+msgstr "見出し 6"
 
 msgid "Home"
 msgstr "ホーム"
@@ -916,8 +930,21 @@ msgstr ""
 "直後のインスタンスへのアクセスは非常に限定されます。VNC コンソールからのみイ"
 "ンスタンスにアクセスすることができます。"
 
+msgid "If not, you can manually download this keypair at the following link:"
+msgstr ""
+"自動的にダウンロードされない場合には、次のリンクから手動でこのキーペアをダウ"
+"ンロードできます。"
+
 msgid "If set to 'Yes' then the image cannot be deleted."
 msgstr "「はい」に設定されていると、このイメージを削除できなくなります。"
+
+msgid ""
+"If uploading the image via a HTTP URL the image location must be accessible "
+"to the Image Service and be a URL direct to the image binary."
+msgstr ""
+"HTTP URL 経由でイメージをアップロードする場合には、イメージの場所はイメージ"
+"サービスからのアクセスが可能で、イメージバイナリーへの直接の URL である必要が"
+"あります。"
 
 msgid ""
 "If you select an availability zone and plan to use the 'boot from volume' "
@@ -926,9 +953,9 @@ msgid ""
 "resides."
 msgstr ""
 "アベイラビリティーゾーンを選択し、ブートソース選択のステップで「ボリュームか"
-"ら起動」オプションを指定する場合には、起動可能ボリュームが属するのと同じアベ"
-"イラビリティーゾーンをインスタンスのアベイラビリティーゾーンに選択するように"
-"してください。"
+"ら起動」オプションを指定する場合には、インスタンスのアベイラビリティーゾーン"
+"に、起動可能ボリュームが属するアベイラビリティーゾーンと同じものを選択するよ"
+"うにしてください。"
 
 msgid ""
 "If you want to create an instance that uses ephemeral storage, meaning the "
@@ -1040,13 +1067,26 @@ msgstr "インスタンスのスナップショット"
 msgid "Instance count is required and must be an integer of at least 1"
 msgstr "インスタンス数は必須で、最低でも 1 以上の整数でなければなりません。"
 
+msgid ""
+"Instance source is the template used to create an instance.\n"
+"    You can use an image, a snapshot of an instance (image snapshot),\n"
+"    a volume or a volume snapshot (if enabled).\n"
+"    You can also choose to use persistent storage by creating a new volume."
+msgstr ""
+"インスタンスのソースは、インスタンスを作成する際のテンプレートです。\n"
+"ソースとして、イメージ、インスタンスのスナップショット (イメージスナップ"
+"ショット)、\n"
+"ボリューム、ボリュームスナップショット (有効になっている場合) が選択できま"
+"す。\n"
+"新しいボリュームを作成して、永続ストレージを使うように選択することもできま"
+"す。"
+
 msgid "Instances"
 msgstr "インスタンス"
 
 msgid "Insufficient privilege level to view user information."
 msgstr "ユーザー情報を参照するのに必要な権限がありません。"
 
-#, fuzzy
 msgid "Is Public"
 msgstr "パブリック"
 
@@ -1103,13 +1143,13 @@ msgid "Killed"
 msgstr "強制終了"
 
 msgid "Large Modal"
-msgstr "大きなモーダル"
+msgstr "大きいモーダル"
 
 msgid "Large button"
 msgstr "大きいボタン"
 
 msgid "Large input"
-msgstr "大きな入力項目"
+msgstr "大きい入力項目"
 
 msgid "Launch"
 msgstr "起動"
@@ -1318,6 +1358,9 @@ msgstr "ネットワーク"
 msgid "Networks provide the communication channels for instances in the cloud."
 msgstr "ネットワークはクラウド内のインスタンス用の通信経路を提供します。"
 
+msgid "New File Contents"
+msgstr "新しいファイルの内容"
+
 msgid "Newer"
 msgstr "新しい"
 
@@ -1356,7 +1399,7 @@ msgid ""
 "          when the file is uploaded (to any depth of folders)."
 msgstr ""
 "注意: ファイル名に区切り記号 ('{$ ctrl.model.DELIMETER $}') を使用して、\n"
-"その新規ファイルを (任意の深さのフォルダーに) アップロードする際に作成され"
+"その新規ファイルを (任意の階層のフォルダーに) アップロードする際に作成され"
 "る \n"
 "フォルダーに配置することができます。"
 
@@ -1365,7 +1408,7 @@ msgid ""
 "          folder name to create deep folders."
 msgstr ""
 "注意: フォルダー名に区切り記号 ('{$ ctrl.model.DELIMETER $}') を使用して、\n"
-"階層の深いフォルダーの作成することができます。"
+"階層の深いフォルダーを作成することができます。"
 
 msgid "Note: you will not be able to download this later."
 msgstr "注意: このダウンロードは後で実行することはできません。"
@@ -1416,25 +1459,25 @@ msgid "One fine body…"
 msgstr "本文…"
 
 msgid "One large body…"
-msgstr "大きな本文..."
+msgstr "大きい本文..."
 
 msgid "One more separated link"
 msgstr "もうひとつの分割されたリンク"
 
 msgid "One small body…"
-msgstr "小さな本文..."
+msgstr "小さい本文..."
 
 msgid "One super large body…"
-msgstr "非常に大きな本文..."
+msgstr "非常に大きい本文..."
 
 msgid "One tiny body…"
-msgstr "非常に小さな本文..."
+msgstr "非常に小さい本文..."
 
 msgid "Option one is this"
-msgstr "オプション１はこれです"
+msgstr "オプション 1 はこれです"
 
 msgid "Option two can be something else"
-msgstr "オプション２は何か別の項目です"
+msgstr "オプション 2 は何か別の項目です"
 
 msgid "Ordered"
 msgstr "番号あり"
@@ -1451,11 +1494,17 @@ msgstr "概要"
 msgid "Owner"
 msgstr "所有者"
 
+msgid "PLOOP"
+msgstr "PLOOP"
+
+msgid "PLOOP - Virtuozzo/Parallels Loopback Disk"
+msgstr "PLOOP - Virtuozzo/Parallels ループバックディスク"
+
 msgid "Pager"
 msgstr "ページャー"
 
 msgid "Pagination"
-msgstr "ページネーション"
+msgstr "ページ"
 
 msgid "Panel content"
 msgstr "パネルの内容"
@@ -1522,8 +1571,8 @@ msgid ""
 "Ports provide extra communication channels to your instances. You can select "
 "ports instead of networks or a mix of both."
 msgstr ""
-"ポートは、インスタンスに追加の通信経路を提供します。ネットワークの代わりに選"
-"択したり、両方を併せて選択したりすることができます。"
+"ポートは、インスタンスに追加の通信経路を提供します。ポートをネットワークの代"
+"わりに選択したり、ネットワークと併せて両方を選択したりすることができます。"
 
 msgid "Previous"
 msgstr "前へ"
@@ -1611,7 +1660,7 @@ msgstr "メモリー"
 msgid "RAW"
 msgstr "RAW"
 
-msgid "RX/TX factor"
+msgid "RX/TX Factor"
 msgstr "RX/TX 係数"
 
 msgid "Radios"
@@ -1660,8 +1709,8 @@ msgid ""
 "Scheduler hints allow you to pass additional placement related information "
 "to the compute scheduler."
 msgstr ""
-"スケジューラーヒントを使うと、compute のスケジューラーに配置に関する追加の情"
-"報を渡すことができます。"
+"スケジューラーヒントを使うと、配置に関する追加の情報を compute のスケジュー"
+"ラーに渡すことができます。"
 
 msgid "Search"
 msgstr "検索"
@@ -1758,11 +1807,20 @@ msgstr "インスタンスを起動するセキュリティーグループを選
 msgid "Select the server group to launch the instance in."
 msgstr "インスタンスを起動するサーバーグループを選択します。"
 
+msgid ""
+"Select the volume type from the drop down menu. In an environment with "
+"multiple-storage back ends, the scheduler determines where to send the "
+"volume based on the volume type."
+msgstr ""
+"ドロップダウンメニューからボリューム種別を選択してください。複数のストレージ"
+"バックエンドがある環境では、スケジューラーがボリューム種別をもとにボリューム"
+"の送信先を決定します。"
+
 msgid "Selects"
-msgstr "セレクト"
+msgstr "選択メニュー"
 
 msgid "Send invitation"
-msgstr "インビテーションの送信"
+msgstr "招待状の送信"
 
 msgid "Separated link"
 msgstr "分割されたリンク"
@@ -1784,11 +1842,12 @@ msgid ""
 "on\n"
 "    the same physical hardware due to availability requirements."
 msgstr ""
-"サーバーグループは VM のコレクションの定義です。\n"
-"コレクション全体に特定のプロパティを与えることができます。\n"
-"たとえば、サーバーグループのポリシーに、可用性の要求から、\n"
-"グループ内の VM が同じ物理ハードウェアに配置しないよう指定することができま"
-"す。"
+"サーバーグループで仮想マシンのコレクションを定義して、\n"
+"    コレクション全体に特定のプロパティーを指定することができます。たとえば、"
+"サーバーグループのポリシーで、\n"
+"    可用性の要件に基づいて、\n"
+"    このグループ内の仮想マシンが同じ物理ハードウェアに配置されないように指定"
+"することができます。"
 
 #, python-format
 msgid "Service type is not enabled: %(desiredType)s"
@@ -1800,6 +1859,9 @@ msgstr "設定 %(setting)s が有効になっていません。"
 
 msgid "Shared"
 msgstr "共有"
+
+msgid "Shared With Project"
+msgstr "プロジェクトと共有"
 
 msgid "Shared with Project"
 msgstr "プロジェクトと共有"
@@ -1823,7 +1885,7 @@ msgid "Snapshot"
 msgstr "スナップショット"
 
 msgid "Someone famous in"
-msgstr "誰か有名な人の名前"
+msgstr "有名人の名前"
 
 msgid "Something else here"
 msgstr "その他の項目"
@@ -1869,10 +1931,10 @@ msgstr "成功"
 
 #, python-format
 msgid "Successfully imported key pair %(name)s."
-msgstr "キーペア %(name)s を正常に取り込みました。"
+msgstr "キーペア %(name)s を正常にインポートしました。"
 
 msgid "Summary Template URL:"
-msgstr "サマリーテンプレートの URL"
+msgstr "サマリーテンプレートの URL:"
 
 msgid "Supports Details View:"
 msgstr "詳細ビューのサポート:"
@@ -1901,8 +1963,24 @@ msgstr "テキスト"
 msgid "Textarea"
 msgstr "テキストエリア"
 
+msgid "The access permission for the image."
+msgstr "イメージのアクセス許可"
+
 msgid "The architecture of the image."
 msgstr "このイメージのアーキテクチャー。"
+
+msgid ""
+"The current Horizon settings indicate no valid\n"
+"                       image creation methods are available. Providing\n"
+"                       an image location and/or uploading from the\n"
+"                       local file system must be allowed to support\n"
+"                       image creation."
+msgstr ""
+"現在 Horizon には有効なイメージの作成方法が\n"
+"                       設定されていません。イメージの作成をProviding\n"
+"                       サポートするには、イメージの場所を指定できるように\n"
+"                       するか、ローカルファイルシステムからのイメージの\n"
+"                       アップロードを許可する必要があります。"
 
 msgid ""
 "The flavor you select for an instance determines the amount of compute, "
@@ -2010,7 +2088,7 @@ msgid ""
 msgstr ""
 "サブネットはネットワークの IP アドレスを表します。サブネットは CIDR 形式で指"
 "定します。\n"
-"通常、CIDR 形式は <samp>192.xxx.x.x/24</samp> のような形です。"
+"通常、CIDR 形式は <samp>192.xxx.x.x/24</samp> のような形式です。"
 
 #, python-format
 msgid "The volume size must be at least %(minVolumeSize)s GB"
@@ -2020,14 +2098,28 @@ msgstr ""
 msgid "Themable Checkbox"
 msgstr "テーマ対応チェックボックス"
 
+msgid "Themable Option 1"
+msgstr "テーマ対応オプション 1"
+
+msgid "Themable Option 2"
+msgstr "テーマ対応オプション 2"
+
 msgid "Themable Radios"
-msgstr "テーマ対応ラジオボタン"
+msgstr "テーマ対応のラジオボタン"
 
 msgid "Themable Selects"
 msgstr "テーマ対応の選択メニュー"
 
 msgid "There are no Availability Zones."
 msgstr "アベイラビリティゾーンがありません。"
+
+msgid ""
+"There are no allowed boot sources.\n"
+"      If you think this is wrong please contact your administrator."
+msgstr ""
+"利用可能なブートソースがありません。\n"
+"      利用可能なブートソースがあるにも拘らず、このメッセージが表示されている"
+"場合には、管理者にお問い合わせください。"
 
 msgid ""
 "There are two ways to generate a key pair. From a Linux system,\n"
@@ -2062,8 +2154,9 @@ msgid ""
 "This is a simple hero unit, a simple jumbotron-style component for calling "
 "extra attention to featured content or information."
 msgstr ""
-"これは、シンプルなヒーローユニットで、お勧めのコンテンツや情報に特別な注意を"
-"喚起するためのシンプルなジャンボトロンスタイルのコンポーネントです。"
+"これは、お勧めのコンテンツや情報に特別な注意を喚起するためのシンプルなヒー"
+"ローユニット (hero-unit)、シンプルなジャンボトロンスタイルのコンポーネントで"
+"す。"
 
 msgid "This is focused..."
 msgstr "フォーカスが当たっています。"
@@ -2096,9 +2189,9 @@ msgid ""
 "primary btn-xs\"><span class=\"fa fa-code\"></span></a> button in the top "
 "right of that section."
 msgstr ""
-"ソースコードを表示するには、セクションの上にカーソルを移動して、セクションの"
-"右上の <a class=\"btn btn-primary btn-xs\"><span class=\"fa fa-code\"></"
-"span></a> ボタンをクリックします。"
+"ソースコードを表示するには、各セクションの上にカーソルを移動して、そのセク"
+"ションの右上にある <a class=\"btn btn-primary btn-xs\"><span class=\"fa fa-"
+"code\"></span></a> ボタンをクリックします。"
 
 msgid "Tooltips"
 msgstr "ツールチップ"
@@ -2127,9 +2220,9 @@ msgid ""
 "a file. The size of your script should not exceed 16 Kb."
 msgstr ""
 "カスタムスクリプトのフィールドにスクリプトを直接入力してください。お使いのブ"
-"ラウザーが HTML5 File API をサポートしている場合には、ファイルからのスクリプ"
-"トの読み込みを選択することができます。スクリプトのサイズは、16 Kb 以下にする"
-"必要があります。"
+"ラウザーが HTML5 File API をサポートしている場合には、ファイルからスクリプト"
+"を読み込ませることができます。スクリプトのサイズは、16 Kb 以下にする必要があ"
+"ります。"
 
 msgid "Typography"
 msgstr "タイポグラフィー"
@@ -2247,6 +2340,9 @@ msgstr "Floating IP アドレスの割り当てを解除できません。"
 msgid "Unable to edit instance metadata."
 msgstr "インスタンスのメタデータを編集できません。"
 
+msgid "Unable to edit snapshot metadata."
+msgstr "スナップショットのメタデータを編集できません。"
+
 msgid "Unable to edit the aggregate extra specs."
 msgstr "アグリゲートの追加スペックを編集できません。"
 
@@ -2268,11 +2364,24 @@ msgstr "ロールを編集できません。"
 msgid "Unable to edit the user."
 msgstr "ユーザーを編集できません。"
 
+msgid "Unable to edit volume metadata."
+msgstr "ボリュームのメタデータを編集できません。"
+
+msgid "Unable to edit volume type metadata."
+msgstr "ボリューム種別メタデータを編集できません。"
+
+msgid "Unable to fetch the groups."
+msgstr "グループの一覧を取得できません"
+
 msgid "Unable to fetch the service catalog."
 msgstr "サービスカタログを取得できません。"
 
 msgid "Unable to fetch the services."
 msgstr "サービスの一覧を取得できません"
+
+#, python-format
+msgid "Unable to generate \"%s\". Please try again."
+msgstr "\"%s\" を生成できませんでした。もう一度試してください。"
 
 msgid "Unable to get details of the object."
 msgstr "オブジェクトの詳細を取得できません。"
@@ -2305,17 +2414,20 @@ msgstr "ID %(id)s のサーバーをハードリブートできません。"
 msgid "Unable to import the keypair."
 msgstr "キーペアをインポートできません。"
 
+msgid "Unable to load the server actions."
+msgstr "サーバーのアクションをロードできません。"
+
 msgid "Unable to load the server console info."
-msgstr "サーバーのコンソール情報を取得できません。"
+msgstr "サーバーのコンソール情報をロードできません。"
 
 msgid "Unable to load the server console log."
-msgstr "サーバーのコンソールログを取得できません。"
+msgstr "サーバーのコンソールログをロードできません。"
 
 msgid "Unable to load the server security groups."
-msgstr "サーバーのセキュリティーグループを取得できません。"
+msgstr "サーバーのセキュリティーグループをロードできません。"
 
 msgid "Unable to load the server volumes."
-msgstr "サーバーのボリューム情報を取得できません。"
+msgstr "サーバーのボリューム情報をロードできません。"
 
 #, python-format
 msgid "Unable to pause the server with id: %(id)s"
@@ -2344,7 +2456,7 @@ msgid "Unable to retrieve settings."
 msgstr "設定を取得できません。"
 
 msgid "Unable to retrieve the Absolute Limits."
-msgstr "絶対上限を取得できません。"
+msgstr "絶対制限を取得できません。"
 
 msgid "Unable to retrieve the QoS Specs."
 msgstr "QoS スペック一覧を取得できません。"
@@ -2377,7 +2489,7 @@ msgid "Unable to retrieve the domains."
 msgstr "ドメイン一覧を取得できません。"
 
 msgid "Unable to retrieve the editable quotas."
-msgstr "変更可能なクォータを取得できません。"
+msgstr "編集可能なクォータを取得できません。"
 
 msgid "Unable to retrieve the extensions."
 msgstr "拡張機能一覧を取得できません。"
@@ -2442,6 +2554,9 @@ msgstr "セキュリティーグループの一覧を取得できません。"
 msgid "Unable to retrieve the server."
 msgstr "サーバーを取得できません。"
 
+msgid "Unable to retrieve the snapshot metadata."
+msgstr "スナップショットのメタデータを取得できません。"
+
 msgid "Unable to retrieve the subnets."
 msgstr "サブネットを取得できません。"
 
@@ -2451,8 +2566,14 @@ msgstr "ユーザーを取得できません。"
 msgid "Unable to retrieve the users."
 msgstr "ユーザーを取得できません。"
 
+msgid "Unable to retrieve the volume metadata."
+msgstr "ボリュームのメタデータを取得できません。"
+
 msgid "Unable to retrieve the volume snapshots."
 msgstr "ボリュームスナップショットの一覧を取得できません。"
+
+msgid "Unable to retrieve the volume type metadata."
+msgstr "ボリューム種別メタデータを取得できません。"
 
 msgid "Unable to retrieve the volume type."
 msgstr "ボリューム種別を取得できません。"
@@ -2537,6 +2658,15 @@ msgstr "インスタンスのメタデータの更新"
 msgid "Update Metadata"
 msgstr "メタデータの更新"
 
+msgid "Update Volume Metadata"
+msgstr "ボリュームのメタデータの更新"
+
+msgid "Update Volume Snapshot Metadata"
+msgstr "ボリュームスナップショットのメタデータの更新"
+
+msgid "Update Volume Type Metadata"
+msgstr "ボリューム種別メタデータの更新"
+
 msgid "Updated"
 msgstr "更新時刻"
 
@@ -2551,6 +2681,9 @@ msgstr "{$ ctrl.model.container.name $} へのファイルのアップロード"
 
 msgid "Uploading"
 msgstr "アップロード中"
+
+msgid "Uploading the image from a local file or from a specified URL."
+msgstr "指定の URL またはローカルファイルからイメージをアップロードします。"
 
 msgid "Url"
 msgstr "URL"
@@ -2667,7 +2800,7 @@ msgid "Warning Anchor"
 msgstr "警告のアンカー"
 
 msgid "Warning Button"
-msgstr "警告のボタン"
+msgstr "警告ボタン"
 
 msgid "Warning!"
 msgstr "警告！"
@@ -2787,6 +2920,10 @@ msgid "message"
 msgid_plural "messages"
 msgstr[0] "メッセージ"
 
+#, python-format
+msgid "resource load failed: %s"
+msgstr "リソースをロードできませんでした: %s"
+
 msgid "snapshot"
 msgstr "スナップショット"
 
@@ -2806,8 +2943,8 @@ msgid ""
 "{$ ctrl.model.counted.files $} files in\n"
 "      {$ ctrl.model.counted.folders $} folders."
 msgstr ""
-"{$ ctrl.model.counted.files $} 個のファイルが\n"
-"      {$ ctrl.model.counted.folders $} 個のフォルダー内にあります。"
+"{$ ctrl.model.counted.folders $} 個のフォルダー内の\n"
+"      {$ ctrl.model.counted.files $} 個のファイル"
 
 msgid "{$ row['provider:network_type'] $}"
 msgstr "{$ row['provider:network_type'] $}"

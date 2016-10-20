@@ -143,9 +143,9 @@
         isServer: false,
         singleton: true,
         options: [
-          {label: gettext('Public'), key: gettext('Public')},
-          {label: gettext('Private'), key: gettext('Private')},
-          {label: gettext('Shared With Project'), key: gettext('Shared With Project')},
+          {label: gettext('Public'), key: 'public'},
+          {label: gettext('Private'), key: 'private'},
+          {label: gettext('Shared With Project'), key: 'shared'},
           {label: gettext('Unknown'), key: 'unknown'}
         ]
       })
@@ -171,6 +171,7 @@
           {label: gettext('Docker'), key: 'docker'},
           {label: gettext('ISO'), key: 'iso'},
           {label: gettext('OVA'), key: 'ova'},
+          {label: gettext('PLOOP'), key: 'ploop'},
           {label: gettext('QCOW2'), key: 'qcow2'},
           {label: gettext('Raw'), key: 'raw'},
           {label: gettext('VDI'), key: 'vdi'},
@@ -213,6 +214,7 @@
     return {
       iso: gettext('ISO - Optical Disk Image'),
       ova: gettext('OVA - Open Virtual Appliance'),
+      ploop: gettext('PLOOP - Virtuozzo/Parallels Loopback Disk'),
       qcow2: gettext('QCOW2 - QEMU Emulator'),
       raw: gettext('Raw'),
       vdi: gettext('VDI - Virtual Disk Image'),
